@@ -82,6 +82,10 @@ public class PageSettingsServiceImpl implements IPageSettingsService
         pages.put("map-tencent", keys(MapConfigKeys.TENCENT_KEY));
         pages.put("map-tianditu", keys(MapConfigKeys.TIANDITU_KEY));
         pages.put("channel-mini", prefixes("channel.mini."));
+        pages.put("decorate-home", prefixes("decorate.home."));
+        pages.put("decorate-profile", prefixes("decorate.profile."));
+        pages.put("decorate-category", prefixes("decorate.category."));
+        pages.put("decorate-tabbar", prefixes("decorate.tabbar."));
         PAGE_CONFIG_KEYS = Collections.unmodifiableMap(pages);
     }
 
