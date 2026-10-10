@@ -107,7 +107,7 @@
     </el-form>
 
     <el-button
-      v-hasPerm="['mall:content:add']"
+      v-hasPerm="['settings:content:add']"
       type="primary"
       icon="Plus"
       class="mb8"
@@ -237,7 +237,7 @@
       >
         <template #default="{ row }">
           <el-button
-            v-hasPerm="['mall:content:edit']"
+            v-hasPerm="['settings:content:edit']"
             link
             type="primary"
             @click="openDialog(row)"
@@ -245,7 +245,7 @@
             编辑
           </el-button>
           <el-button
-            v-hasPerm="['mall:content:edit']"
+            v-hasPerm="['settings:content:edit']"
             link
             :type="row.status === '1' ? 'warning' : 'success'"
             @click="toggleStatus(row)"
@@ -253,7 +253,7 @@
             {{ row.status === '1' ? inactiveLabel : activeLabel }}
           </el-button>
           <el-button
-            v-hasPerm="['mall:content:delete']"
+            v-hasPerm="['settings:content:delete']"
             link
             type="danger"
             @click="removeRow(row)"
