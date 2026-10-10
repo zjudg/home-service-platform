@@ -2,8 +2,8 @@
   <view class="page safe-bottom">
     <view v-if="!authStore.isLoggedIn" class="guest-panel surface">
       <view class="guest-icon">?</view>
-      <text class="guest-title">登录后管理个人信息</text>
-      <text class="guest-desc">登录后可以查看账户资料和使用更多功能</text>
+      <text class="guest-title">{{ configStore.profile.welcomeText || '登录后管理个人信息' }}</text>
+      <text v-if="configStore.profile.serviceTitle" class="guest-desc">{{ configStore.profile.serviceTitle }}</text>
       <button class="primary-button guest-button" @click="goLogin">去登录</button>
     </view>
     <view v-else class="profile surface">
@@ -13,7 +13,7 @@
         <text class="profile-meta">{{ authStore.user?.email || '已登录用户' }}</text>
       </view>
     </view>
-    <view v-if="authStore.isLoggedIn" class="section-title user-title">账户信息</view>
+    <view v-if="authStore.isLoggedIn" class="section-title user-title">{{ configStore.profile.pageTitle || '账户信息' }}</view>
     <view v-if="authStore.isLoggedIn" class="info-list surface">
       <view class="info-row"><text>用户名</text><text class="info-value">{{ authStore.user?.userName || '-' }}</text></view>
       <view class="info-row"><text>昵称</text><text class="info-value">{{ authStore.user?.nickName || '-' }}</text></view>
@@ -21,16 +21,25 @@
       <view class="info-row"><text>邮箱</text><text class="info-value">{{ authStore.user?.email || '-' }}</text></view>
     </view>
     <button v-if="authStore.isLoggedIn" class="primary-button logout-button" @click="logout">退出登录</button>
+    <AppTabBar current-key="profile" />
   </view>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import AppTabBar from '@/components/AppTabBar.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useConfigStore } from '@/stores/config'
 
 const authStore = useAuthStore()
+const configStore = useConfigStore()
 const displayName = computed(() => authStore.user?.nickName || authStore.user?.userName || '用户')
 const initials = computed(() => displayName.value.slice(0, 1).toUpperCase())
+
+onMounted(async () => {
+  await configStore.load().catch(() => {})
+  uni.setNavigationBarTitle({ title: configStore.profile.pageTitle || configStore.navigation.items.find(item => item.key === 'profile')?.name || configStore.appTitle })
+})
 
 function goLogin () {
   uni.navigateTo({ url: '/pages/login/index' })

@@ -11,6 +11,9 @@ export function setUnauthorizedHandler (handler) {
 
 function buildUrl (url) {
   if (/^https?:\/\//.test(url)) return url
+  if (url.startsWith('/api/')) {
+    return baseUrl.startsWith('http') ? `${baseUrl.replace(/\/$/, '')}${url}` : url
+  }
   return `${baseUrl.replace(/\/$/, '')}/${url.replace(/^\//, '')}`
 }
 
