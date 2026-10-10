@@ -14,7 +14,12 @@
         :src="assetUrl(item.key === currentKey ? item.activeIcon : item.icon)"
         mode="aspectFit"
       />
-      <text v-else class="tab-fallback">{{ item.name?.slice(0, 1) || '·' }}</text>
+      <uni-icons
+        v-else
+        :type="fallbackIcon(item.key)"
+        size="24"
+        :color="item.key === currentKey ? activeStyle.color : inactiveStyle.color"
+      />
       <text class="tab-name">{{ item.name }}</text>
     </view>
   </view>
@@ -22,6 +27,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'
 import { useConfigStore } from '@/stores/config'
 import { assetUrl } from '@/utils/assets'
 
@@ -44,6 +50,18 @@ const routeMap = {
   user: '/pages/user/index'
 }
 
+const fallbackIcons = {
+  home: 'home',
+  category: 'list',
+  cart: 'cart',
+  profile: 'person',
+  user: 'person'
+}
+
+function fallbackIcon (key) {
+  return fallbackIcons[key] || 'grid'
+}
+
 function openItem (item) {
   const path = routeMap[item.key] || item.path || item.link
   if (!path) return
@@ -60,6 +78,5 @@ function openItem (item) {
 .app-tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20; display: flex; height: calc(112rpx + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1rpx solid; box-shadow: 0 -8rpx 28rpx rgba(31, 50, 82, .06); }
 .tab-item { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: center; justify-content: center; padding: 12rpx 8rpx 8rpx; font-size: 22rpx; }
 .tab-icon { width: 46rpx; height: 46rpx; margin-bottom: 6rpx; }
-.tab-fallback { display: flex; align-items: center; justify-content: center; width: 46rpx; height: 46rpx; margin-bottom: 6rpx; border-radius: 50%; background: currentColor; color: #fff; font-size: 25rpx; }
 .tab-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
