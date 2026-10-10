@@ -24,14 +24,10 @@ public class MiniConfigServiceImpl implements IMiniConfigService
     public MiniBootstrapConfig bootstrap()
     {
         MiniBootstrapConfig result = new MiniBootstrapConfig();
+        // Keep bootstrap limited to startup identity. Pages load their own
+        // configuration through the dedicated endpoints below.
         result.setSite(site());
         result.setMini(mini());
-        result.setNavigation(navigation());
-        result.setHome(home());
-        result.setCategory(category());
-        result.setProfile(profile());
-        result.setPaymentMethods(paymentMethods());
-        result.setUploadPolicy(uploadPolicy());
         return result;
     }
 

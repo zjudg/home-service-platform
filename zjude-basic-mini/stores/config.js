@@ -1,6 +1,12 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { getMiniBootstrap } from '@/api/mini'
+import {
+  getMiniCategory,
+  getMiniHome,
+  getMiniNavigation,
+  getMiniProfile,
+  getMiniSite
+} from '@/api/mini'
 
 function payload (response) {
   return response?.data || response || {}
@@ -23,12 +29,21 @@ export const useConfigStore = defineStore('config', () => {
     loading.value = true
     error.value = ''
     try {
-      const bootstrap = payload(await getMiniBootstrap())
-      site.value = bootstrap.site || {}
-      navigation.value = normalizeNavigation(bootstrap.navigation || {})
-      home.value = normalizePage(bootstrap.home || {})
-      category.value = bootstrap.category || {}
-      profile.value = normalizePage(bootstrap.profile || {})
+      const responses = await Promise.allSettled([
+        getMiniSite(),
+        getMiniNavigation(),
+        getMiniHome(),
+        getMiniCategory(),
+        getMiniProfile()
+      ])
+      const [siteResponse, navigationResponse, homeResponse, categoryResponse, profileResponse] = responses
+      site.value = valueOr(siteResponse, site.value)
+      navigation.value = normalizeNavigation(valueOr(navigationResponse, navigation.value))
+      home.value = normalizePage(valueOr(homeResponse, home.value))
+      category.value = valueOr(categoryResponse, category.value)
+      profile.value = normalizePage(valueOr(profileResponse, profile.value))
+      const failed = responses.find(response => response.status === 'rejected')
+      if (failed) error.value = failed.reason?.message || '部分页面配置加载失败'
       if (!navigation.value.items.length) {
         throw new Error('后台暂未配置底部导航')
       }
@@ -41,10 +56,18 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
+  function valueOr (response, fallback) {
+    return response?.status === 'fulfilled' ? payload(response.value) : fallback
+  }
+
   function normalizeNavigation (value) {
     return {
       ...value,
-      items: Array.isArray(value.items) ? value.items.filter(item => String(item.isVisible ?? '1') !== '0') : []
+      items: Array.isArray(value.items)
+        ? value.items
+            .filter(item => String(item.isVisible ?? '1') !== '0')
+            .map(item => ({ ...item, key: item.key || item.page, name: item.name || item.label }))
+        : []
     }
   }
 

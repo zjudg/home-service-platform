@@ -87,7 +87,7 @@ function openNavItem (item) {
     uni.navigateTo({ url: path.startsWith('/') ? path : `/${path}` })
     return
   }
-  uni.showToast({ title: item.name || '暂未配置', icon: 'none' })
+  uni.showToast({ title: item.name || item.label || '暂未配置', icon: 'none' })
 }
 
 function goLogin () {
