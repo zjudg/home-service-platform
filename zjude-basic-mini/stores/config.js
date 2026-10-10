@@ -28,18 +28,21 @@ export const useConfigStore = defineStore('config', () => {
     loading.value = true
     error.value = ''
     try {
-      const [siteResponse, navigationResponse, homeResponse, categoryResponse, profileResponse] = await Promise.all([
+      const responses = await Promise.allSettled([
         getMiniSite(),
         getMiniNavigation(),
         getMiniHome(),
         getMiniCategory(),
         getMiniProfile()
       ])
-      site.value = payload(siteResponse)
-      navigation.value = normalizeNavigation(payload(navigationResponse))
-      home.value = normalizePage(payload(homeResponse))
-      category.value = payload(categoryResponse)
-      profile.value = normalizePage(payload(profileResponse))
+      const [siteResponse, navigationResponse, homeResponse, categoryResponse, profileResponse] = responses
+      site.value = valueOr(siteResponse, site.value)
+      navigation.value = normalizeNavigation(valueOr(navigationResponse, navigation.value))
+      home.value = normalizePage(valueOr(homeResponse, home.value))
+      category.value = valueOr(categoryResponse, category.value)
+      profile.value = normalizePage(valueOr(profileResponse, profile.value))
+      const failed = responses.find(response => response.status === 'rejected')
+      if (failed) error.value = failed.reason?.message || '部分页面配置加载失败'
       loaded.value = true
     } catch (requestError) {
       error.value = requestError.message || '页面配置加载失败'
@@ -47,6 +50,10 @@ export const useConfigStore = defineStore('config', () => {
     } finally {
       loading.value = false
     }
+  }
+
+  function valueOr (response, fallback) {
+    return response?.status === 'fulfilled' ? payload(response.value) : fallback
   }
 
   function normalizeNavigation (value) {

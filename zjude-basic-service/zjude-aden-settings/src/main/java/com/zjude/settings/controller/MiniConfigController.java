@@ -1,6 +1,7 @@
 package com.zjude.settings.controller;
 
 import com.zjude.common.core.domain.AjaxResult;
+import com.zjude.common.annotation.Anonymous;
 import com.zjude.settings.service.IMiniConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/mini/config")
 @Tag(name = "小程序配置", description = "小程序启动所需的公开商城配置")
 @SecurityRequirements
+@Anonymous
 public class MiniConfigController
 {
     @Resource
