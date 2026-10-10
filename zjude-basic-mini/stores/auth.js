@@ -61,7 +61,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   setUnauthorizedHandler(() => {
     clearSession()
-    uni.reLaunch({ url: '/pages/login/index' })
   })
 
   return { token, user, loading, isLoggedIn, signIn, loadUser, signOut, restore, clearSession }
