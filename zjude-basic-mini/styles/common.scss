@@ -1,0 +1,15 @@
+$app-primary: #2f6fed;
+$app-primary-dark: #1f56c5;
+$app-bg: #f5f7fb;
+$app-surface: #ffffff;
+$app-text: #172033;
+$app-muted: #7b8798;
+$app-border: #e8edf5;
+
+.page { min-height: 100vh; padding: 32rpx; background: $app-bg; }
+.safe-bottom { padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); }
+.surface { background: $app-surface; border: 1rpx solid $app-border; border-radius: 20rpx; }
+.section-title { color: $app-text; font-size: 32rpx; font-weight: 700; }
+.muted { color: $app-muted; }
+.primary-button { background: $app-primary; color: #fff; font-size: 30rpx; font-weight: 600; line-height: 92rpx; border-radius: 16rpx; }
+.primary-button:active { background: $app-primary-dark; }
