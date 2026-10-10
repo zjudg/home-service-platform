@@ -1,5 +1,13 @@
 <template>
-  <view class="page home-page safe-bottom">
+  <view v-if="!configStore.navigationReady" class="page startup-page safe-bottom">
+    <view class="startup-panel surface">
+      <view class="startup-spinner" />
+      <text class="startup-title">{{ configStore.loading ? '正在加载首页配置' : '首页配置加载失败' }}</text>
+      <text class="startup-message">{{ configStore.loading ? '正在获取后台导航，请稍候' : configStore.error }}</text>
+      <button v-if="!configStore.loading" class="startup-retry" @click="reloadConfig">重新加载</button>
+    </view>
+  </view>
+  <view v-else class="page home-page safe-bottom">
     <view class="hero surface" :style="heroStyle">
       <view>
         <text class="eyebrow">{{ configStore.appTitle }}</text>
@@ -60,6 +68,11 @@ onMounted(async () => {
   uni.setNavigationBarTitle({ title: configStore.appTitle })
 })
 
+async function reloadConfig () {
+  configStore.loaded = false
+  await configStore.load().catch(() => {})
+}
+
 function openNavItem (item) {
   const path = item.modulePath || item.link || item.customLink
   if (path) {
@@ -92,4 +105,11 @@ function goLogin () {
 .status-value { color: $app-text; }
 .status-value--ok { color: #23a26d; }
 .login-entry { margin-top: 36rpx; color: $app-primary; background: transparent; border: 1rpx solid #c9d9f7; font-size: 28rpx; line-height: 82rpx; border-radius: 16rpx; }
+.startup-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40rpx; }
+.startup-panel { display: flex; width: 100%; flex-direction: column; align-items: center; padding: 68rpx 36rpx; text-align: center; }
+.startup-spinner { width: 54rpx; height: 54rpx; border: 6rpx solid #dce7fb; border-top-color: $app-primary; border-radius: 50%; animation: startup-spin 1s linear infinite; }
+.startup-title { margin-top: 28rpx; color: $app-text; font-size: 32rpx; font-weight: 700; }
+.startup-message { margin-top: 14rpx; color: $app-muted; font-size: 25rpx; }
+.startup-retry { margin-top: 34rpx; padding: 0 46rpx; color: #fff; background: $app-primary; font-size: 27rpx; line-height: 76rpx; border-radius: 14rpx; }
+@keyframes startup-spin { to { transform: rotate(360deg); } }
 </style>

@@ -24,10 +24,14 @@ public class MiniConfigServiceImpl implements IMiniConfigService
     public MiniBootstrapConfig bootstrap()
     {
         MiniBootstrapConfig result = new MiniBootstrapConfig();
-        // Bootstrap is intentionally lightweight. Page-specific data is loaded
-        // from /site, /navigation, /home, /category, /profile and /upload/policy.
         result.setSite(site());
         result.setMini(mini());
+        result.setNavigation(navigation());
+        result.setHome(home());
+        result.setCategory(category());
+        result.setProfile(profile());
+        result.setPaymentMethods(paymentMethods());
+        result.setUploadPolicy(uploadPolicy());
         return result;
     }
 
