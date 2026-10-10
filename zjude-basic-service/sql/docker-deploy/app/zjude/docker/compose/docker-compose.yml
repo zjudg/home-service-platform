@@ -1,0 +1,54 @@
+version: '3.8'
+networks:
+  zjudeadennetwork:
+    driver: overlay
+    external: true
+services:
+  prod-api:
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 1G
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 2
+    image: registry.cn-hangzhou.aliyuncs.com/zjude_tech/zjude-aden-admin:v20260709_f1
+    networks:
+      - zjudeadennetwork
+    volumes:
+      - /app/zjude/docker/logs:/log
+      - /app/zjude/file/upload:/files
+      - /etc/localtime:/etc/localtime
+  nginx:
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 2
+    image: registry.cn-hangzhou.aliyuncs.com/zjude_tech/zjude-aden-nginx:v20260709_f1
+    networks:
+      - zjudeadennetwork
+    ports:
+      - 80:80
+    volumes:
+      - /app/zjude/docker/logs:/data/log/nginx
+  redis:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 2
+    image: redis:7.0.8
+    command: redis-server /etc/redis/redis.conf
+    networks:
+      - zjudeadennetwork
+    volumes:
+      - /app/zjude/docker/redis/redis.conf:/etc/redis/redis.conf
+      - /app/zjude/docker/redis/data:/data
