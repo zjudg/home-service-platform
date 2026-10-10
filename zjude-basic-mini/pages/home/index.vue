@@ -1,11 +1,19 @@
 <template>
   <view v-if="!configStore.navigationReady" class="page startup-page safe-bottom">
+    <view class="startup-brand">
+      <image class="startup-logo" src="/static/logo.png" mode="aspectFit" />
+      <text class="startup-brand-name">{{ appStore.appName }}</text>
+    </view>
     <view class="startup-panel surface">
-      <view class="startup-spinner" />
-      <text class="startup-title">{{ configStore.loading ? '正在加载首页配置' : '首页配置加载失败' }}</text>
-      <text class="startup-message">{{ configStore.loading ? '正在获取后台导航，请稍候' : configStore.error }}</text>
+      <view class="startup-state" :class="{ 'startup-state--error': !configStore.loading }">
+        <uni-icons :type="configStore.loading ? 'spinner-cycle' : 'cloud-download'" size="32" :color="configStore.loading ? '#2f6fed' : '#e38b3f'" />
+      </view>
+      <text class="startup-kicker">{{ configStore.loading ? 'INITIALIZING' : 'SERVICE UNAVAILABLE' }}</text>
+      <text class="startup-title">{{ configStore.loading ? '正在准备首页' : '首页配置加载失败' }}</text>
+      <text class="startup-message">{{ configStore.loading ? '正在同步后台导航和页面配置' : '请确认后端服务已启动，再重新加载' }}</text>
       <button v-if="!configStore.loading" class="startup-retry" @click="reloadConfig">重新加载</button>
     </view>
+    <text class="startup-foot">{{ configStore.loading ? '首次打开需要同步后台配置' : '配置来自后台管理系统' }}</text>
   </view>
   <view v-else class="page home-page safe-bottom">
     <view class="hero surface" :style="heroStyle">
@@ -105,11 +113,16 @@ function goLogin () {
 .status-value { color: $app-text; }
 .status-value--ok { color: #23a26d; }
 .login-entry { margin-top: 36rpx; color: $app-primary; background: transparent; border: 1rpx solid #c9d9f7; font-size: 28rpx; line-height: 82rpx; border-radius: 16rpx; }
-.startup-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40rpx; }
-.startup-panel { display: flex; width: 100%; flex-direction: column; align-items: center; padding: 68rpx 36rpx; text-align: center; }
-.startup-spinner { width: 54rpx; height: 54rpx; border: 6rpx solid #dce7fb; border-top-color: $app-primary; border-radius: 50%; animation: startup-spin 1s linear infinite; }
-.startup-title { margin-top: 28rpx; color: $app-text; font-size: 32rpx; font-weight: 700; }
-.startup-message { margin-top: 14rpx; color: $app-muted; font-size: 25rpx; }
-.startup-retry { margin-top: 34rpx; padding: 0 46rpx; color: #fff; background: $app-primary; font-size: 27rpx; line-height: 76rpx; border-radius: 14rpx; }
-@keyframes startup-spin { to { transform: rotate(360deg); } }
+.startup-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 80rpx 32rpx 44rpx; background: linear-gradient(180deg, #edf4ff 0%, #f5f7fb 42%, #f5f7fb 100%); }
+.startup-brand { display: flex; align-items: center; margin-bottom: 56rpx; }
+.startup-logo { width: 64rpx; height: 64rpx; padding: 10rpx; border-radius: 18rpx; background: #fff; box-shadow: 0 12rpx 28rpx rgba(47, 111, 237, .16); }
+.startup-brand-name { margin-left: 18rpx; color: $app-text; font-size: 30rpx; font-weight: 700; letter-spacing: 1rpx; }
+.startup-panel { display: flex; width: 100%; max-width: 620rpx; flex-direction: column; align-items: center; padding: 58rpx 38rpx 52rpx; text-align: center; box-shadow: 0 18rpx 48rpx rgba(42, 63, 97, .08); }
+.startup-state { display: flex; align-items: center; justify-content: center; width: 112rpx; height: 112rpx; border-radius: 36rpx; background: #eaf2ff; }
+.startup-state--error { background: #fff3e8; }
+.startup-kicker { margin-top: 30rpx; color: #93a1b4; font-size: 20rpx; font-weight: 700; letter-spacing: 3rpx; }
+.startup-title { margin-top: 14rpx; color: $app-text; font-size: 34rpx; font-weight: 700; }
+.startup-message { max-width: 480rpx; margin-top: 16rpx; color: $app-muted; font-size: 26rpx; line-height: 1.6; }
+.startup-retry { width: 280rpx; margin-top: 34rpx; color: #fff; background: $app-primary; box-shadow: 0 10rpx 20rpx rgba(47, 111, 237, .2); font-size: 27rpx; line-height: 78rpx; border-radius: 14rpx; }
+.startup-foot { margin-top: 36rpx; color: #a4afbf; font-size: 22rpx; }
 </style>
