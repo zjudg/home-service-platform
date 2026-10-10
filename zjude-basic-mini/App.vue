@@ -1,15 +1,13 @@
 <script setup>
 import { onLaunch } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
-import { useAuthStore } from '@/stores/auth'
 import { useConfigStore } from '@/stores/config'
 
 const appStore = useAppStore()
-const authStore = useAuthStore()
 const configStore = useConfigStore()
 
 onLaunch(async () => {
-  await Promise.allSettled([authStore.restore(), configStore.load()])
+  await configStore.load().catch(() => {})
   appStore.markReady()
 })
 </script>
