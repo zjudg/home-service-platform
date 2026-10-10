@@ -1,9 +1,9 @@
 {
 	"pages": [
-		{ "path": "pages/login/index", "style": { "navigationStyle": "custom" } },
 		{ "path": "pages/home/index", "style": { "navigationBarTitleText": "首页" } },
 		{ "path": "pages/user/index", "style": { "navigationBarTitleText": "个人中心" } },
-		{ "path": "pages/settings/index", "style": { "navigationBarTitleText": "设置" } }
+		{ "path": "pages/settings/index", "style": { "navigationBarTitleText": "设置" } },
+		{ "path": "pages/login/index", "style": { "navigationStyle": "custom" } }
 	],
 	"tabBar": {
 		"color": "#8c98a8",

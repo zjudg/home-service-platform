@@ -3,8 +3,8 @@
     <view class="hero surface">
       <view>
         <text class="eyebrow">Zjude Aden</text>
-        <text class="hero-title">你好，{{ displayName }}</text>
-        <text class="hero-subtitle">欢迎回到你的移动工作台</text>
+        <text class="hero-title">{{ authStore.isLoggedIn ? `你好，${displayName}` : '欢迎使用' }}</text>
+        <text class="hero-subtitle">{{ authStore.isLoggedIn ? '欢迎回到你的移动工作台' : '这是一个无需登录即可访问的基础工作台' }}</text>
       </view>
       <image class="hero-logo" src="/static/logo.png" mode="aspectFit" />
     </view>
@@ -25,9 +25,10 @@
     </view>
     <view class="status-card surface">
       <view class="status-row"><text>当前环境</text><text class="status-value">{{ appStore.platform }}</text></view>
-      <view class="status-row"><text>登录状态</text><text class="status-value status-value--ok">已登录</text></view>
+      <view class="status-row"><text>登录状态</text><text class="status-value" :class="{ 'status-value--ok': authStore.isLoggedIn }">{{ authStore.isLoggedIn ? '已登录' : '游客访问' }}</text></view>
       <view class="status-row"><text>框架版本</text><text class="status-value">Vue 3 + uni-app</text></view>
     </view>
+    <button v-if="!authStore.isLoggedIn" class="login-entry" @click="goLogin">登录后使用账户功能</button>
   </view>
 </template>
 
@@ -50,6 +51,10 @@ const shortcuts = [
 function showComingSoon (title) {
   uni.showToast({ title: `${title}即将开放`, icon: 'none' })
 }
+
+function goLogin () {
+  uni.navigateTo({ url: '/pages/login/index' })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -68,4 +73,5 @@ function showComingSoon (title) {
 .status-row:last-child { border-bottom: 0; }
 .status-value { color: $app-text; }
 .status-value--ok { color: #23a26d; }
+.login-entry { margin-top: 36rpx; color: $app-primary; background: transparent; border: 1rpx solid #c9d9f7; font-size: 28rpx; line-height: 82rpx; border-radius: 16rpx; }
 </style>

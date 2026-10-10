@@ -8,6 +8,8 @@ Zjude Aden 的 uni-app Vue 3 多端基础客户端，使用 JavaScript 和 `<scr
 - 微信小程序
 - Android / iOS App（配置预留）
 
+应用首页为公开入口，无需登录即可访问。登录只用于账户信息等需要身份的功能，未登录用户仍可正常浏览基础首页和设置页面。
+
 ## 开发
 
 ```bash
