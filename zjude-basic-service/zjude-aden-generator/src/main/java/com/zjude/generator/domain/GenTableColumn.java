@@ -5,7 +5,7 @@ import com.zjude.common.core.domain.BaseEntity;
 import com.zjude.common.utils.StringUtils;
 
 /**
- * 代码生成业务字段表 gen_table_column
+ * 代码生成业务字段表 zjudg_gen_table_column
  * 
  * @author ruoyi
  */

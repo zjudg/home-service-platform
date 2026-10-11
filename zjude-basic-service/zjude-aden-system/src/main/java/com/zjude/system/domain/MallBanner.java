@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
- * 轮播图表 mall_banner
+ * 轮播图表 zjudg_mall_banner
  *
  * @author bai
  */

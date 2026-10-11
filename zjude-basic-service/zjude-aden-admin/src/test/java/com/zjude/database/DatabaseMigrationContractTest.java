@@ -18,8 +18,8 @@ class DatabaseMigrationContractTest
     private static final Pattern CREATE_TABLE = Pattern.compile(
             "(?im)^\\s*CREATE\\s+TABLE\\s+`([^`]+)`");
     private static final Set<String> FRAMEWORK_TABLES = Set.of(
-            "gen_table",
-            "gen_table_column",
+            "zjudg_gen_table",
+            "zjudg_gen_table_column",
             "sys_config",
             "sys_dept",
             "sys_dict_data",

@@ -9,7 +9,7 @@ import com.zjude.common.core.domain.BaseEntity;
 import com.zjude.common.utils.StringUtils;
 
 /**
- * 业务表 gen_table
+ * 业务表 zjudg_gen_table
  * 
  * @author ruoyi
  */

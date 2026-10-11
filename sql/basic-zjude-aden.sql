@@ -18,10 +18,10 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for channel_mini_upload_record
+-- Table structure for zjudg_channel_mini_upload_record
 -- ----------------------------
-DROP TABLE IF EXISTS `channel_mini_upload_record`;
-CREATE TABLE `channel_mini_upload_record`  (
+DROP TABLE IF EXISTS `zjudg_channel_mini_upload_record`;
+CREATE TABLE `zjudg_channel_mini_upload_record`  (
   `upload_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '上传记录ID',
   `version` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '版本号',
   `project_remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目备注',
@@ -36,10 +36,10 @@ CREATE TABLE `channel_mini_upload_record`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '小程序代码上传记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for channel_wechat_menu
+-- Table structure for zjudg_channel_wechat_menu
 -- ----------------------------
-DROP TABLE IF EXISTS `channel_wechat_menu`;
-CREATE TABLE `channel_wechat_menu`  (
+DROP TABLE IF EXISTS `zjudg_channel_wechat_menu`;
+CREATE TABLE `zjudg_channel_wechat_menu`  (
   `menu_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单ID',
   `parent_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '父菜单ID',
   `menu_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单名称',
@@ -57,10 +57,10 @@ CREATE TABLE `channel_wechat_menu`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '微信公众号菜单' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for channel_wechat_reply_rule
+-- Table structure for zjudg_channel_wechat_reply_rule
 -- ----------------------------
-DROP TABLE IF EXISTS `channel_wechat_reply_rule`;
-CREATE TABLE `channel_wechat_reply_rule`  (
+DROP TABLE IF EXISTS `zjudg_channel_wechat_reply_rule`;
+CREATE TABLE `zjudg_channel_wechat_reply_rule`  (
   `reply_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复规则ID',
   `rule_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '规则名称',
   `reply_type` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'TEXT' COMMENT '回复类型',
@@ -78,10 +78,10 @@ CREATE TABLE `channel_wechat_reply_rule`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '微信公众号自动回复规则' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gen_table
+-- Table structure for zjudg_gen_table
 -- ----------------------------
-DROP TABLE IF EXISTS `gen_table`;
-CREATE TABLE `gen_table`  (
+DROP TABLE IF EXISTS `zjudg_gen_table`;
+CREATE TABLE `zjudg_gen_table`  (
   `table_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
   `table_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '表名称',
   `table_comment` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '表描述',
@@ -107,10 +107,10 @@ CREATE TABLE `gen_table`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代码生成业务表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for gen_table_column
+-- Table structure for zjudg_gen_table_column
 -- ----------------------------
-DROP TABLE IF EXISTS `gen_table_column`;
-CREATE TABLE `gen_table_column`  (
+DROP TABLE IF EXISTS `zjudg_gen_table_column`;
+CREATE TABLE `zjudg_gen_table_column`  (
   `column_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
   `table_id` bigint(20) NULL DEFAULT NULL COMMENT '归属表编号',
   `column_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '列名称',
@@ -137,10 +137,10 @@ CREATE TABLE `gen_table_column`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代码生成业务表字段' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for mall_banner
+-- Table structure for zjudg_mall_banner
 -- ----------------------------
-DROP TABLE IF EXISTS `mall_banner`;
-CREATE TABLE `mall_banner`  (
+DROP TABLE IF EXISTS `zjudg_mall_banner`;
+CREATE TABLE `zjudg_mall_banner`  (
   `seq_no` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `banner_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '轮播图ID',
   `banner_title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '轮播图标题',
@@ -165,10 +165,10 @@ CREATE TABLE `mall_banner`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '轮播图表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for mall_content_item
+-- Table structure for zjudg_mall_content_item
 -- ----------------------------
-DROP TABLE IF EXISTS `mall_content_item`;
-CREATE TABLE `mall_content_item`  (
+DROP TABLE IF EXISTS `zjudg_mall_content_item`;
+CREATE TABLE `zjudg_mall_content_item`  (
   `content_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容资源ID',
   `resource_type` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资源类型：AD广告 SLOT广告位 HELP_CAT帮助分类 ARTICLE_CAT文章分类 HELP帮助 ARTICLE文章',
   `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '标题或分类名称',
