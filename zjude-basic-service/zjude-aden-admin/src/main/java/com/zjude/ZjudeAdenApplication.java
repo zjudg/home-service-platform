@@ -1,0 +1,21 @@
+package com.zjude;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+
+/**
+ * 启动程序
+ * 
+ * @author zjude
+ */
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+public class ZjudeAdenApplication
+{
+    public static void main(String[] args)
+    {
+        System.setProperty("spring.devtools.restart.enabled", "false");
+        SpringApplication.run(ZjudeAdenApplication.class, args);
+        System.out.println("Zjude Aden started successfully.");
+    }
+}

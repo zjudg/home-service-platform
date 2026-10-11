@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.MallContentItemMapper">
+  <resultMap id="ContentResult" type="com.zjude.system.domain.MallContentItem">
+    <id property="contentId" column="content_id"/>
+    <result property="resourceType" column="resource_type"/><result property="title" column="title"/>
+    <result property="categoryId" column="category_id"/><result property="slotId" column="slot_id"/>
+    <result property="platform" column="platform"/><result property="image" column="image"/>
+    <result property="linkType" column="link_type"/><result property="link" column="link"/>
+    <result property="intro" column="intro"/><result property="content" column="content"/>
+    <result property="isAnnouncement" column="is_announcement"/><result property="status" column="status"/>
+    <result property="sortNum" column="sort_num"/><result property="imageWidth" column="image_width"/>
+    <result property="imageHeight" column="image_height"/><result property="viewCount" column="view_count"/>
+    <result property="likeCount" column="like_count"/><result property="createBy" column="create_by"/>
+    <result property="createTime" column="create_time"/><result property="updateBy" column="update_by"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+  <sql id="columns">select content_id, resource_type, title, category_id, slot_id, platform, image, link_type, link, intro, content, is_announcement, status, sort_num, image_width, image_height, view_count, like_count, create_by, create_time, update_by, update_time from mall_content_item</sql>
+  <select id="selectContentList" resultMap="ContentResult">
+    <include refid="columns"/><where>
+      <if test="resourceType != null">and resource_type = #{resourceType}</if>
+      <if test="title != null and title != ''">and title like concat('%', #{title}, '%')</if>
+      <if test="categoryId != null and categoryId != ''">and category_id = #{categoryId}</if>
+      <if test="slotId != null and slotId != ''">and slot_id = #{slotId}</if>
+      <if test="platform != null and platform != ''">and platform = #{platform}</if>
+      <if test="isAnnouncement != null and isAnnouncement != ''">and is_announcement = #{isAnnouncement}</if>
+    </where> order by sort_num asc, create_time desc
+  </select>
+  <select id="selectContentById" resultMap="ContentResult"><include refid="columns"/> where content_id = #{contentId}</select>
+  <insert id="insertContent">insert into mall_content_item (content_id,resource_type,title,category_id,slot_id,platform,image,link_type,link,intro,content,is_announcement,status,sort_num,image_width,image_height,create_by,create_time) values (#{contentId},#{resourceType},#{title},#{categoryId},#{slotId},#{platform},#{image},#{linkType},#{link},#{intro},#{content},#{isAnnouncement},#{status},#{sortNum},#{imageWidth},#{imageHeight},#{createBy},sysdate())</insert>
+  <update id="updateContent">update mall_content_item set title=#{title},category_id=#{categoryId},slot_id=#{slotId},platform=#{platform},image=#{image},link_type=#{linkType},link=#{link},intro=#{intro},content=#{content},is_announcement=#{isAnnouncement},status=#{status},sort_num=#{sortNum},image_width=#{imageWidth},image_height=#{imageHeight},update_by=#{updateBy},update_time=sysdate() where content_id=#{contentId}</update>
+  <delete id="deleteContentById">delete from mall_content_item where content_id = #{contentId}</delete>
+</mapper>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="icon" href="/favicon.ico">
+  <title>Zjude 工作台</title>
+  <!--[if lt IE 11]><script>window.location.href='/html/ie.html';</script><![endif]-->
+  <style>
+    html,
+    body,
+    #app {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .chromeframe {
+      margin: 0.2em 0;
+      background: #ccc;
+      color: #000;
+      padding: 0.2em 0;
+    }
+
+    #loader-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.08), transparent 42%),
+        linear-gradient(315deg, rgba(37, 99, 235, 0.16), transparent 54%),
+        #061827;
+    }
+
+    #loader-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.3;
+      background-image:
+        linear-gradient(rgba(125, 211, 252, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(125, 211, 252, 0.08) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+
+    #loader {
+      position: relative;
+      width: min(460px, calc(100% - 40px));
+      padding: 34px 38px 32px;
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      border-radius: 10px;
+      background: rgba(7, 31, 50, 0.88);
+      box-shadow: 0 28px 100px rgba(0, 0, 0, 0.38);
+      text-align: left;
+      z-index: 1001;
+    }
+
+    #loader::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #22d3ee, #2563eb, #22d3ee);
+      background-size: 200% 100%;
+      animation: scan 2.4s linear infinite;
+    }
+
+    .loader-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #f0f9ff;
+      font: 700 18px/1 Arial, sans-serif;
+      letter-spacing: 0.16em;
+    }
+
+    .loader-brand small {
+      margin-left: 4px;
+      color: #7dd3fc;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+    }
+
+    .loader-mark {
+      display: inline-flex;
+      width: 30px;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+      color: #fff;
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      letter-spacing: 0;
+    }
+
+    .loader-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 36px;
+      color: #dbeafe;
+      font: 600 14px/1.4 Arial, sans-serif;
+    }
+
+    .loader-status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22d3ee;
+      box-shadow: 0 0 14px #22d3ee;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    .loader-subtitle {
+      margin-top: 7px;
+      color: rgba(186, 230, 253, 0.62);
+      font: 11px/1.5 Arial, sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .loader-track {
+      height: 4px;
+      margin-top: 26px;
+      overflow: hidden;
+      background: rgba(125, 211, 252, 0.12);
+    }
+
+    .loader-track span {
+      display: block;
+      width: 42%;
+      height: 100%;
+      background: linear-gradient(90deg, #22d3ee, #2563eb);
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.8);
+      animation: progress 1.8s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+      to { background-position: 200% 0; }
+    }
+
+    @keyframes pulse {
+      50% { opacity: 0.35; transform: scale(0.72); }
+    }
+
+    @keyframes progress {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(300%); }
+    }
+
+    .loaded #loader {
+      opacity: 0;
+      -webkit-transition: all 0.3s ease-out;
+      transition: all 0.3s ease-out;
+    }
+
+    .loaded #loader-wrapper {
+      visibility: hidden;
+      -webkit-transform: translateY(-100%);
+      -ms-transform: translateY(-100%);
+      transform: translateY(-100%);
+      -webkit-transition: all 0.3s 1s ease-out;
+      transition: all 0.3s 1s ease-out;
+    }
+
+    .no-js #loader-wrapper {
+      display: none;
+    }
+
+    .no-js h1 {
+      color: #222222;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div id="loader-wrapper">
+      <div id="loader">
+        <div class="loader-brand">
+          <span class="loader-mark">J</span>
+          <span>ZJUDE</span>
+          <small>WORKSPACE</small>
+        </div>
+        <div class="loader-status">正在启动 Zjude 工作台</div>
+        <div class="loader-subtitle">Initializing workspace services</div>
+        <div class="loader-track"><span></span></div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

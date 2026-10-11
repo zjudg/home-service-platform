@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+    <groupId>com.zjude</groupId>
+    <artifactId>zjude-aden</artifactId>
+    <version>1.0.0</version>
+
+    <name>zjude-aden</name>
+    <description>后台管理系统</description>
+
+    <properties>
+        <zjude.version>1.0.0</zjude.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>21</java.version>
+        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+        <spring.boot.version>3.2.2</spring.boot.version>
+        <druid.version>1.2.20</druid.version>
+        <bitwalker.version>1.21</bitwalker.version>
+        <swagger.version>3.0.0</swagger.version>
+        <kaptcha.version>2.3.3</kaptcha.version>
+        <pagehelper.boot.version>1.4.7</pagehelper.boot.version>
+        <fastjson.version>2.0.43</fastjson.version>
+        <oshi.version>6.4.11</oshi.version>
+        <commons.io.version>2.13.0</commons.io.version>
+        <commons.collections.version>3.2.2</commons.collections.version>
+        <poi.version>4.1.2</poi.version>
+        <velocity.version>2.3</velocity.version>
+        <jwt.version>0.9.1</jwt.version>
+        <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version>
+        <jasypt.version>3.0.5</jasypt.version>
+        <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
+        <mysql.connector.version>8.2.0</mysql.connector.version>
+        <qiniu.version>7.19.0</qiniu.version>
+        <aliyun.oss.version>3.18.5</aliyun.oss.version>
+        <tencent.cos.version>5.6.281</tencent.cos.version>
+        <aliyun.sms.version>2.0.24</aliyun.sms.version>
+    </properties>
+
+    <profiles>
+        <!-- production environment -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <env>prod</env>
+            </properties>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+        </profile>
+        <!-- development environment -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <env>dev</env>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+
+    <!-- 依赖声明 -->
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Spring Boot 依赖管理 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- 新增四个配置依赖 -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>${mysql.connector.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.3.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>6.0.0</version>
+            </dependency>
+
+            <!-- jasypt -->
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt.version}</version>
+            </dependency>
+
+            <!-- 阿里数据库连接池 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-3-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <!-- 解析客户端操作系统、浏览器�?-->
+            <dependency>
+                <groupId>eu.bitwalker</groupId>
+                <artifactId>UserAgentUtils</artifactId>
+                <version>${bitwalker.version}</version>
+            </dependency>
+
+            <!-- pagehelper 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.boot.version}</version>
+            </dependency>
+
+            <!-- 获取系统信息 -->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
+            </dependency>
+
+            <!-- Swagger3依赖 -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <version>${springdoc-openapi.version}</version>
+            </dependency>
+
+            <!-- io常用工具�?-->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+
+            <!-- excel工具 -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+
+            <!-- velocity代码生成使用模板 -->
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-engine-core</artifactId>
+                <version>${velocity.version}</version>
+            </dependency>
+
+            <!-- collections工具�?-->
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons.collections.version}</version>
+            </dependency>
+
+            <!-- 阿里JSON解析�?-->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!-- Token 生成与解析 -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+
+            <!-- 验证�?-->
+            <dependency>
+                <groupId>pro.fessional</groupId>
+                <artifactId>kaptcha</artifactId>
+                <version>${kaptcha.version}</version>
+            </dependency>
+
+            <!-- 代码生成-->
+            <dependency>
+                <groupId>com.zjude</groupId>
+                <artifactId>zjude-aden-generator</artifactId>
+                <version>${zjude.version}</version>
+            </dependency>
+
+            <!-- 核心模块-->
+            <dependency>
+                <groupId>com.zjude</groupId>
+                <artifactId>zjude-aden-framework</artifactId>
+                <version>${zjude.version}</version>
+            </dependency>
+
+            <!-- 系统模块-->
+            <dependency>
+                <groupId>com.zjude</groupId>
+                <artifactId>zjude-aden-system</artifactId>
+                <version>${zjude.version}</version>
+            </dependency>
+
+            <!-- 通用工具-->
+            <dependency>
+                <groupId>com.zjude</groupId>
+                <artifactId>zjude-aden-common</artifactId>
+                <version>${zjude.version}</version>
+            </dependency>
+
+            <!-- 公共配置集成模块 -->
+            <dependency>
+                <groupId>com.zjude</groupId>
+                <artifactId>zjude-aden-integrated</artifactId>
+                <version>${zjude.version}</version>
+            </dependency>
+
+            <!-- 公共配置管理模块；不包含商城商品、订单、会员等业务 -->
+            <dependency>
+                <groupId>com.zjude</groupId>
+                <artifactId>zjude-aden-settings</artifactId>
+                <version>${zjude.version}</version>
+            </dependency>
+
+            <!-- 第三方存储和短信 SDK，仅由公共配置集成模块使用 -->
+            <dependency>
+                <groupId>com.qiniu</groupId>
+                <artifactId>qiniu-java-sdk</artifactId>
+                <version>${qiniu.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun.oss.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qcloud</groupId>
+                <artifactId>cos_api</artifactId>
+                <version>${tencent.cos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dysmsapi20170525</artifactId>
+                <version>${aliyun.sms.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>annotations</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+        <module>zjude-aden-admin</module>
+        <module>zjude-aden-framework</module>
+        <module>zjude-aden-system</module>
+        <module>zjude-aden-generator</module>
+        <module>zjude-aden-common</module>
+        <module>zjude-aden-integrated</module>
+        <module>zjude-aden-settings</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <parameters>true</parameters>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+</project>
