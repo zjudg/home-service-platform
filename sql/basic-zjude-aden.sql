@@ -137,10 +137,10 @@ CREATE TABLE `zjudg_gen_table_column`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代码生成业务表字段' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for zjudg_mall_banner
+-- Table structure for zjudg_banner
 -- ----------------------------
-DROP TABLE IF EXISTS `zjudg_mall_banner`;
-CREATE TABLE `zjudg_mall_banner`  (
+DROP TABLE IF EXISTS `zjudg_banner`;
+CREATE TABLE `zjudg_banner`  (
   `seq_no` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `banner_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '轮播图ID',
   `banner_title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '轮播图标题',
@@ -159,16 +159,16 @@ CREATE TABLE `zjudg_mall_banner`  (
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`seq_no`) USING BTREE,
   UNIQUE INDEX `idx_banner_id`(`banner_id`) USING BTREE COMMENT '业务主键索引',
-  INDEX `idx_mall_banner_bp`(`banner_position`) USING BTREE,
-  INDEX `idx_mall_banner_s`(`status`) USING BTREE,
-  INDEX `idx_mall_banner_se`(`start_time`, `end_time`) USING BTREE
+  INDEX `idx_banner_bp`(`banner_position`) USING BTREE,
+  INDEX `idx_banner_s`(`status`) USING BTREE,
+  INDEX `idx_banner_se`(`start_time`, `end_time`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '轮播图表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for zjudg_mall_content_item
+-- Table structure for zjudg_content_item
 -- ----------------------------
-DROP TABLE IF EXISTS `zjudg_mall_content_item`;
-CREATE TABLE `zjudg_mall_content_item`  (
+DROP TABLE IF EXISTS `zjudg_content_item`;
+CREATE TABLE `zjudg_content_item`  (
   `content_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容资源ID',
   `resource_type` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资源类型：AD广告 SLOT广告位 HELP_CAT帮助分类 ARTICLE_CAT文章分类 HELP帮助 ARTICLE文章',
   `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '标题或分类名称',

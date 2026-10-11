@@ -25,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<sql id="selectBannerVo">
         select banner_id, banner_title, image_url, link_type, link_url, banner_position, banner_sort, status, start_time, end_time, create_by, create_time, update_by, update_time, remark
-		from zjudg_mall_banner
+		from zjudg_banner
     </sql>
 
 	<select id="selectBannerList" parameterType="com.zjude.system.domain.MallBanner" resultMap="MallBannerResult">
@@ -59,7 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<update id="updateBanner" parameterType="com.zjude.system.domain.MallBanner">
-		update zjudg_mall_banner
+		update zjudg_banner
 		<set>
 			<if test="bannerTitle != null and bannerTitle != ''">banner_title = #{bannerTitle},</if>
 			<if test="imageUrl != null and imageUrl != ''">image_url = #{imageUrl},</if>
@@ -78,7 +78,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 
 	<insert id="insertBanner" parameterType="com.zjude.system.domain.MallBanner" useGeneratedKeys="true" keyProperty="seqNo">
-		insert into zjudg_mall_banner(
+		insert into zjudg_banner(
 			<if test="bannerId != null and bannerId != ''">banner_id,</if>
 			<if test="bannerTitle != null and bannerTitle != ''">banner_title,</if>
 			<if test="imageUrl != null and imageUrl != ''">image_url,</if>
@@ -110,11 +110,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</insert>
 
 	<delete id="deleteBannerById" parameterType="String">
-		delete from zjudg_mall_banner where banner_id = #{bannerId,jdbcType=VARCHAR}
+		delete from zjudg_banner where banner_id = #{bannerId,jdbcType=VARCHAR}
 	</delete>
 
 	<delete id="deleteBannerByIds" parameterType="String">
-		delete from zjudg_mall_banner where banner_id in
+		delete from zjudg_banner where banner_id in
 		<foreach collection="array" item="bannerId" open="(" separator="," close=")">
 			#{bannerId,jdbcType=VARCHAR}
         </foreach>

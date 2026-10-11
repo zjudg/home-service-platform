@@ -15,7 +15,7 @@
     <result property="createTime" column="create_time"/><result property="updateBy" column="update_by"/>
     <result property="updateTime" column="update_time"/>
   </resultMap>
-  <sql id="columns">select content_id, resource_type, title, category_id, slot_id, platform, image, link_type, link, intro, content, is_announcement, status, sort_num, image_width, image_height, view_count, like_count, create_by, create_time, update_by, update_time from zjudg_mall_content_item</sql>
+  <sql id="columns">select content_id, resource_type, title, category_id, slot_id, platform, image, link_type, link, intro, content, is_announcement, status, sort_num, image_width, image_height, view_count, like_count, create_by, create_time, update_by, update_time from zjudg_content_item</sql>
   <select id="selectContentList" resultMap="ContentResult">
     <include refid="columns"/><where>
       <if test="resourceType != null">and resource_type = #{resourceType}</if>
@@ -27,7 +27,7 @@
     </where> order by sort_num asc, create_time desc
   </select>
   <select id="selectContentById" resultMap="ContentResult"><include refid="columns"/> where content_id = #{contentId}</select>
-  <insert id="insertContent">insert into zjudg_mall_content_item (content_id,resource_type,title,category_id,slot_id,platform,image,link_type,link,intro,content,is_announcement,status,sort_num,image_width,image_height,create_by,create_time) values (#{contentId},#{resourceType},#{title},#{categoryId},#{slotId},#{platform},#{image},#{linkType},#{link},#{intro},#{content},#{isAnnouncement},#{status},#{sortNum},#{imageWidth},#{imageHeight},#{createBy},sysdate())</insert>
-  <update id="updateContent">update zjudg_mall_content_item set title=#{title},category_id=#{categoryId},slot_id=#{slotId},platform=#{platform},image=#{image},link_type=#{linkType},link=#{link},intro=#{intro},content=#{content},is_announcement=#{isAnnouncement},status=#{status},sort_num=#{sortNum},image_width=#{imageWidth},image_height=#{imageHeight},update_by=#{updateBy},update_time=sysdate() where content_id=#{contentId}</update>
-  <delete id="deleteContentById">delete from zjudg_mall_content_item where content_id = #{contentId}</delete>
+  <insert id="insertContent">insert into zjudg_content_item (content_id,resource_type,title,category_id,slot_id,platform,image,link_type,link,intro,content,is_announcement,status,sort_num,image_width,image_height,create_by,create_time) values (#{contentId},#{resourceType},#{title},#{categoryId},#{slotId},#{platform},#{image},#{linkType},#{link},#{intro},#{content},#{isAnnouncement},#{status},#{sortNum},#{imageWidth},#{imageHeight},#{createBy},sysdate())</insert>
+  <update id="updateContent">update zjudg_content_item set title=#{title},category_id=#{categoryId},slot_id=#{slotId},platform=#{platform},image=#{image},link_type=#{linkType},link=#{link},intro=#{intro},content=#{content},is_announcement=#{isAnnouncement},status=#{status},sort_num=#{sortNum},image_width=#{imageWidth},image_height=#{imageHeight},update_by=#{updateBy},update_time=sysdate() where content_id=#{contentId}</update>
+  <delete id="deleteContentById">delete from zjudg_content_item where content_id = #{contentId}</delete>
 </mapper>
