@@ -33,6 +33,21 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function signInWithWechat (profile) {
+    loading.value = true
+    try {
+      const response = await authApi.wechatLogin(profile)
+      const nextToken = response.token || response.data?.token
+      if (!nextToken) throw new Error('微信登录响应缺少令牌')
+      token.value = nextToken
+      setStorage(TOKEN_KEY, nextToken)
+      await loadUser()
+      return response
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function loadUser () {
     const response = await authApi.getInfo()
     user.value = response.user || response.data?.user || null
@@ -63,5 +78,5 @@ export const useAuthStore = defineStore('auth', () => {
     clearSession()
   })
 
-  return { token, user, loading, isLoggedIn, signIn, loadUser, signOut, restore, clearSession }
+  return { token, user, loading, isLoggedIn, signIn, signInWithWechat, loadUser, signOut, restore, clearSession }
 })

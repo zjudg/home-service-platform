@@ -26,6 +26,6 @@ defineEmits(['retry'])
 .status-title { color: $uni-text-color; font-size: 32rpx; font-weight: 600; }
 .status-message { margin-top: 14rpx; font-size: 26rpx; text-align: center; }
 .status-button { margin-top: 28rpx; padding: 0 32rpx; background: $uni-color-primary; color: #fff; font-size: 26rpx; line-height: 72rpx; border-radius: 36rpx; }
-.status-spinner { width: 42rpx; height: 42rpx; margin-bottom: 24rpx; border: 5rpx solid #dfe8f5; border-top-color: $uni-color-primary; border-radius: 50%; animation: spin 0.8s linear infinite; }
+.status-spinner { width: 42rpx; height: 42rpx; margin-bottom: 24rpx; border: 5rpx solid $app-primary-soft; border-top-color: $uni-color-primary; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

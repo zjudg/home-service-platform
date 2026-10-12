@@ -1,78 +1,31 @@
 <template>
-  <view class="page safe-bottom">
-    <view v-if="!authStore.isLoggedIn" class="guest-panel surface">
-      <view class="guest-icon">?</view>
-      <text class="guest-title">{{ configStore.profile.welcomeText || '登录后管理个人信息' }}</text>
-      <text v-if="configStore.profile.serviceTitle" class="guest-desc">{{ configStore.profile.serviceTitle }}</text>
-      <button class="primary-button guest-button" @click="goLogin">去登录</button>
-    </view>
-    <view v-else class="profile surface">
-      <view class="avatar"><text>{{ initials }}</text></view>
-      <view class="profile-copy">
-        <text class="profile-name">{{ displayName }}</text>
-        <text class="profile-meta">{{ authStore.user?.email || '已登录用户' }}</text>
-      </view>
-    </view>
-    <view v-if="authStore.isLoggedIn" class="section-title user-title">{{ configStore.profile.pageTitle || '账户信息' }}</view>
-    <view v-if="authStore.isLoggedIn" class="info-list surface">
-      <view class="info-row"><text>用户名</text><text class="info-value">{{ authStore.user?.userName || '-' }}</text></view>
-      <view class="info-row"><text>昵称</text><text class="info-value">{{ authStore.user?.nickName || '-' }}</text></view>
-      <view class="info-row"><text>手机号</text><text class="info-value">{{ authStore.user?.phonenumber || '-' }}</text></view>
-      <view class="info-row"><text>邮箱</text><text class="info-value">{{ authStore.user?.email || '-' }}</text></view>
-    </view>
-    <button v-if="authStore.isLoggedIn" class="primary-button logout-button" @click="logout">退出登录</button>
-    <AppTabBar current-key="profile" />
+  <view class="page safe-bottom"><view class="profile-header"><view class="header-user"><view class="avatar"><image v-if="authStore.user?.avatar" :src="authStore.user.avatar" /><text v-else>{{ authStore.isLoggedIn ? initials : '?' }}</text></view><view><text class="profile-name">{{ authStore.isLoggedIn ? displayName : '未登录' }}</text><text class="profile-meta">{{ authStore.isLoggedIn ? '欢迎回来，管理您的服务' : '登录后管理预约、地址和评价' }}</text></view></view><uni-icons type="gear" size="24" color="#fff" @click="openSettings" /></view>
+    <view class="order-summary surface"><view class="summary-head"><text class="summary-title">预约订单</text><text class="summary-link" @click="openOrders">查看全部 ›</text></view><view class="summary-stats"><view v-for="item in orderStats" :key="item.title" class="summary-stat" @click="openOrders"><text class="stat-value">{{ item.value }}</text><text class="stat-label">{{ item.title }}</text></view></view></view>
+    <view class="section-title user-title">我的服务</view><view class="service-grid surface"><view v-for="item in serviceActions" :key="item.title" class="service-action" @click="item.action"><view class="service-icon" :class="item.tone"><uni-icons :type="item.icon" size="23" :color="item.color" /></view><text>{{ item.title }}</text></view></view>
+    <view class="info-list surface"><view class="info-row" @click="openOrders"><text>我的预约</text><text class="info-value">{{ authStore.isLoggedIn ? '查看预约进度' : '登录后查看' }} ›</text></view><view class="info-row" @click="requireLogin"><text>服务地址</text><text class="info-value">{{ authStore.isLoggedIn ? '管理常用地址' : '登录后管理' }} ›</text></view><view class="info-row" @click="requireLogin"><text>服务评价</text><text class="info-value">{{ authStore.isLoggedIn ? '查看评价记录' : '登录后查看' }} ›</text></view></view>
+    <button v-if="authStore.isLoggedIn" class="logout-button" @click="logout">退出登录</button><AppTabBar current-key="profile" />
   </view>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'
 import AppTabBar from '@/components/AppTabBar.vue'
+import { listOrders } from '@/api/service'
 import { useAuthStore } from '@/stores/auth'
 import { useConfigStore } from '@/stores/config'
 
-const authStore = useAuthStore()
-const configStore = useConfigStore()
-const displayName = computed(() => authStore.user?.nickName || authStore.user?.userName || '用户')
-const initials = computed(() => displayName.value.slice(0, 1).toUpperCase())
-
-onMounted(async () => {
-  await configStore.load().catch(() => {})
-  uni.setNavigationBarTitle({ title: configStore.profile.pageTitle || configStore.navigation.items.find(item => item.key === 'profile')?.name || configStore.appTitle })
-})
-
-function goLogin () {
-  uni.navigateTo({ url: '/pages/login/index' })
-}
-
-async function logout () {
-  uni.showModal({
-    title: '退出登录',
-    content: '确定要退出当前账号吗？',
-    success: async ({ confirm }) => {
-      if (!confirm) return
-      await authStore.signOut()
-      uni.reLaunch({ url: '/pages/login/index' })
-    }
-  })
-}
+const authStore = useAuthStore(); const configStore = useConfigStore(); const displayName = computed(() => authStore.user?.nickName || authStore.user?.userName || '用户'); const initials = computed(() => displayName.value.slice(0, 1).toUpperCase()); const orderStats = ref([{ title: '待确认', value: 0 }, { title: '服务中', value: 0 }, { title: '已完成', value: 0 }, { title: '已取消', value: 0 }])
+const serviceActions = [{ title: '收货地址', icon: 'location', tone: 'green', color: '#2e806d', action: () => requireLogin() }, { title: '评价管理', icon: 'star', tone: 'orange', color: '#d9953d', action: () => requireLogin() }, { title: '我的收藏', icon: 'heart', tone: 'green', color: '#2e806d', action: () => requireLogin() }, { title: '联系客服', icon: 'phone', tone: 'green', color: '#2e806d', action: () => uni.showToast({ title: '客服功能由后台配置', icon: 'none' }) }, { title: '我的钱包', icon: 'wallet', tone: 'green', color: '#2e806d', action: () => requireLogin() }]
+onMounted(async () => { await configStore.load().catch(() => {}); uni.setNavigationBarTitle({ title: configStore.profile.pageTitle || '我的' }); if (authStore.isLoggedIn) loadOrders() })
+async function loadOrders () { try { const response = await listOrders({ pageNum: 1, pageSize: 100 }); const orders = response.rows || response.data?.rows || []; orderStats.value = [{ title: '待确认', value: orders.filter(item => String(item.orderStatus) === '0').length }, { title: '服务中', value: orders.filter(item => String(item.orderStatus) === '1').length }, { title: '已完成', value: orders.filter(item => String(item.orderStatus) === '2').length }, { title: '已取消', value: orders.filter(item => String(item.orderStatus) === '3').length }] } catch (e) {} }
+function goLogin () { uni.navigateTo({ url: '/pages/login/index?redirect=/pages/user/index' }) }
+function requireLogin () { if (authStore.isLoggedIn) return; uni.showModal({ title: '登录后继续', content: '登录后可管理预约和服务信息', confirmText: '去登录', success: ({ confirm }) => { if (confirm) goLogin() } }) }
+function openOrders () { if (authStore.isLoggedIn) uni.reLaunch({ url: '/pages/orders/index' }); else goLogin() }
+function openSettings () { uni.navigateTo({ url: '/pages/settings/index' }) }
+async function logout () { uni.showModal({ title: '退出登录', content: '确定要退出当前账号吗？', success: async ({ confirm }) => { if (!confirm) return; await authStore.signOut(); uni.reLaunch({ url: '/pages/user/index' }) } }) }
 </script>
 
 <style lang="scss" scoped>
-.guest-panel { display: flex; flex-direction: column; align-items: center; padding: 68rpx 36rpx; text-align: center; }
-.guest-icon { display: flex; align-items: center; justify-content: center; width: 96rpx; height: 96rpx; border-radius: 50%; background: #e6efff; color: $app-primary; font-size: 52rpx; font-weight: 700; }
-.guest-title { margin-top: 28rpx; color: $app-text; font-size: 34rpx; font-weight: 700; }
-.guest-desc { margin-top: 14rpx; color: $app-muted; font-size: 25rpx; }
-.guest-button { width: 100%; margin-top: 36rpx; }
-.profile { display: flex; align-items: center; padding: 36rpx 32rpx; }
-.avatar { display: flex; align-items: center; justify-content: center; width: 112rpx; height: 112rpx; border-radius: 50%; background: #e6efff; color: $app-primary; font-size: 44rpx; font-weight: 700; }
-.profile-copy { display: flex; flex-direction: column; margin-left: 26rpx; }
-.profile-name { color: $app-text; font-size: 36rpx; font-weight: 700; }
-.profile-meta { margin-top: 10rpx; color: $app-muted; font-size: 25rpx; }
-.user-title { margin: 48rpx 4rpx 20rpx; }
-.info-list { padding: 0 28rpx; }
-.info-row { display: flex; justify-content: space-between; padding: 30rpx 0; color: $app-muted; font-size: 27rpx; border-bottom: 1rpx solid $app-border; }
-.info-row:last-child { border-bottom: 0; }
-.info-value { max-width: 60%; overflow: hidden; color: $app-text; text-overflow: ellipsis; white-space: nowrap; }
-.logout-button { width: 100%; margin-top: 54rpx; background: #fff; color: #e45656; border: 1rpx solid #f2cccc; }
+.profile-header{display:flex;align-items:center;justify-content:space-between;margin:-32rpx -32rpx 0;padding:58rpx 32rpx 34rpx;background:$app-primary;color:#fff}.header-user{display:flex;align-items:center}.avatar{display:flex;align-items:center;justify-content:center;width:108rpx;height:108rpx;border-radius:50%;background:#fff;color:$app-primary;font-size:42rpx;font-weight:700;overflow:hidden}.avatar image{width:100%;height:100%}.header-user>view:last-child{display:flex;flex-direction:column;margin-left:22rpx}.profile-name{font-size:36rpx;font-weight:800}.profile-meta{margin-top:10rpx;opacity:.86;font-size:22rpx}.order-summary{margin-top:20rpx;padding:24rpx}.summary-head{display:flex;align-items:center;justify-content:space-between}.summary-title{color:$app-text;font-size:29rpx;font-weight:700}.summary-link{color:$app-primary;font-size:23rpx}.summary-stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:24rpx}.summary-stat{display:flex;flex-direction:column;align-items:center;border-right:1rpx solid $app-border}.summary-stat:last-child{border-right:0}.stat-value{color:$app-primary;font-size:34rpx;font-weight:800}.stat-label{margin-top:7rpx;color:$app-muted;font-size:21rpx}.user-title{margin:42rpx 4rpx 18rpx}.service-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6rpx;padding:22rpx 10rpx}.service-action{display:flex;flex-direction:column;align-items:center;color:$app-text;font-size:21rpx}.service-icon{display:flex;align-items:center;justify-content:center;width:62rpx;height:62rpx;margin-bottom:10rpx;border-radius:18rpx;background:$app-primary-soft}.service-icon.orange{background:#fff0df}.service-icon.blue,.service-icon.purple{background:$app-primary-soft}.info-list{margin-top:20rpx;padding:0 26rpx}.info-row{display:flex;align-items:center;justify-content:space-between;padding:27rpx 0;color:$app-text;font-size:26rpx;border-bottom:1rpx solid $app-border}.info-row:last-child{border-bottom:0}.info-value{color:$app-muted;font-size:22rpx}.logout-button{width:100%;margin-top:32rpx;color:#d65c58;background:#fff;border:1rpx solid #f2cccc;line-height:82rpx;border-radius:14rpx}
 </style>

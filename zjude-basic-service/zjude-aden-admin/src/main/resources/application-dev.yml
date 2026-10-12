@@ -161,6 +161,6 @@ spring:
         # 主库数据源
         master:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/basic-zjude-aden?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          url: jdbc:mysql://localhost:3306/home-service-system?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
           username: root
           password: ENC(KHU6JWNQhsUW0V14DKza7GyZVT9LRlTj)

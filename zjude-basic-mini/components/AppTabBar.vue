@@ -37,15 +37,15 @@ const configStore = useConfigStore()
 const items = computed(() => configStore.navigation.items || [])
 const barStyle = computed(() => ({
   backgroundColor: configStore.navigation.backgroundColor || '#ffffff',
-  borderTopColor: configStore.navigation.borderStyle === 'white' ? '#ffffff' : '#e8edf5'
+  borderTopColor: configStore.navigation.borderStyle === 'white' ? '#ffffff' : '#e3ece8'
 }))
-const activeStyle = computed(() => ({ color: configStore.navigation.activeColor || '#2f6fed' }))
-const inactiveStyle = computed(() => ({ color: configStore.navigation.textColor || '#8c98a8' }))
+const activeStyle = computed(() => ({ color: configStore.navigation.activeColor || '#2e806d' }))
+const inactiveStyle = computed(() => ({ color: configStore.navigation.textColor || '#8c9d97' }))
 
 const routeMap = {
   home: '/pages/home/index',
-  category: '/pages/category/index',
-  cart: '/pages/cart/index',
+  category: '/pages/services/index',
+  cart: '/pages/orders/index',
   profile: '/pages/user/index',
   user: '/pages/user/index'
 }
@@ -75,7 +75,7 @@ function openItem (item) {
 </script>
 
 <style lang="scss" scoped>
-.app-tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20; display: flex; height: calc(112rpx + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1rpx solid; box-shadow: 0 -8rpx 28rpx rgba(31, 50, 82, .06); }
+.app-tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20; display: flex; height: calc(112rpx + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1rpx solid; box-shadow: 0 -8rpx 28rpx rgba(35, 90, 73, .06); }
 .tab-item { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: center; justify-content: center; padding: 12rpx 8rpx 8rpx; font-size: 22rpx; }
 .tab-icon { width: 46rpx; height: 46rpx; margin-bottom: 6rpx; }
 .tab-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
