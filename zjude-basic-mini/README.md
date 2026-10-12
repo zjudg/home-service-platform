@@ -18,7 +18,7 @@ pnpm run dev:h5
 pnpm run dev:mp-weixin
 ```
 
-H5 开发环境默认通过 `/api` 代理到 `http://localhost:8379`。生产和测试 API 地址分别配置在 `.env.production`、`.env.staging` 中，真实地址请通过本地环境变量覆盖，不要提交密钥。
+H5 开发环境默认通过 `/api` 代理到 `http://localhost:8379`。微信开发者工具或真机访问本地后端时，不能使用设备自身的 `localhost`；请在未纳入 Git 的 `.env.development.local` 中将 `VITE_API_BASE_URL` 配置为开发电脑的局域网 IP（例如 `http://192.168.1.10:8379`），并确保手机与电脑连接同一网络。生产和测试 API 地址分别配置在 `.env.production`、`.env.staging` 中，真实地址请通过本地环境变量覆盖，不要提交密钥。
 
 ## 构建
 

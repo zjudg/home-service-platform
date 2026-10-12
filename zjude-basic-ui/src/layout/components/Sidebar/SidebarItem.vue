@@ -108,10 +108,31 @@ function resolvePath (routePath, routeQuery) {
     return props.basePath
   }
   if (routeQuery) {
-    const query = JSON.parse(routeQuery)
+    const query = parseRouteQuery(routeQuery)
     return { path: getNormalPath(props.basePath + '/' + routePath), query }
   }
   return getNormalPath(props.basePath + '/' + routePath)
+}
+
+function parseRouteQuery (routeQuery) {
+  if (typeof routeQuery === 'object') {
+    return routeQuery
+  }
+
+  if (typeof routeQuery !== 'string') {
+    return {}
+  }
+
+  try {
+    return JSON.parse(routeQuery)
+  } catch {
+    const query = {}
+    const params = new URLSearchParams(routeQuery.startsWith('?') ? routeQuery.slice(1) : routeQuery)
+    params.forEach((value, key) => {
+      query[key] = value
+    })
+    return query
+  }
 }
 
 function hasTitle (title) {

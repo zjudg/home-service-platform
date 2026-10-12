@@ -23,6 +23,7 @@
 ## Data and Security
 - MySQL 8 and Redis are infrastructure dependencies.
 - SQL changes live under `zjude-basic-service/zjude-aden-admin/src/main/resources/db/migration`.
+- Database table names for system functions must use the `sys_` prefix; all other business tables must use the `zjudg_` prefix.
 - Every business table has an explicit primary key, status, timestamps, and indexes derived from query paths.
 - Never commit secrets, real AppIDs, tokens, passwords, private keys, or payment certificates.
 - Do not log passwords, tokens, payment payload secrets, identity data, or full receiving-account details.

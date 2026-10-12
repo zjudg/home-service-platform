@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgCityMapper">
+  <resultMap id="CityResult" type="com.zjude.system.domain.ZjudgCity">
+    <id property="cityId" column="city_id"/><result property="cityName" column="city_name"/><result property="provinceName" column="province_name"/><result property="initialLetter" column="initial_letter"/><result property="status" column="status"/>
+  </resultMap>
+  <select id="selectList" resultMap="CityResult">select city_id, city_name, province_name, initial_letter, status from zjudg_city <where><if test="status != null and status != ''">and status = #{status}</if><if test="cityName != null and cityName != ''">and city_name like concat('%', #{cityName}, '%')</if></where> order by initial_letter, city_name</select>
+</mapper>

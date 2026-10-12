@@ -4,11 +4,11 @@
     <view class="settings-list surface">
       <view class="setting-row" @click="showAbout">
         <view><text class="setting-title">关于应用</text><text class="setting-desc">Zjude Aden 基础移动端</text></view>
-        <uni-icons type="right" size="18" color="#a4afbf" />
+        <uni-icons type="right" size="18" color="#9aa9a5" />
       </view>
       <view class="setting-row" @click="clearCache">
         <view><text class="setting-title">清理缓存</text><text class="setting-desc">清理本地临时数据</text></view>
-        <uni-icons type="right" size="18" color="#a4afbf" />
+        <uni-icons type="right" size="18" color="#9aa9a5" />
       </view>
       <view class="setting-row setting-row--static">
         <view><text class="setting-title">运行环境</text><text class="setting-desc">{{ appStore.platform }}</text></view>

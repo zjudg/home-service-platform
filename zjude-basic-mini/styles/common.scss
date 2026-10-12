@@ -1,10 +1,4 @@
-$app-primary: #2f6fed;
-$app-primary-dark: #1f56c5;
-$app-bg: #f5f7fb;
-$app-surface: #ffffff;
-$app-text: #172033;
-$app-muted: #7b8798;
-$app-border: #e8edf5;
+@import './tokens.scss';
 
 .page { min-height: 100vh; padding: 32rpx; background: $app-bg; }
 .safe-bottom { padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); }

@@ -36,12 +36,12 @@ function findLabel (key) {
 </script>
 
 <style lang="scss" scoped>
-.cart-hero { padding: 34rpx 30rpx; background: linear-gradient(135deg, #2f6fed, #65a0ff); color: #fff; }
+.cart-hero { padding: 34rpx 30rpx; background: $app-primary; color: #fff; }
 .cart-title, .cart-subtitle { display: block; }
 .cart-title { font-size: 38rpx; font-weight: 700; }
 .cart-subtitle { margin-top: 12rpx; opacity: .82; font-size: 25rpx; }
 .empty-panel { display: flex; flex-direction: column; align-items: center; margin-top: 24rpx; padding: 80rpx 30rpx; text-align: center; }
-.empty-icon { display: flex; align-items: center; justify-content: center; width: 100rpx; height: 100rpx; border-radius: 30rpx; background: #e9f1ff; color: $app-primary; font-size: 42rpx; font-weight: 700; }
+.empty-icon { display: flex; align-items: center; justify-content: center; width: 100rpx; height: 100rpx; border-radius: 30rpx; background: $app-primary-soft; color: $app-primary; font-size: 42rpx; font-weight: 700; }
 .empty-title { margin-top: 28rpx; color: $app-text; font-size: 30rpx; font-weight: 600; }
 .empty-description { margin-top: 12rpx; color: $app-muted; font-size: 25rpx; }
 </style>

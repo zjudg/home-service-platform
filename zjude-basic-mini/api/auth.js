@@ -4,6 +4,10 @@ export function login (data) {
   return request({ url: '/login', method: 'POST', data })
 }
 
+export function wechatLogin (data) {
+  return request({ url: '/api/mini/auth/login', method: 'POST', data })
+}
+
 export function getInfo () {
   return request({ url: '/get/info', method: 'GET' })
 }
