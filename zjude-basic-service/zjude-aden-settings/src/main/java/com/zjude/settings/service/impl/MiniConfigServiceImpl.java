@@ -1,12 +1,16 @@
 package com.zjude.settings.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.zjude.common.enums.BannerLinkType;
 import com.zjude.common.utils.StringUtils;
+import com.zjude.settings.domain.MiniBanner;
 import com.zjude.settings.domain.MiniBootstrapConfig;
 import com.zjude.settings.domain.MiniPaymentMethod;
 import com.zjude.settings.service.IMiniConfigService;
 import com.zjude.settings.service.MiniPaymentPolicy;
+import com.zjude.system.domain.ZjudgBanner;
 import com.zjude.system.service.ISysConfigService;
+import com.zjude.system.service.IZjudgBannerService;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,6 +23,9 @@ public class MiniConfigServiceImpl implements IMiniConfigService
 {
     @Resource
     private ISysConfigService configService;
+
+    @Resource
+    private IZjudgBannerService bannerService;
 
     @Override
     public MiniBootstrapConfig bootstrap()
@@ -154,6 +161,26 @@ public class MiniConfigServiceImpl implements IMiniConfigService
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("provider", provider);
         result.put("domain", value(domainKey));
+        return result;
+    }
+
+    @Override
+    public List<MiniBanner> banners(String position)    {
+        // 轮播为展示类内容，与城市维度无关；只按位置 + 启用状态 + 有效期过滤
+        List<ZjudgBanner> rows = bannerService.selectPublishedBanners(position);
+        List<MiniBanner> result = new ArrayList<>();
+        for (ZjudgBanner row : rows)
+        {
+            MiniBanner item = new MiniBanner();
+            item.setId(row.getBannerId());
+            item.setTitle(row.getBannerTitle());
+            item.setSubtitle(row.getRemark());
+            item.setImage(row.getImageUrl());
+            item.setLinkType(row.getLinkType());
+            // 无跳转时不下发地址，避免前端把空串当成可跳转链接
+            item.setLink(BannerLinkType.NONE.getCode().equals(row.getLinkType()) ? "" : row.getLinkUrl());
+            result.add(item);
+        }
         return result;
     }
 

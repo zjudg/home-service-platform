@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequestMapping("/api/mini/config")
-@Tag(name = "小程序配置", description = "小程序启动所需的公开商城配置")
+@Tag(name = "小程序配置", description = "小程序启动所需的公开站点配置")
 @SecurityRequirements
 @Anonymous
 public class MiniConfigController
@@ -57,6 +57,13 @@ public class MiniConfigController
     public AjaxResult category()
     {
         return AjaxResult.success(service.category());
+    }
+
+    @GetMapping("/banners")
+    @Operation(summary = "获取指定位置的轮播图", description = "只返回启用中且在有效期内的轮播图；position 取 index/category/activity，默认 index")
+    public AjaxResult banners(@RequestParam(required = false) String position)
+    {
+        return AjaxResult.success(service.banners(position));
     }
 
     @GetMapping("/profile")
