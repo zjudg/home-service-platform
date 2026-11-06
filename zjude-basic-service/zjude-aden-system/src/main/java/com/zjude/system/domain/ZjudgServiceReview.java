@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 public class ZjudgServiceReview extends BaseEntity {
     @Serial private static final long serialVersionUID = 1L;
     private String reviewId;
+    private String orderId;
     private String serviceId;
     private String serviceName;
     private String userId;
@@ -21,6 +22,8 @@ public class ZjudgServiceReview extends BaseEntity {
     private String status;
     public String getReviewId() { return reviewId; }
     public void setReviewId(String value) { reviewId = value; }
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String value) { orderId = value; }
     public String getServiceId() { return serviceId; }
     public void setServiceId(String value) { serviceId = value; }
     public String getServiceName() { return serviceName; }

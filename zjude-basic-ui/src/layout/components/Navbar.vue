@@ -28,7 +28,7 @@
             <img
               :src="logo"
               class="user-avatar"
-              alt="Zjude"
+              alt="妙洁家政"
             />
             <el-icon><caret-bottom /></el-icon>
           </div>
@@ -95,23 +95,26 @@ function logout () {
 
 <style lang='scss' scoped>
 .navbar {
-  height: 50px;
+  height: 56px;
   overflow: hidden;
   position: relative;
-  background: #0a2134;
-  border-bottom: 1px solid rgba(125, 211, 252, 0.16);
-  box-shadow: 0 8px 24px rgba(2, 20, 35, 0.16);
+  background: #fff;
+  border-bottom: 1px solid #f2ede9;
+  box-shadow: 0 1px 3px rgba(31, 28, 26, 0.04);
 
   .hamburger-container {
-    line-height: 46px;
+    line-height: 52px;
     height: 100%;
     float: left;
+    padding: 0 10px;
     cursor: pointer;
+    color: #7a726c;
     transition: background 0.3s;
     -webkit-tap-highlight-color: transparent;
 
     &:hover {
-      background: rgba(125, 211, 252, 0.08);
+      background: #faf7f5;
+      color: #e06a3d;
     }
   }
 
@@ -121,7 +124,7 @@ function logout () {
 
   .topmenu-container {
     position: absolute;
-    left: 50px;
+    left: 56px;
   }
 
   .errLog-container {
@@ -132,7 +135,7 @@ function logout () {
   .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
+    line-height: 56px;
     display: flex;
 
     &:focus {
@@ -144,7 +147,7 @@ function logout () {
       padding: 0 8px;
       height: 100%;
       font-size: 18px;
-      color: rgba(224, 242, 254, 0.78);
+      color: #7a726c;
       vertical-align: text-bottom;
 
       &.hover-effect {
@@ -152,35 +155,36 @@ function logout () {
         transition: background 0.3s;
 
         &:hover {
-          background: rgba(125, 211, 252, 0.08);
+          background: #faf7f5;
         }
       }
     }
 
     .avatar-container {
-      margin-right: 40px;
+      margin-right: 28px;
 
       .avatar-wrapper {
-        margin-top: 5px;
+        margin-top: 8px;
         position: relative;
 
         .user-avatar {
           cursor: pointer;
-          width: 40px;
-          height: 40px;
-          padding: 4px;
+          width: 38px;
+          height: 38px;
+          padding: 3px;
           object-fit: contain;
-          border: 1px solid rgba(125, 211, 252, 0.28);
-          border-radius: 8px;
-          background: #fff;
+          border: 1px solid #ece6e1;
+          border-radius: 10px;
+          background: #fbf8f6;
         }
 
         i {
           cursor: pointer;
           position: absolute;
-          right: -20px;
-          top: 25px;
+          right: -18px;
+          top: 22px;
           font-size: 12px;
+          color: #a39b95;
         }
       }
     }

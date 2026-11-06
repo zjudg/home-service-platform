@@ -19,6 +19,11 @@ public class SmsServiceFacade implements SmsService
     @Override
     public void send(String mobile, SmsScene scene, Map<String, String> params)
     {
+        // 开发/联调：未启用短信通道时直接返回，验证码由调用方回显
+        if ("true".equalsIgnoreCase(configService.selectConfigByKey(SmsConfigKeys.MOCK_ENABLED)))
+        {
+            return;
+        }
         if (!"1".equals(configService.selectConfigByKey(SmsConfigKeys.ALIYUN_STATUS)))
         {
             throw new ServiceException("短信通道未启用");

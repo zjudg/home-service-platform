@@ -36,6 +36,20 @@ public class SecurityUtils
     }
 
     /**
+     * 获取当前登录用户 ID；匿名请求返回 null，不抛出未授权异常。
+     * 共享的服务费/合同查看页使用此方法，真正的支付、认领和签署仍必须登录。
+     */
+    public static String getUserIdIfAuthenticated()
+    {
+        Authentication authentication = getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof LoginUser loginUser))
+        {
+            return null;
+        }
+        return loginUser.getUserId();
+    }
+
+    /**
      * 获取部门ID
      **/
     public static String getDeptId()

@@ -5,7 +5,7 @@
         <div class="page-header">
           <div class="page-header__title">
             <span>网站设置</span>
-            <span class="page-header__hint">配置商城及管理后台的基础品牌信息</span>
+            <span class="page-header__hint">配置家政站点及管理后台的基础品牌信息</span>
           </div>
           <el-button
             type="primary"
@@ -73,15 +73,15 @@ const form = reactive({})
 const settings = [
   {
     key: 'website.shopName',
-    label: '商城名称',
+    label: '站点名称',
     type: 'text',
-    placeholder: '请输入商城名称',
+    placeholder: '请输入站点名称',
     default: 'LikeShop',
-    tip: '商城名称会显示在网站标题及相关页面中'
+    tip: '站点名称会显示在网站标题及相关页面中'
   },
   {
     key: 'website.favicon',
-    label: '商城浏览器图标',
+    label: '站点浏览器图标',
     type: 'image',
     fileSize: 2,
     tip: '建议尺寸：32px×32px，支持 jpg、jpeg、png、ico 格式'
@@ -95,14 +95,14 @@ const settings = [
   },
   {
     key: 'website.mobileLogo',
-    label: '移动端商城 Logo',
+    label: '移动端 Logo',
     type: 'image',
     fileSize: 2,
     tip: '建议尺寸：172px×48px，支持 jpg、jpeg、png 格式'
   },
   {
     key: 'website.pcLogo',
-    label: 'PC 端商城 Logo',
+    label: 'PC 端 Logo',
     type: 'image',
     fileSize: 2,
     tip: '建议尺寸：160px×56px，支持 jpg、jpeg、png 格式'
@@ -149,6 +149,27 @@ const settings = [
     type: 'image',
     fileSize: 2,
     tip: '建议尺寸：400px×400px，支持 jpg、jpeg、png 格式'
+  },
+  {
+    key: 'website.servicePhone',
+    label: '客服电话',
+    type: 'text',
+    placeholder: '请输入客服电话，如 400-000-0000',
+    tip: '小程序「我的 - 联系客服」点击后直接拨打该号码，留空则不展示拨号入口'
+  },
+  {
+    key: 'website.serviceHours',
+    label: '客服服务时间',
+    type: 'text',
+    placeholder: '如 工作日 9:00 - 21:00',
+    tip: '展示在小程序「我的 - 联系客服」的说明文字中'
+  },
+  {
+    key: 'website.serviceQrCode',
+    label: '客服二维码',
+    type: 'image',
+    fileSize: 2,
+    tip: '用户可长按识别添加客服，未上传时只展示电话拨号'
   }
 ]
 

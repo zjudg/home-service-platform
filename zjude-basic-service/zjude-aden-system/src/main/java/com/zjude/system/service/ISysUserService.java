@@ -38,6 +38,22 @@ public interface ISysUserService
     SysUser selectUserByUserName(String userName);
 
     /**
+     * 通过手机号查询用户（小程序验证码登录使用）
+     *
+     * @param phoneNumber 手机号
+     * @return 用户对象信息
+     */
+    SysUser selectUserByPhoneNumber(String phoneNumber);
+
+    /**
+     * 通过微信小程序 openid 查询用户。
+     *
+     * @param openid 微信 openid
+     * @return 用户对象信息，未绑定微信时返回 null
+     */
+    SysUser selectUserByWxOpenid(String openid);
+
+    /**
      * 通过用户ID查询用户
      * 
      * @param userId 用户ID

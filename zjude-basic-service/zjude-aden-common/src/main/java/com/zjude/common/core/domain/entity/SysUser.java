@@ -36,6 +36,12 @@ public class SysUser extends BaseEntity
     @Excel(name = "登录名称")
     private String userName;
 
+    /** 微信小程序 openid，订阅消息下发依赖此值 */
+    private String wxOpenid;
+
+    /** 微信 unionid，用于跨端识别同一用户 */
+    private String wxUnionid;
+
     /** 用户昵称 */
     @Excel(name = "用户名称")
     private String nickName;
@@ -152,7 +158,7 @@ public class SysUser extends BaseEntity
 
     @Xss(message = "用户账号不能包含脚本字符")
     @NotBlank(message = "用户账号不能为空")
-    @Size(max = 30, message = "用户账号长度不能超过30个字符")
+    @Size(max = 64, message = "用户账号长度不能超过64个字符")
     public String getUserName()
     {
         return userName;
@@ -161,6 +167,26 @@ public class SysUser extends BaseEntity
     public void setUserName(String userName)
     {
         this.userName = userName;
+    }
+
+    public String getWxOpenid()
+    {
+        return wxOpenid;
+    }
+
+    public void setWxOpenid(String wxOpenid)
+    {
+        this.wxOpenid = wxOpenid;
+    }
+
+    public String getWxUnionid()
+    {
+        return wxUnionid;
+    }
+
+    public void setWxUnionid(String wxUnionid)
+    {
+        this.wxUnionid = wxUnionid;
     }
 
     @Email(message = "邮箱格式不正确")

@@ -57,7 +57,7 @@ public class SysLoginController
      * 
      * @return 用户信息
      */
-    @GetMapping("/get/info")
+    @GetMapping({ "/get/info", "/api/get/info" })
     public AjaxResult getInfo()
     {
         SysUser user = SecurityUtils.getLoginUser().getUser();

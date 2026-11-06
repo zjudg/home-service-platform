@@ -162,7 +162,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 RouterVo children = new RouterVo();
                 children.setPath(menu.getPath());
                 children.setComponent(menu.getComponent());
-                children.setName(toRouteName(joinRoutePath(parentPath, menu.getPath())));
+                children.setName(toRouteName(routeNamePath(parentPath, menu.getPath())));
                 children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals("1", menu.getIsCache()), menu.getPath()));
                 children.setQuery(menu.getQuery());
                 childrenList.add(children);
@@ -316,7 +316,16 @@ public class SysMenuServiceImpl implements ISysMenuService {
         if (isMenuFrame(menu)) {
             return StringUtils.EMPTY;
         }
-        return toRouteName(joinRoutePath(parentPath, menu.getPath()));
+        return toRouteName(routeNamePath(parentPath, menu.getPath()));
+    }
+
+    /**
+     * 空子路径用于让列表页直接落在目录地址，例如 /zjudg/order。
+     * 路由名称仍补一个 index，避免父目录和默认子页面重名。
+     */
+    private String routeNamePath(String parentPath, String path) {
+        String joined = joinRoutePath(parentPath, path);
+        return StringUtils.isEmpty(path) ? joinRoutePath(joined, "index") : joined;
     }
 
     private String joinRoutePath(String parentPath, String path) {

@@ -370,7 +370,6 @@ const ids = ref([])
 const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
-const title = ref('')
 const dateRange = ref([])
 const defaultSort = ref({ prop: 'operTime', order: 'descending' })
 

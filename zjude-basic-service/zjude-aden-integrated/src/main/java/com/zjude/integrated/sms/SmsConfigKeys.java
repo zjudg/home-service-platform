@@ -15,6 +15,9 @@ public final class SmsConfigKeys
     public static final String ALIYUN_TEMPLATE_RESET_PASSWORD = "sms.aliyun.template.resetPassword";
     public static final String ALIYUN_TEMPLATE_ORDER = "sms.aliyun.template.order";
 
+    /** 开发/联调用：未配置短信通道时直接把验证码回显到小程序 */
+    public static final String MOCK_ENABLED = "sms.mock.enabled";
+
     private SmsConfigKeys()
     {
     }

@@ -1,26 +1,35 @@
-$blue: #324157 !default;
-$light-blue: #3A71A8 !default;
-$red: #C03639 !default;
-$pink: #E65D6E !default;
-$green: #30B08F !default;
-$tiffany: #4AB7BD !default;
-$yellow: #FEC171 !default;
-$panGreen: #30B08F !default;
+@use './tokens' as *;
 
-$base-menu-color: hsla(0, 0%, 100%, .65) !default;
-$base-menu-color-active: #fff !default;
-$base-menu-background: #001529 !default;
-$base-logo-title-color: #fff !default;
-$base-menu-light-color: rgba(0, 0, 0, .7) !default;
-$base-menu-light-background: #fff !default;
-$base-logo-light-title-color: #001529 !default;
-$base-sub-menu-background: #000c17 !default;
-$base-sub-menu-hover: #001528 !default;
+$blue: $info !default;
+$light-blue: $brand-500 !default;
+$red: $danger !default;
+$pink: $danger !default;
+$green: $success !default;
+$tiffany: $info !default;
+$yellow: $warning !default;
+$panGreen: $success !default;
 
-$color-primary: #409EFF !default;
-$color-success: #67C23A !default;
-$color-warning: #E6A23C !default;
-$color-danger: #F56C6C !default;
-$color-info: #909399 !default;
+// 侧边栏：浅色暖底 + 暖灰菜单文字
+$base-menu-color: $ink-700 !default;
+$base-menu-color-active: $brand-600 !default;
+$base-menu-background: $surface !default;
+$base-logo-title-color: $ink-900 !default;
+$base-menu-light-color: $ink-700 !default;
+$base-menu-light-background: $surface !default;
+$base-logo-light-title-color: $ink-900 !default;
+$base-sub-menu-background: $bg-sunken !default;
+$base-sub-menu-hover: $brand-50 !default;
 
-$base-sidebar-width: 200px !default;
+$base-sidebar-width: 220px !default;
+
+$color-primary: $brand-500 !default;
+$color-success: $success !default;
+$color-warning: $warning !default;
+$color-danger: $danger !default;
+$color-info: $ink-500 !default;
+
+$color-text: $ink-900 !default;
+$color-text-secondary: $ink-500 !default;
+$color-border: $line !default;
+$color-bg: $bg !default;
+$color-surface: $surface !default;

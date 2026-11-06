@@ -3,30 +3,61 @@
     v-if="!configStore.navigationReady"
     class="page startup-page"
   >
-    <view class="startup-brand">
-      <image
-        class="startup-logo"
-        src="/static/logo.png"
-        mode="aspectFit"
-      />
+    <view class="startup-glow startup-glow--top" />
+    <view class="startup-glow startup-glow--bottom" />
+
+    <view class="startup-header">
+      <view class="startup-logo-frame">
+        <image
+          class="startup-logo"
+          src="/static/logo.png"
+          mode="aspectFit"
+        />
+      </view>
       <text class="startup-brand-name">
         {{ appStore.appName }}
       </text>
     </view>
-    <view class="startup-panel card">
-      <view class="startup-icon">
-        <uni-icons
-          :type="configStore.loading ? 'spinner-cycle' : 'cloud-download'"
-          size="30"
-          color="#e06a3d"
-        />
+
+    <view class="startup-main">
+      <view class="startup-illustration">
+        <view class="startup-orbit startup-orbit--outer" />
+        <view class="startup-orbit startup-orbit--inner" />
+        <view class="startup-home-icon">
+          <uni-icons
+            type="home"
+            size="66"
+            color="#e06a3d"
+          />
+        </view>
+        <view class="startup-spark startup-spark--one">
+          ✦
+        </view>
+        <view class="startup-spark startup-spark--two">
+          ✦
+        </view>
+        <view class="startup-art-dot startup-art-dot--one" />
+        <view class="startup-art-dot startup-art-dot--two" />
       </view>
-      <text class="startup-title">
-        {{ configStore.loading ? '正在准备首页' : '首页配置加载失败' }}
-      </text>
-      <text class="startup-message">
-        {{ configStore.loading ? '正在同步服务信息' : '请确认后端服务已启动' }}
-      </text>
+
+      <view class="startup-copy">
+        <text class="startup-title">
+          首页加载中，请稍后
+        </text>
+        <text class="startup-message">
+          {{ configStore.loading ? '正在为您准备服务信息' : configStore.error }}
+        </text>
+      </view>
+    </view>
+
+    <view class="startup-bottom">
+      <view
+        v-if="configStore.loading"
+        class="startup-progress"
+        aria-label="Loading"
+      >
+        <view class="startup-progress-bar" />
+      </view>
       <button
         v-if="!configStore.loading"
         class="primary-button startup-retry"
@@ -90,6 +121,7 @@
       >
         <swiper
           class="banner-swiper"
+          :style="bannerHeightStyle"
           autoplay
           circular
           :interval="4500"
@@ -102,36 +134,15 @@
           >
             <view
               class="banner-slide"
+              :style="bannerHeightStyle"
               @click="openBanner(banner)"
             >
               <image
-                v-if="bannerImage(banner)"
                 class="banner-image"
                 :src="assetUrl(bannerImage(banner))"
-                mode="aspectFill"
+                mode="widthFix"
+                @load="onBannerImageLoad($event, banner)"
               />
-              <view
-                v-else
-                class="banner-fallback"
-              />
-              <view class="banner-mask" />
-              <view class="banner-copy">
-                <text class="banner-title">
-                  {{ banner.title || banner.name || '' }}
-                </text>
-                <text
-                  v-if="banner.subtitle || banner.description"
-                  class="banner-sub"
-                >
-                  {{ banner.subtitle || banner.description }}
-                </text>
-                <view
-                  v-if="banner.link || banner.serviceId"
-                  class="banner-cta"
-                >
-                  了解服务
-                </view>
-              </view>
             </view>
           </swiper-item>
         </swiper>
@@ -234,7 +245,7 @@
               <image
                 v-if="firstImage(item)"
                 :src="assetUrl(firstImage(item))"
-                mode="aspectFill"
+                mode="aspectFit"
               />
               <view
                 v-else
@@ -291,7 +302,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'
 import AppTabBar from '@/components/AppTabBar.vue'
@@ -310,12 +321,23 @@ import { toastInfo } from '@/utils/feedback'
 const appStore = useAppStore(); const configStore = useConfigStore(); const cityStore = useCityStore()
 const location = ref('')
 const pageTitle = computed(() => configStore.site?.shopName || appStore.appName)
-const categories = ref([]); const services = ref([]); const loading = ref(false); const errorMessage = ref(''); const categoryError = ref('')
+const categories = ref([]); const services = ref([]); const loading = ref(true); const errorMessage = ref(''); const categoryError = ref('')
 const bannerIndex = ref(0)
+const bannerImageRatios = reactive({})
+const bannerContentWidth = uni.getSystemInfoSync().windowWidth || 375
 const tableBanners = ref([])
 // 轮播优先用后台「轮播图管理」(zjudg_banner) 的数据；
 // 未配置轮播图时回退到装修配置里的 banners，保证首页不会因此变空
-const banners = computed(() => (tableBanners.value.length ? tableBanners.value : (configStore.home?.banners || [])))
+const banners = computed(() => {
+  const source = tableBanners.value.length ? tableBanners.value : (configStore.home?.banners || [])
+  return source.filter(banner => banner?.image || banner?.imageUrl || banner?.url)
+})
+const bannerHeight = computed(() => {
+  const image = bannerImage(banners.value[bannerIndex.value])
+  const ratio = bannerImageRatios[image] || (320 / 686)
+  return Math.round(bannerContentWidth * ratio)
+})
+const bannerHeightStyle = computed(() => ({ height: `${bannerHeight.value}px` }))
 const visibleCategories = computed(() => categories.value.slice(0, 8))
 const hotServices = computed(() => services.value.slice(0, 4))
 const trusts = [
@@ -330,9 +352,14 @@ function categoryLabel (item) { return item.categoryName || item.name || item.ti
 function firstImage (item) { const value = item?.carouselImages || item?.imageUrl || ''; return Array.isArray(value) ? value[0] : String(value).split(',')[0] }
 function bannerImage (banner) { return banner?.image || banner?.imageUrl || banner?.url || '' }
 function onBannerChange (event) { bannerIndex.value = event.detail?.current || 0 }
+function onBannerImageLoad (event, banner) {
+  const { width, height } = event.detail || {}
+  const image = bannerImage(banner)
+  if (image && width > 0 && height > 0) bannerImageRatios[image] = height / width
+}
 
 onMounted(async () => {
-  cityStore.restore()
+  await cityStore.initialize()
   location.value = cityStore.cityName || location.value
   await configStore.load().catch(() => {})
   await loadHomeData()
@@ -415,7 +442,7 @@ function openCity () { uni.navigateTo({ url: `/pages/city/index?current=${encode
   display: flex;
   align-items: center;
   height: 88rpx;
-  margin-bottom: $space-3;
+  margin-bottom: $space-2;
   padding: 0 $space-2;
   border-radius: $radius-pill;
   background: $surface;
@@ -467,54 +494,20 @@ function openCity () { uni.navigateTo({ url: `/pages/city/index?current=${encode
   color: $ink-400;
 }
 
-.home-body { padding: $space-3 $page-gutter 0; }
+.home-body { padding: 0 $page-gutter 0; }
 
 /* ---------- 轮播 ---------- */
 .banner-wrap {
   position: relative;
+  margin-right: -$page-gutter;
+  margin-left: -$page-gutter;
   overflow: hidden;
   border-radius: $radius-lg;
 }
 
-.banner-swiper, .banner-image, .banner-slide { width: 100%; height: 320rpx; }
-.banner-slide { position: relative; display: block; }
-
-.banner-fallback { width: 100%; height: 100%; background: linear-gradient(135deg, #fdece4, #f9d5c5); }
-
-.banner-mask {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, rgba(31, 28, 26, 0.62) 0%, rgba(31, 28, 26, 0.18) 58%, rgba(31, 28, 26, 0) 100%);
-}
-
-.banner-copy {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 $space-4;
-  color: #fff;
-}
-
-.banner-title { font-size: 40rpx; font-weight: $weight-heavy; letter-spacing: 0.5rpx; }
-.banner-sub { margin-top: $space-1; font-size: $font-caption; color: rgba(255, 255, 255, 0.88); }
-
-.banner-cta {
-  align-self: flex-start;
-  margin-top: $space-3;
-  padding: 0 $space-3;
-  height: 60rpx;
-  line-height: 60rpx;
-  border-radius: $radius-pill;
-  background: rgba(255, 255, 255, 0.92);
-  color: $brand-600;
-  font-size: $font-micro;
-  font-weight: $weight-semibold;
-}
+.banner-swiper, .banner-slide { width: 100%; }
+.banner-slide { position: relative; display: block; background: $bg; }
+.banner-image { display: block; width: 100%; }
 
 .banner-dots {
   position: absolute;
@@ -620,9 +613,9 @@ function openCity () { uni.navigateTo({ url: `/pages/city/index?current=${encode
 }
 .service-tile:active { transform: scale(0.98); }
 
-.service-cover { position: relative; width: 100%; height: 240rpx; overflow: hidden; background: $bg-sunken; }
+.service-cover { position: relative; width: 100%; height: 140rpx; overflow: hidden; background: #fff5ef; }
 .service-cover image { width: 100%; height: 100%; }
-.service-cover-skeleton { width: 100%; height: 240rpx; }
+.service-cover-skeleton { width: 100%; height: 140rpx; }
 
 .service-cover-fallback {
   display: flex;
@@ -691,44 +684,246 @@ function openCity () { uni.navigateTo({ url: `/pages/city/index?current=${encode
 
 /* ---------- 启动页 ---------- */
 .startup-page {
+  position: relative;
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: calc(48rpx + env(safe-area-inset-top)) 40rpx calc(40rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(155deg, #fffaf7 0%, #faf7f5 54%, #f5f8f4 100%);
+}
+
+.startup-glow {
+  position: absolute;
+  z-index: 0;
+  width: 500rpx;
+  height: 500rpx;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.startup-glow--top {
+  top: -250rpx;
+  right: -220rpx;
+  background: radial-gradient(circle, rgba(245, 138, 95, 0.18) 0%, rgba(245, 138, 95, 0.05) 52%, rgba(245, 138, 95, 0) 74%);
+}
+
+.startup-glow--bottom {
+  bottom: -300rpx;
+  left: -270rpx;
+  background: radial-gradient(circle, rgba(47, 158, 107, 0.11) 0%, rgba(47, 158, 107, 0.035) 52%, rgba(47, 158, 107, 0) 74%);
+}
+
+.startup-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-height: 76rpx;
+}
+
+.startup-logo-frame {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 76rpx;
+  height: 76rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: 22rpx;
+  background: #fff;
+  box-shadow: 0 10rpx 28rpx rgba(31, 28, 26, 0.08);
+}
+
+.startup-logo { width: 58rpx; height: 58rpx; border-radius: 14rpx; }
+.startup-brand-name {
+  margin-left: 18rpx;
+  font-size: 32rpx;
+  font-weight: $weight-heavy;
+  color: $ink-900;
+  letter-spacing: 0.5rpx;
+}
+
+.startup-main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: $space-8 $page-gutter;
+  min-height: 680rpx;
+  padding: 24rpx 0 48rpx;
 }
 
-.startup-brand { display: flex; align-items: center; margin-bottom: $space-8; }
-.startup-logo { width: 76rpx; height: 76rpx; border-radius: $radius-md; }
-.startup-brand-name {
-  margin-left: $space-2;
-  font-size: 36rpx;
-  font-weight: $weight-heavy;
-  color: $brand-600;
-  letter-spacing: 1rpx;
-}
-
-.startup-panel {
+.startup-illustration {
+  position: relative;
   display: flex;
-  width: 100%;
+  align-items: center;
+  justify-content: center;
+  width: 390rpx;
+  height: 360rpx;
+  margin-bottom: 26rpx;
+}
+
+.startup-orbit {
+  position: absolute;
+  display: block;
+  border: 1rpx solid rgba(224, 106, 61, 0.12);
+  border-radius: 50%;
+}
+
+.startup-orbit--outer {
+  width: 350rpx;
+  height: 350rpx;
+  background: rgba(255, 255, 255, 0.24);
+  animation: startup-orbit-pulse 3.2s ease-in-out infinite;
+}
+
+.startup-orbit--inner {
+  width: 272rpx;
+  height: 272rpx;
+  border-color: rgba(224, 106, 61, 0.08);
+  background: rgba(255, 255, 255, 0.36);
+  animation: startup-orbit-pulse 3.2s ease-in-out -1.6s infinite;
+}
+
+.startup-home-icon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 172rpx;
+  height: 172rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.95);
+  border-radius: 52rpx;
+  background: linear-gradient(145deg, #fff 12%, #fff6f0 100%);
+  box-shadow: 0 22rpx 54rpx rgba(180, 88, 50, 0.15), inset 0 1rpx 0 #fff;
+  animation: startup-home-float 2.8s ease-in-out infinite;
+}
+
+.startup-spark {
+  position: absolute;
+  z-index: 2;
+  color: $brand-400;
+  font-size: 36rpx;
+  line-height: 1;
+  animation: startup-sparkle 1.8s ease-in-out infinite;
+}
+
+.startup-spark--one { top: 48rpx; right: 76rpx; }
+.startup-spark--two { bottom: 66rpx; left: 62rpx; color: #83b998; font-size: 24rpx; }
+
+.startup-art-dot {
+  position: absolute;
+  z-index: 2;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #f5a27f;
+  box-shadow: 0 0 0 9rpx rgba(245, 162, 127, 0.13);
+  animation: startup-dot-pulse 1.8s ease-in-out infinite;
+}
+
+.startup-art-dot--one { top: 106rpx; left: 40rpx; }
+.startup-art-dot--two { right: 40rpx; bottom: 104rpx; width: 10rpx; height: 10rpx; background: #7bb58f; box-shadow: 0 0 0 8rpx rgba(123, 181, 143, 0.14); }
+
+.startup-copy {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  padding: $space-8 $space-4;
+  max-width: 100%;
   text-align: center;
 }
 
-.startup-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 50%;
-  background: $brand-50;
+.startup-title {
+  font-size: 38rpx;
+  font-weight: $weight-bold;
+  letter-spacing: 0.5rpx;
+  color: $ink-900;
 }
 
-.startup-title { margin-top: $space-3; font-size: $font-title; font-weight: $weight-bold; color: $ink-900; }
-.startup-message { margin-top: $space-1; font-size: $font-caption; color: $ink-400; }
-.startup-retry { width: 280rpx; margin-top: $space-4; line-height: 80rpx; }
+.startup-message {
+  max-width: 620rpx;
+  min-height: 36rpx;
+  margin-top: 14rpx;
+  font-size: $font-caption;
+  line-height: 1.6;
+  color: $ink-400;
+}
+
+.startup-bottom {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 30rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.92);
+  border-radius: 30rpx;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 18rpx 54rpx rgba(31, 28, 26, 0.07);
+}
+
+.startup-progress {
+  position: relative;
+  width: 100%;
+  height: 10rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: #f3eeea;
+}
+
+.startup-progress-bar {
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f6b18f, $brand-500);
+  animation: startup-progress 1.6s ease-in-out infinite;
+}
+
+.startup-retry {
+  width: 100%;
+  margin: 0;
+  line-height: 82rpx;
+}
+
+.startup-retry:active { transform: scale(0.99); }
+
+@keyframes startup-progress {
+  0% { transform: translateX(-105%); }
+  100% { transform: translateX(245%); }
+}
+
+@keyframes startup-orbit-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes startup-home-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10rpx); }
+}
+
+@keyframes startup-sparkle {
+  0%, 100% { opacity: 0.5; transform: scale(0.84) rotate(-8deg); }
+  50% { opacity: 1; transform: scale(1.12) rotate(8deg); }
+}
+
+@keyframes startup-dot-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-progress-bar,
+  .startup-orbit--outer,
+  .startup-orbit--inner,
+  .startup-home-icon,
+  .startup-spark,
+  .startup-art-dot {
+    animation-duration: 4s;
+  }
+}
 </style>

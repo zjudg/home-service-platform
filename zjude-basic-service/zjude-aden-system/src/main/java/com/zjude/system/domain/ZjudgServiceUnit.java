@@ -10,12 +10,16 @@ public class ZjudgServiceUnit extends BaseEntity {
     @Serial private static final long serialVersionUID = 1L;
     private String unitId;
     private String unitName;
+    /** 计量方式：NONE、HOUR、AREA、COUNT。 */
+    private String measureType;
     private Integer sortNum;
     private String status;
     public String getUnitId() { return unitId; }
     public void setUnitId(String value) { unitId = value; }
     @NotBlank(message = "单位名称不能为空") public String getUnitName() { return unitName; }
     public void setUnitName(String value) { unitName = value; }
+    @NotBlank(message = "计量方式不能为空") public String getMeasureType() { return measureType; }
+    public void setMeasureType(String value) { measureType = value; }
     @NotNull(message = "排序不能为空") public Integer getSortNum() { return sortNum; }
     public void setSortNum(Integer value) { sortNum = value; }
     @NotBlank(message = "状态不能为空") public String getStatus() { return status; }

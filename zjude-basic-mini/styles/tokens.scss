@@ -1,11 +1,122 @@
-// Single source of truth for the mobile client's visual language.
-$app-primary: #2e806d;
-$app-primary-dark: #245d55;
-$app-primary-soft: #e1f3ec;
-$app-primary-tint: #edf7f2;
-$app-bg: #f5f7f6;
-$app-surface: #ffffff;
-$app-text: #243a36;
-$app-muted: #7b8f88;
-$app-border: #e3ece8;
-$app-accent: #e6674d;
+// ============================================================
+// 柔光卡片设计系统 · Soft Surface Design Tokens
+// 暖灰底 + 降饱和橙 + 极淡阴影，全站唯一色板来源。
+// ============================================================
+
+// ---------- 品牌色：降饱和暖橙 ----------
+$brand-50: #fff7f3;
+$brand-100: #fdece4;
+$brand-200: #f9d5c5;
+$brand-400: #f58a5f;
+$brand-500: #e06a3d;
+$brand-600: #c9582d;
+$brand-700: #a84722;
+$brand-tint: rgba(224, 106, 61, 0.12);
+
+// ---------- 中性色：偏暖灰 ----------
+$ink-900: #1f1c1a;
+$ink-700: #3d3733;
+$ink-500: #7a726c;
+$ink-400: #a39b95;
+$ink-300: #c4bcb6;
+$line: #ece6e1;
+$line-soft: #f2ede9;
+
+// ---------- 表面层级 ----------
+$bg: #faf7f5;
+$bg-sunken: #f5f1ee;
+$surface: #ffffff;
+$surface-muted: #fbf8f6;
+$overlay: rgba(31, 28, 26, 0.45);
+
+// ---------- 自定义导航栏 ----------
+$navbar-bg: $bg;
+$navbar-drop: rgba(250, 247, 245, 0.86);
+
+// ---------- 语义色 ----------
+$success: #2f9e6b;
+$success-bg: #e8f6ef;
+$warning: #d98a1f;
+$warning-bg: #fdf3e3;
+$danger: #d9503f;
+$danger-bg: #fdeceb;
+$info: #4a7fb5;
+$info-bg: #edf3fa;
+
+// ---------- 字号（6 级，不再增加中间档） ----------
+$font-display: 44rpx;
+$font-title: 34rpx;
+$font-body: 28rpx;
+$font-caption: 24rpx;
+$font-micro: 21rpx;
+$font-button: 29rpx;
+
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-semibold: 600;
+$weight-bold: 700;
+$weight-heavy: 800;
+
+// ---------- 间距（8pt 栅格） ----------
+$space-1: 8rpx;
+$space-2: 16rpx;
+$space-3: 24rpx;
+$space-4: 32rpx;
+$space-6: 48rpx;
+$space-8: 64rpx;
+$page-gutter: 32rpx;
+
+// ---------- 圆角 ----------
+$radius-sm: 12rpx;
+$radius-md: 20rpx;
+$radius-lg: 28rpx;
+$radius-xl: 40rpx;
+$radius-pill: 999rpx;
+
+// ---------- 阴影：柔光，只有两层 ----------
+$shadow-card: 0 4rpx 20rpx rgba(31, 28, 26, 0.05);
+$shadow-float: 0 8rpx 32rpx rgba(31, 28, 26, 0.10);
+$shadow-bar: 0 -4rpx 20rpx rgba(31, 28, 26, 0.05);
+
+// ---------- 兼容旧变量名，逐步迁移 ----------
+$app-primary: $brand-500;
+$app-primary-dark: $brand-600;
+$app-primary-light: $brand-400;
+$app-primary-soft: $brand-100;
+$app-primary-tint: $brand-50;
+$app-primary-glow: $brand-tint;
+$app-accent: $brand-500;
+$app-success: $success;
+$app-warning: $warning;
+$app-danger: $danger;
+$app-bg: $bg;
+$app-bg-deep: $bg-sunken;
+$app-surface: $surface;
+$app-surface-glass: $surface;
+$app-surface-glass-strong: $surface;
+$app-surface-muted: $surface-muted;
+$app-text: $ink-900;
+$app-text-soft: $ink-700;
+$app-muted: $ink-500;
+$app-muted-light: $ink-400;
+$app-border: $line;
+$app-border-strong: $line;
+$app-glass-border: $surface;
+$app-shadow-sm: $shadow-card;
+$app-shadow: $shadow-card;
+$app-shadow-lg: $shadow-float;
+$app-shadow-primary: $shadow-card;
+$app-shadow-inset: none;
+$app-radius-sm: $radius-sm;
+$app-radius: $radius-lg;
+$app-radius-lg: $radius-lg;
+$app-radius-xl: $radius-xl;
+$app-radius-pill: $radius-pill;
+$app-gap-sm: $space-2;
+$app-gap: $space-3;
+$app-gap-lg: $space-4;
+$app-gradient-primary: $brand-500;
+$app-gradient-warm: $brand-400;
+$app-gradient-surface: $surface;
+$app-side-gradient: $brand-50;
+$app-primary-soft-legacy: $brand-100;

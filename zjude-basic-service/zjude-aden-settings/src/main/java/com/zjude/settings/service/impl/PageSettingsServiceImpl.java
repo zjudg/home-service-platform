@@ -16,6 +16,7 @@ import com.zjude.integrated.payment.PaymentConfigKeys;
 import com.zjude.integrated.sms.SmsConfigKeys;
 import com.zjude.integrated.app.AppConfigKeys;
 import com.zjude.integrated.map.MapConfigKeys;
+import com.zjude.integrated.wechat.WechatConfigKeys;
 import com.zjude.settings.service.IPageSettingsService;
 import com.zjude.system.domain.SysConfig;
 import com.zjude.system.service.ISysConfigService;
@@ -41,9 +42,28 @@ public class PageSettingsServiceImpl implements IPageSettingsService
                 AppConfigKeys.ANDROID_DOWNLOAD_URL,
                 AppConfigKeys.DOWNLOAD_TEXT,
                 AppConfigKeys.PRIVACY_AGREEMENT,
-                AppConfigKeys.WECHAT_LOGIN));
+                AppConfigKeys.WECHAT_LOGIN,
+                WechatConfigKeys.APP_ID,
+                WechatConfigKeys.APP_SECRET));
         pages.put("share", prefixes("share."));
         pages.put("notification", prefixes("notification."));
+        pages.put("wechatSubscribe", keys(
+                WechatConfigKeys.SUBSCRIBE_ENABLED,
+                WechatConfigKeys.TEMPLATE_ACCEPTED,
+                WechatConfigKeys.TEMPLATE_FINISHED,
+                WechatConfigKeys.TEMPLATE_PAID,
+                WechatConfigKeys.TEMPLATE_NEW_ORDER,
+                WechatConfigKeys.TEMPLATE_ADMIN_CREATED,
+                WechatConfigKeys.TEMPLATE_ADMIN_ACCEPTED,
+                WechatConfigKeys.PAGE_ORDER,
+                WechatConfigKeys.PAGE_MASTER_ORDER,
+                WechatConfigKeys.PAGE_ADMIN_ORDER,
+                WechatConfigKeys.FIELD_ACCEPTED,
+                WechatConfigKeys.FIELD_FINISHED,
+                WechatConfigKeys.FIELD_PAID,
+                WechatConfigKeys.FIELD_NEW_ORDER,
+                WechatConfigKeys.FIELD_ADMIN_CREATED,
+                WechatConfigKeys.FIELD_ADMIN_ACCEPTED));
         pages.put("sms", keys(
                 SmsConfigKeys.PROVIDER,
                 SmsConfigKeys.ALIYUN_STATUS,
@@ -67,6 +87,16 @@ public class PageSettingsServiceImpl implements IPageSettingsService
                 PaymentConfigKeys.WECHAT_CERTIFICATE_SERIAL_NO,
                 PaymentConfigKeys.WECHAT_NOTIFY_URL,
                 PaymentConfigKeys.WECHAT_AUTH_DIRECTORY,
+                PaymentConfigKeys.WECHAT_PLATFORM_CERTIFICATE,
+                PaymentConfigKeys.WECHAT_PLATFORM_SERIAL_NO,
+                PaymentConfigKeys.WECHAT_PUBLIC_KEY_ID,
+                PaymentConfigKeys.WECHAT_PUBLIC_KEY,
+                PaymentConfigKeys.WECHAT_REFUND_NOTIFY_URL,
+                PaymentConfigKeys.WECHAT_ORDER_DESCRIPTION_PREFIX,
+                com.zjude.integrated.payment.TransferConfigKeys.AUTO_TRANSFER_ENABLED,
+                com.zjude.integrated.payment.TransferConfigKeys.SCENE_ID,
+                com.zjude.integrated.payment.TransferConfigKeys.SCENE_NAME,
+                com.zjude.integrated.payment.TransferConfigKeys.REMARK,
                 PaymentConfigKeys.ALIPAY_ENABLED,
                 PaymentConfigKeys.ALIPAY_APP_ID,
                 PaymentConfigKeys.ALIPAY_PRIVATE_KEY,
@@ -171,6 +201,8 @@ public class PageSettingsServiceImpl implements IPageSettingsService
         return PaymentConfigKeys.WECHAT_API_V3_KEY.equals(key)
                 || PaymentConfigKeys.WECHAT_CERTIFICATE.equals(key)
                 || PaymentConfigKeys.WECHAT_PRIVATE_KEY.equals(key)
+                || PaymentConfigKeys.WECHAT_PUBLIC_KEY.equals(key)
+                || PaymentConfigKeys.WECHAT_PLATFORM_CERTIFICATE.equals(key)
                 || PaymentConfigKeys.ALIPAY_PRIVATE_KEY.equals(key)
                 || PaymentConfigKeys.ALIPAY_PUBLIC_KEY.equals(key)
                 || SmsConfigKeys.ALIYUN_ACCESS_KEY_SECRET.equals(key)

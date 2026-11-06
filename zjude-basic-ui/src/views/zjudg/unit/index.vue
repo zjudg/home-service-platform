@@ -14,7 +14,11 @@
       <el-table-column
         label="单位名称"
         prop="unitName"
-      /><el-table-column
+      /><el-table-column label="计量方式">
+        <template #default="{row}">
+          {{ measureTypeLabel(row.measureType) }}
+        </template>
+      </el-table-column><el-table-column
         label="排序"
         prop="sortNum"
       /><el-table-column label="状态">
@@ -69,6 +73,13 @@
             v-model="form.sortNum"
             :min="0"
           />
+        </el-form-item><el-form-item label="计量方式" required>
+          <el-select v-model="form.measureType" placeholder="请选择">
+            <el-option label="无需数量" value="NONE" />
+            <el-option label="按小时" value="HOUR" />
+            <el-option label="按面积" value="AREA" />
+            <el-option label="按数量" value="COUNT" />
+          </el-select>
         </el-form-item><el-form-item label="状态">
           <el-switch
             v-model="form.status"
@@ -90,5 +101,5 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'; import { ElMessage, ElMessageBox } from 'element-plus'; import { listUnit, addUnit, updateUnit, deleteUnit } from '@/api/zjudg/unit'; const rows = ref([]); const total = ref(0); const loading = ref(false); const visible = ref(false); const query = reactive({ pageNum: 1, pageSize: 10 }); const form = reactive({}); const load = () => { loading.value = true; listUnit(query).then(r => { rows.value = r.rows || []; total.value = r.total || 0 }).finally(() => { loading.value = false }) }; const open = row => { Object.keys(form).forEach(k => delete form[k]); Object.assign(form, row || { unitName: '', sortNum: 0, status: '0' }); visible.value = true }; const save = () => { (form.unitId ? updateUnit : addUnit)(form).then(() => { ElMessage.success('保存成功'); visible.value = false; load() }) }; const remove = id => ElMessageBox.confirm('确认删除此单位吗？', '提示', { type: 'warning' }).then(() => deleteUnit(id).then(() => { ElMessage.success('删除成功'); load() })); onMounted(load)
+import { ref, reactive, onMounted } from 'vue'; import { ElMessage, ElMessageBox } from 'element-plus'; import { listUnit, addUnit, updateUnit, deleteUnit } from '@/api/zjudg/unit'; const measureTypes = { NONE: '无需数量', HOUR: '按小时', AREA: '按面积', COUNT: '按数量' }; const measureTypeLabel = type => measureTypes[type] || '未配置'; const rows = ref([]); const total = ref(0); const loading = ref(false); const visible = ref(false); const query = reactive({ pageNum: 1, pageSize: 10 }); const form = reactive({}); const load = () => { loading.value = true; listUnit(query).then(r => { rows.value = r.rows || []; total.value = r.total || 0 }).finally(() => { loading.value = false }) }; const open = row => { Object.keys(form).forEach(k => delete form[k]); Object.assign(form, row || { unitName: '', measureType: '', sortNum: 0, status: '0' }); visible.value = true }; const save = () => { (form.unitId ? updateUnit : addUnit)(form).then(() => { ElMessage.success('保存成功'); visible.value = false; load() }) }; const remove = id => ElMessageBox.confirm('确认删除此单位吗？', '提示', { type: 'warning' }).then(() => deleteUnit(id).then(() => { ElMessage.success('删除成功'); load() })); onMounted(load)
 </script><style scoped>.mb8{margin-bottom:8px}</style>

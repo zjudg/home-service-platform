@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM dragonwell-registry.cn-hangzhou.cr.aliyuncs.com/dragonwell/dragonwell:21
 
 VOLUME /tmp
 
@@ -14,4 +14,4 @@ RUN chmod +x start.sh
 
 RUN chmod +x /files
 
-CMD sh start.sh
+CMD ["sh", "start.sh"]

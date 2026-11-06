@@ -1,26 +1,32 @@
 <template>
-  <view v-if="items.length" class="app-tabbar" :style="barStyle">
+  <view class="ui-tabbar" :style="tabBarStyle">
     <view
       v-for="item in items"
       :key="item.key || item.name"
-      class="tab-item"
-      :class="{ 'tab-item--active': item.key === currentKey }"
-      :style="item.key === currentKey ? activeStyle : inactiveStyle"
+      class="ui-tabbar__item"
+      :class="{ 'ui-tabbar__item--active': item.key === currentKey }"
       @click="openItem(item)"
     >
-      <image
-        v-if="item.key === currentKey ? item.activeIcon : item.icon"
-        class="tab-icon"
-        :src="assetUrl(item.key === currentKey ? item.activeIcon : item.icon)"
-        mode="aspectFit"
-      />
-      <uni-icons
-        v-else
-        :type="fallbackIcon(item.key)"
-        size="24"
-        :color="item.key === currentKey ? activeStyle.color : inactiveStyle.color"
-      />
-      <text class="tab-name">{{ item.name }}</text>
+      <view class="ui-tabbar__icon-wrap">
+        <image
+          v-if="item.key === currentKey ? item.activeIcon : item.icon"
+          class="ui-tabbar__icon"
+          :src="assetUrl(item.key === currentKey ? item.activeIcon : item.icon)"
+          mode="aspectFit"
+        />
+        <uni-icons
+          v-else
+          :type="fallbackIcon(item.key)"
+          size="22"
+          :color="item.key === currentKey ? activeColor : textColor"
+        />
+      </view>
+      <text
+        class="ui-tabbar__label"
+        :style="{ color: item.key === currentKey ? activeColor : textColor }"
+      >
+        {{ item.name }}
+      </text>
     </view>
   </view>
 </template>
@@ -30,17 +36,36 @@ import { computed } from 'vue'
 import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'
 import { useConfigStore } from '@/stores/config'
 import { assetUrl } from '@/utils/assets'
+import { showToast } from '@/utils/feedback'
 
 defineProps({ currentKey: { type: String, default: '' } })
 
 const configStore = useConfigStore()
-const items = computed(() => configStore.navigation.items || [])
-const barStyle = computed(() => ({
-  backgroundColor: configStore.navigation.backgroundColor || '#ffffff',
-  borderTopColor: configStore.navigation.borderStyle === 'white' ? '#ffffff' : '#e3ece8'
-}))
-const activeStyle = computed(() => ({ color: configStore.navigation.activeColor || '#2e806d' }))
-const inactiveStyle = computed(() => ({ color: configStore.navigation.textColor || '#8c9d97' }))
+
+// 后台未配置导航时给出稳定的默认四栏，避免整页空白
+const defaultItems = [
+  { key: 'home', name: '首页' },
+  { key: 'category', name: '服务' },
+  { key: 'cart', name: '订单' },
+  { key: 'profile', name: '我的' }
+]
+
+const items = computed(() => {
+  const configured = configStore.navigation.items || []
+  return configured.length ? configured : defaultItems
+})
+
+// 后台「底部导航」装修可配色，未配置时回落到设计令牌的默认值
+const tabBarStyle = computed(() => {
+  const navigation = configStore.navigation || {}
+  return {
+    background: navigation.backgroundColor || '',
+    borderTop: navigation.borderStyle || ''
+  }
+})
+
+const activeColor = computed(() => configStore.navigation?.activeColor || '#e06a3d')
+const textColor = computed(() => configStore.navigation?.textColor || '#a39b95')
 
 const routeMap = {
   home: '/pages/home/index',
@@ -53,7 +78,7 @@ const routeMap = {
 const fallbackIcons = {
   home: 'home',
   category: 'list',
-  cart: 'cart',
+  cart: 'list',
   profile: 'person',
   user: 'person'
 }
@@ -67,16 +92,79 @@ function openItem (item) {
   if (!path) return
   if (/^https?:\/\//.test(path)) {
     uni.setClipboardData({ data: path })
-    uni.showToast({ title: '链接已复制', icon: 'none' })
+    showToast('链接已复制')
     return
   }
-  uni.reLaunch({ url: path.startsWith('/') ? path : `/${path}` })
+  const url = path.startsWith('/') ? path : `/${path}`
+  // 用 redirectTo 替换当前页而非 reLaunch：
+  // reLaunch 会关闭所有页面并重建页面栈，切换时必然出现明显白屏；
+  // redirectTo 只替换栈顶，配合页面保留上一帧内容可显著减少闪烁。
+  uni.redirectTo({
+    url,
+    fail: () => {
+      // 页面栈已满（10 层）等异常情况再退回 reLaunch
+      uni.reLaunch({ url })
+    }
+  })
 }
 </script>
 
 <style lang="scss" scoped>
-.app-tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20; display: flex; height: calc(112rpx + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1rpx solid; box-shadow: 0 -8rpx 28rpx rgba(35, 90, 73, .06); }
-.tab-item { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: center; justify-content: center; padding: 12rpx 8rpx 8rpx; font-size: 22rpx; }
-.tab-icon { width: 46rpx; height: 46rpx; margin-bottom: 6rpx; }
-.tab-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@import '@/styles/tokens.scss';
+
+.ui-tabbar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  height: calc(108rpx + env(safe-area-inset-bottom));
+  padding: 10rpx 24rpx env(safe-area-inset-bottom);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  box-shadow: $shadow-bar;
+  border-radius: $radius-xl $radius-xl 0 0;
+}
+
+.ui-tabbar__item {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  transition: transform 0.15s ease;
+}
+.ui-tabbar__item:active { transform: scale(0.94); }
+
+.ui-tabbar__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48rpx;
+  height: 48rpx;
+  transition: transform 0.2s ease;
+}
+
+.ui-tabbar__item--active .ui-tabbar__icon-wrap { transform: translateY(-2rpx) scale(1.06); }
+
+.ui-tabbar__icon { width: 44rpx; height: 44rpx; }
+
+.ui-tabbar__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: $font-micro;
+  font-weight: $weight-medium;
+  color: $ink-400;
+}
+
+.ui-tabbar__item--active .ui-tabbar__label {
+  color: $brand-500;
+  font-weight: $weight-semibold;
+}
 </style>

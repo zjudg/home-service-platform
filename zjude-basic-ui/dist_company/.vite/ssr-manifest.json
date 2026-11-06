@@ -1,0 +1,515 @@
+{
+  "\u0000vite/modulepreload-polyfill.js": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "index.html": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/@unhead+vue@2.1.13_vue@3.5.34_typescript@6.0.3_/node_modules/@unhead/vue/dist/client.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/@unhead+vue@2.1.13_vue@3.5.34_typescript@6.0.3_/node_modules/@unhead/vue/dist/shared/vue.Cr7xSEtD.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/@unhead+vue@2.1.13_vue@3.5.34_typescript@6.0.3_/node_modules/@unhead/vue/dist/shared/vue.N9zWjxoK.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/@vue+reactivity@3.5.34/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/@vue+runtime-core@3.5.34/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/@vue+runtime-dom@3.5.34/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/@vue+shared@3.5.34/node_modules/@vue/shared/dist/shared.esm-bundler.js": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/hookable@6.1.1/node_modules/hookable/dist/index.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/unhead@2.1.13/node_modules/unhead/dist/client.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/unhead@2.1.13/node_modules/unhead/dist/shared/unhead.B5FWS6X0.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/unhead@2.1.13/node_modules/unhead/dist/shared/unhead.CbpEuj3y.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/unhead@2.1.13/node_modules/unhead/dist/shared/unhead.Ct24BOby.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/unhead@2.1.13/node_modules/unhead/dist/shared/unhead.yem5I2v_.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/vite-ssg@28.3.0_unhead@3.1._c37696a58331b57b225fdcaee7281965/node_modules/vite-ssg/dist/index.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/vite-ssg@28.3.0_unhead@3.1._c37696a58331b57b225fdcaee7281965/node_modules/vite-ssg/dist/shared/vite-ssg.C6pK7rvr.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/vite-ssg@28.3.0_unhead@3.1._c37696a58331b57b225fdcaee7281965/node_modules/vite-ssg/dist/shared/vite-ssg.ETIvV-80.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/vue-router@4.6.4_vue@3.5.34_typescript@6.0.3_/node_modules/vue-router/dist/devtools-EWN81iOl.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "node_modules/.pnpm/vue-router@4.6.4_vue@3.5.34_typescript@6.0.3_/node_modules/vue-router/dist/vue-router.mjs": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/App.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/App.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/api/official.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/assets/hero-elder-care.jpg": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/assets/hero-housekeeping-cleaning.jpg": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/assets/hero-maternity-care.jpg": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/assets/hero-store-consultation.jpg": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/assets/map/img.png": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/assets/qrcode/mini-program.png": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/assets/qrcode/official-account.png": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/components/SectionHead.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/components/SectionHead.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/components/SeoHead.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/components/SeoHead.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/components/SiteFooter.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/components/SiteFooter.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/components/SiteHeader.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/components/SiteHeader.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/data/seo.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/data/site.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/main.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/router/index.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/style.css": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/AboutView.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/AboutView.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/ContactView.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/ContactView.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/HomeView.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/HomeView.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/LocalLandingView.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/LocalLandingView.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/ReviewsView.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/ReviewsView.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/ServicesView.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/ServicesView.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/TrainingView.vue": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ],
+  "src/views/TrainingView.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/mini-program-q8GHPWL9.png",
+    "/assets/official-account-BZPjY7Hu.png",
+    "/assets/img-GzFlGLLq.png",
+    "/assets/hero-elder-care-DVFGa40K.jpg",
+    "/assets/hero-housekeeping-cleaning-CLwaICZy.jpg",
+    "/assets/hero-maternity-care-Z1Mrd8K0.jpg",
+    "/assets/hero-store-consultation-BIj8NWo6.jpg"
+  ]
+}

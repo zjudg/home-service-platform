@@ -41,6 +41,7 @@ public class UploadSettingsServiceImpl implements IUploadSettingsService
         aliyun.setBucket(value(values, UploadConfigKeys.ALIYUN_BUCKET));
         aliyun.setEndpoint(value(values, UploadConfigKeys.ALIYUN_ENDPOINT));
         aliyun.setAccessKeyId(value(values, UploadConfigKeys.ALIYUN_ACCESS_KEY_ID));
+        aliyun.setDir(value(values, UploadConfigKeys.ALIYUN_DIR));
         aliyun.setDomain(value(values, UploadConfigKeys.ALIYUN_DOMAIN));
         settings.setAliyun(aliyun);
 
@@ -75,6 +76,7 @@ public class UploadSettingsServiceImpl implements IUploadSettingsService
         save(records, UploadConfigKeys.ALIYUN_ACCESS_KEY_ID, "阿里云-AccessKeyId", aliyun.getAccessKeyId(), username);
         save(records, UploadConfigKeys.ALIYUN_ACCESS_KEY_SECRET, "阿里云-AccessKeySecret",
                 secret(aliyun.getAccessKeySecret(), records, UploadConfigKeys.ALIYUN_ACCESS_KEY_SECRET), username);
+        save(records, UploadConfigKeys.ALIYUN_DIR, "阿里云-目录", aliyun.getDir(), username);
         save(records, UploadConfigKeys.ALIYUN_DOMAIN, "阿里云-空间域名", aliyun.getDomain(), username);
 
         UploadSettingsRequest.TencentConfig tencent = safe(request.getTencent(),

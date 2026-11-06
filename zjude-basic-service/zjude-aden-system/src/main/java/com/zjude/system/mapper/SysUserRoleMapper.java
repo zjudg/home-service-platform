@@ -47,6 +47,16 @@ public interface SysUserRoleMapper
     int deleteUserRoleInfo(SysUserRole userRole);
 
     /**
+     * 为小程序用户授予业务管理员角色；SQL 使用 NOT EXISTS 保证重复点击幂等。
+     */
+    int grantMiniAdmin(@Param("userId") String userId);
+
+    /**
+     * 撤销小程序用户的业务管理员角色。
+     */
+    int revokeMiniAdmin(@Param("userId") String userId);
+
+    /**
      * 批量取消授权用户角色
      * 
      * @param roleId 角色ID

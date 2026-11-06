@@ -1,7 +1,154 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjude.system.mapper.ZjudgOrderMapper">
-  <resultMap id="OrderResult" type="com.zjude.system.domain.ZjudgOrder"><id property="orderId" column="order_id"/><result property="orderNo" column="order_no"/><result property="serviceId" column="service_id"/><result property="serviceName" column="service_name"/><result property="userId" column="user_id"/><result property="userInfo" column="user_info"/><result property="appointmentDate" column="appointment_date"/><result property="slotId" column="slot_id"/><result property="slotName" column="slot_name"/><result property="amount" column="amount"/><result property="orderStatus" column="order_status"/><result property="paymentStatus" column="payment_status"/><result property="createTime" column="create_time"/></resultMap>
-  <select id="selectList" resultMap="OrderResult">select order_id,order_no,service_id,service_name,user_id,user_info,appointment_date,slot_id,slot_name,amount,order_status,payment_status,create_time from zjudg_order <where><if test="orderNo != null and orderNo != ''">and order_no like concat('%',#{orderNo},'%')</if><if test="serviceName != null and serviceName != ''">and service_name like concat('%',#{serviceName},'%')</if><if test="userInfo != null and userInfo != ''">and user_info like concat('%',#{userInfo},'%')</if><if test="orderStatus != null and orderStatus != ''">and order_status=#{orderStatus}</if><if test="paymentStatus != null and paymentStatus != ''">and payment_status=#{paymentStatus}</if><if test="params.beginTime != null and params.beginTime != ''">and create_time &gt;= #{params.beginTime}</if><if test="params.endTime != null and params.endTime != ''">and create_time &lt; date_add(#{params.endTime},interval 1 day)</if></where> order by create_time desc</select>
-  <select id="selectById" resultMap="OrderResult">select order_id,order_no,service_id,service_name,user_id,user_info,appointment_date,slot_id,slot_name,amount,order_status,payment_status,create_time from zjudg_order where order_id=#{id}</select>
+  <resultMap id="OrderResult" type="com.zjude.system.domain.ZjudgOrder"><id property="orderId" column="order_id"/><result property="orderNo" column="order_no"/><result property="serviceId" column="service_id"/><result property="serviceName" column="service_name"/><result property="serviceImage" column="service_image"/><result property="categoryName" column="category_name"/><result property="categoryImage" column="category_image"/><result property="cityId" column="city_id"/><result property="userId" column="user_id"/><result property="userInfo" column="user_info"/><result property="masterId" column="master_id"/><result property="dispatchStatus" column="dispatch_status"/><result property="dispatchTime" column="dispatch_time"/><result property="settleStatus" column="settle_status"/><result property="masterIncome" column="master_income"/><result property="platformFee" column="platform_fee"/><result property="settleTime" column="settle_time"/><result property="acceptTime" column="accept_time"/><result property="startTime" column="start_time"/><result property="finishTime" column="finish_time"/><result property="finishPhotos" column="finish_photos"/><result property="appointmentDate" column="appointment_date"/><result property="slotId" column="slot_id"/><result property="slotName" column="slot_name"/><result property="quantity" column="quantity"/><result property="quantityUnit" column="quantity_unit"/><result property="address" column="address"/><result property="phone" column="phone"/><result property="amount" column="amount"/><result property="orderStatus" column="order_status"/><result property="paymentStatus" column="payment_status"/><result property="reviewed" column="reviewed"/><result property="remark" column="remark"/><result property="createBy" column="create_by"/><result property="createTime" column="create_time"/><result property="updateBy" column="update_by"/></resultMap>
+  <sql id="columns">o.order_id,o.order_no,o.service_id,o.service_name,(select s.carousel_images from zjudg_service s where s.service_id=o.service_id) service_image,(select c.category_name from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id where s.service_id=o.service_id) category_name,(select c.image_url from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id where s.service_id=o.service_id) category_image,o.city_id,o.user_id,o.user_info,o.master_id,o.dispatch_status,o.dispatch_time,o.accept_time,o.start_time,o.finish_time,o.finish_photos,o.appointment_date,o.slot_id,o.slot_name,o.quantity,o.quantity_unit,o.address,o.phone,o.amount,o.order_status,o.payment_status,o.settle_status,o.master_income,o.platform_fee,o.settle_time,o.remark,o.create_by,o.create_time,o.update_time,(select count(1) from zjudg_service_review r where r.order_id=o.order_id) reviewed</sql>
+  <sql id="selectListWhere">
+    <where>
+      <if test="orderNo != null and orderNo != ''">and o.order_no like concat('%',#{orderNo},'%')</if>
+      <if test="userId != null and userId != ''">and o.user_id=#{userId}</if>
+      <if test="serviceId != null and serviceId != ''">and o.service_id=#{serviceId}</if>
+      <if test="serviceName != null and serviceName != ''">and o.service_name like concat('%',#{serviceName},'%')</if>
+      <if test="userInfo != null and userInfo != ''">and o.user_info like concat('%',#{userInfo},'%')</if>
+      <if test="phone != null and phone != ''">and o.phone like concat('%',#{phone},'%')</if>
+      <if test="masterId != null and masterId != ''">and o.master_id=#{masterId}</if>
+      <if test="orderStatus != null and orderStatus != ''">and o.order_status=#{orderStatus}</if>
+      <if test="paymentStatus != null and paymentStatus != ''">and o.payment_status=#{paymentStatus}</if>
+      <if test="params.beginTime != null and params.beginTime != ''">and o.create_time &gt;= #{params.beginTime}</if>
+      <if test="params.endTime != null and params.endTime != ''">and o.create_time &lt; date_add(#{params.endTime},interval 1 day)</if>
+      <!-- 数据权限：由 DataScopeAspect 注入，未配置时为空串 -->
+      ${params.dataScope}
+    </where>
+  </sql>
+  <select id="selectList" resultMap="OrderResult">
+    select <include refid="columns"/> from zjudg_order o
+    <include refid="selectListWhere"/>
+    order by o.create_time desc
+  </select>
+  <select id="selectListByUser" resultMap="OrderResult">
+    select <include refid="columns"/> from zjudg_order o
+    where o.user_id=#{userId}
+    <if test="orderStatus != null and orderStatus != ''">and o.order_status=#{orderStatus}</if>
+    order by o.create_time desc
+  </select>
+  <select id="selectListByUser_COUNT" resultType="long">
+    select count(1) from zjudg_order o
+    where o.user_id=#{userId}
+    <if test="orderStatus != null and orderStatus != ''">and o.order_status=#{orderStatus}</if>
+  </select>
+  <!-- Avoid PageHelper wrapping the full order query (including its correlated review count) in a derived count query. -->
+  <select id="selectList_COUNT" resultType="long">
+    select count(1) from zjudg_order o
+    <include refid="selectListWhere"/>
+  </select>
+  <select id="selectById" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o where o.order_id=#{id}</select>
+  <select id="selectByIdAndUser" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o where o.order_id=#{id} and o.user_id=#{userId}</select>
+  <select id="selectByIdAndMaster" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o where o.order_id=#{id} and o.master_id=#{masterId}</select>
+
+  <!-- 待接单池：仅返回未指派、仍待接单、预约日期不早于今天的订单 -->
+  <select id="selectPendingPool" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o
+    where o.master_id is null and o.order_status='0' and o.appointment_date &gt;= #{appointmentDate}
+    <if test="slotId != null and slotId != ''">and o.slot_id=#{slotId}</if>
+    order by o.appointment_date asc, o.create_time asc</select>
+
+  <!--
+    按技能过滤的待接单池。
+    skills 为逗号分隔的分类 ID，通过服务表的 category_id 做匹配；
+    同时兼容二级分类前缀（师傅选 ZC_CLEAN 也能看到 ZC_CLEAN_HOME 的订单）。
+  -->
+  <select id="selectPendingPoolBySkills" resultMap="OrderResult">
+    select <include refid="columns"/> from zjudg_order o
+    left join zjudg_service s on s.service_id = o.service_id
+    where o.master_id is null and o.order_status='0' and o.appointment_date &gt;= #{appointmentDate}
+    <if test="slotId != null and slotId != ''">and o.slot_id=#{slotId}</if>
+    and (
+      s.category_id in
+      <foreach collection="skillList" item="skill" open="(" separator="," close=")">#{skill}</foreach>
+      <foreach collection="skillList" item="skill">
+        or s.category_id like concat(#{skill}, '_%')
+      </foreach>
+    )
+    order by o.appointment_date asc, o.create_time asc
+  </select>
+
+  <select id="countActiveBySlot" resultType="int">select count(1) from zjudg_order where slot_id=#{slotId} and appointment_date=#{appointmentDate} and order_status &lt;&gt; '3'</select>
+  <select id="selectFinishedByUser" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o where o.order_id=#{id} and o.user_id=#{userId} and o.order_status='2'</select>
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgOrder">insert into zjudg_order(order_id,order_no,service_id,service_name,city_id,user_id,user_info,appointment_date,slot_id,slot_name,quantity,quantity_unit,address,phone,amount,order_status,payment_status,create_by,create_time,remark) values(#{orderId},#{orderNo},#{serviceId},#{serviceName},#{cityId},#{userId},#{userInfo},#{appointmentDate},#{slotId},#{slotName},#{quantity},#{quantityUnit},#{address},#{phone},#{amount},#{orderStatus},#{paymentStatus},#{createBy},sysdate(),#{remark})</insert>
+  <update id="updateStatusOwned">update zjudg_order set order_status=#{targetStatus},update_by=#{operator},update_time=sysdate() where order_id=#{id} and user_id=#{userId} and order_status=#{fromStatus}</update>
+  <update id="updateStatus">update zjudg_order set order_status=#{targetStatus},update_by=#{operator},update_time=sysdate() where order_id=#{id}</update>
+
+  <!-- 抢单：master_id is null 条件保证两名师傅并发接单时只有一人成功 -->
+  <update id="claimOrder">update zjudg_order set master_id=#{masterId},order_status=#{targetStatus},accept_time=sysdate(),update_by=#{operator},update_time=sysdate() where order_id=#{id} and order_status=#{fromStatus} and master_id is null</update>
+
+  <!-- 师傅侧状态流转：同时校验归属与期望状态，防止越权与重复提交 -->
+  <update id="updateStatusByMaster">update zjudg_order set order_status=#{targetStatus},update_by=#{operator},update_time=sysdate() where order_id=#{id} and master_id=#{masterId} and order_status=#{fromStatus}</update>
+
+  <!-- 开工：额外记录 start_time -->
+  <update id="startService">update zjudg_order set order_status=#{targetStatus},start_time=sysdate(),update_by=#{operator},update_time=sysdate() where order_id=#{id} and master_id=#{masterId} and order_status=#{fromStatus}</update>
+
+  <!-- 完工：额外记录 finish_time 与完工凭证 -->
+  <update id="finishService">update zjudg_order set order_status=#{targetStatus},finish_time=sysdate(),finish_photos=#{finishPhotos},update_by=#{operator},update_time=sysdate() where order_id=#{id} and master_id=#{masterId} and order_status=#{fromStatus}</update>
+
+  <!-- 师傅评分回写：以已评价订单为单位重算均值与完单数 -->
+  <select id="selectMasterRating" resultType="java.math.BigDecimal">
+    select round(avg(r.rating),1) from zjudg_service_review r join zjudg_order o on o.order_id=r.order_id
+    where o.master_id=#{masterId} and o.order_status='2'
+  </select>
+  <select id="countFinishedByMaster" resultType="int">
+    select count(1) from zjudg_order where master_id=#{masterId} and order_status='2'
+  </select>
+
+  <!-- 幂等：仅未支付订单会被置为已支付，重复回调不产生副作用 -->
+  <update id="markPaid">
+    update zjudg_order set payment_status='1',update_by=#{operator},update_time=sysdate()
+    where order_id=#{orderId} and payment_status='0'
+  </update>
+
+  <!-- 退款完成：仅已支付订单会被置为已退款 -->
+  <update id="markRefunded">
+    update zjudg_order set payment_status='2',update_by=#{operator},update_time=sysdate()
+    where order_id=#{orderId} and payment_status='1'
+  </update>
+
+  <!-- 结算幂等：仅未结算订单会被标记，重复调用不会重复记账 -->
+  <update id="markSettled">
+    update zjudg_order
+    set settle_status='1',master_income=#{masterIncome},platform_fee=#{platformFee},settle_time=sysdate(),update_time=sysdate()
+    where order_id=#{orderId} and settle_status='0'
+  </update>
+
+  <update id="markSettleReversed">
+    update zjudg_order set settle_status='2',update_time=sysdate() where order_id=#{orderId}
+  </update>
+
+  <!-- 指派：master_id is null 保证并发下只有一次成功 -->
+  <update id="assignMaster">
+    update zjudg_order
+    set master_id=#{masterId},dispatch_status='1',dispatch_time=sysdate(),update_by='dispatch',update_time=sysdate()
+    where order_id=#{orderId} and master_id is null and order_status='0'
+    <if test="expectDispatchStatus != null and expectDispatchStatus != ''">
+      and dispatch_status=#{expectDispatchStatus}
+    </if>
+  </update>
+
+  <update id="markDispatchFailed">
+    update zjudg_order set dispatch_status='2',update_time=sysdate() where order_id=#{orderId} and dispatch_status='0'
+  </update>
+
+  <!--
+    拒单释放：只有当前持有该单、且订单仍待接单（未开工）时才清空师傅，
+    并重置 dispatch_status 为 0 让定时补偿任务能再次派单。
+  -->
+  <update id="releaseMaster">
+    update zjudg_order
+    set master_id=null,dispatch_status='0',update_by='reject',update_time=sysdate()
+    where order_id=#{orderId} and master_id=#{masterId} and order_status='0'
+  </update>
+
+  <select id="selectDispatchPending" resultMap="OrderResult">
+    select <include refid="columns"/> from zjudg_order o
+    where o.master_id is null and o.order_status='0' and o.payment_status='1' and o.dispatch_status='0'
+    order by o.create_time asc
+    limit 50
+  </select>
 </mapper>

@@ -25,6 +25,21 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item label="发布城市">
+        <el-select
+          v-model="query.cityId"
+          clearable
+          filterable
+          placeholder="全部城市"
+        >
+          <el-option
+            v-for="item in cityOptions"
+            :key="item.cityId"
+            :label="item.cityName"
+            :value="item.cityId"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button
           type="primary"
@@ -83,36 +98,66 @@
       <el-table-column
         type="selection"
         width="50"
-      /><el-table-column
+      />
+      <el-table-column
         label="服务名称"
         prop="serviceName"
         min-width="180"
-      /><el-table-column
+      />
+      <el-table-column
+        label="服务图片"
+        width="100"
+      >
+        <template #default="{ row }">
+          <image-preview
+            v-if="getServiceImage(row.carouselImages)"
+            :src="getServiceImage(row.carouselImages)"
+            width="64"
+            height="64"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column
         label="服务分类"
         prop="categoryName"
-      /><el-table-column
+      />
+      <el-table-column
         label="价格"
         prop="price"
-      /><el-table-column
+      />
+      <el-table-column
         label="单位"
         prop="unitName"
-      /><el-table-column
+      />
+      <el-table-column
         label="预约人数"
         prop="reserveCount"
-      /><el-table-column label="销售状态">
+      />
+      <el-table-column label="销售状态">
         <template #default="{ row }">
           <el-tag :type="row.status === '0' ? 'success' : 'info'">
             {{ row.status === '0' ? '销售中' : '仓库中' }}
           </el-tag>
         </template>
-      </el-table-column><el-table-column
+      </el-table-column>
+      <el-table-column
+        label="发布城市"
+        width="110"
+      >
+        <template #default="{ row }">
+          {{ row.cityName || '全国' }}
+        </template>
+      </el-table-column>
+      <el-table-column
         label="排序"
         prop="sortNum"
-      /><el-table-column
+      />
+      <el-table-column
         label="添加时间"
         prop="createTime"
         width="170"
-      /><el-table-column
+      />
+      <el-table-column
         label="操作"
         width="150"
       >
@@ -123,7 +168,8 @@
             @click="openForm(row.serviceId)"
           >
             编辑
-          </el-button><el-button
+          </el-button>
+          <el-button
             link
             type="danger"
             @click="remove([row.serviceId])"
@@ -178,6 +224,23 @@
                   :value="item.categoryId"
                 />
               </el-select>
+            </el-form-item><el-form-item label="发布城市">
+              <el-select
+                v-model="form.cityId"
+                clearable
+                filterable
+                placeholder="留空表示全国可用"
+              >
+                <el-option
+                  v-for="item in cityOptions"
+                  :key="item.cityId"
+                  :label="`${item.provinceName} ${item.cityName}`"
+                  :value="item.cityId"
+                />
+              </el-select>
+              <div class="form-tip">
+                留空时该服务对所有城市可见；选择城市后仅该城市可见
+              </div>
             </el-form-item><el-form-item
               label="轮播图"
             >
@@ -233,10 +296,12 @@
         </el-tab-pane><el-tab-pane
           label="服务详情"
           name="detail"
+          lazy
         >
           <editor
             v-model="form.detailContent"
             :min-height="350"
+            :auto-focus="true"
           /><el-divider /><div
             class="detail-preview"
             v-html="form.detailContent"
@@ -262,17 +327,23 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { listService, getService, addService, updateService, deleteService } from '@/api/zjudg/service'
 import { listCategory } from '@/api/zjudg/category'
 import { listUnit } from '@/api/zjudg/unit'
+import { listCity } from '@/api/zjudg/city'
 
-const loading = ref(false); const rows = ref([]); const total = ref(0); const selected = ref([]); const categories = ref([]); const units = ref([]); const formVisible = ref(false); const activeTab = ref('base')
-const query = reactive({ pageNum: 1, pageSize: 10, serviceName: '', categoryId: '', status: '' }); const form = reactive({})
+const loading = ref(false); const rows = ref([]); const total = ref(0); const selected = ref([]); const categories = ref([]); const units = ref([]); const cityOptions = ref([]); const formVisible = ref(false); const activeTab = ref('base')
+const query = reactive({ pageNum: 1, pageSize: 10, serviceName: '', categoryId: '', cityId: '', status: '' }); const form = reactive({})
 function load () { loading.value = true; listService(query).then(res => { rows.value = res.rows || []; total.value = res.total || 0 }).finally(() => { loading.value = false }) }
-function reset () { Object.assign(query, { pageNum: 1, serviceName: '', categoryId: '', status: '' }); load() }
-function blank () { Object.keys(form).forEach(key => delete form[key]); Object.assign(form, { serviceName: '', serviceIntro: '', categoryId: '', carouselImages: '', price: 0, originalPrice: null, unitId: '', sortNum: 0, status: '1', detailContent: '' }) }
+function reset () { Object.assign(query, { pageNum: 1, serviceName: '', categoryId: '', cityId: '', status: '' }); load() }
+function blank () { Object.keys(form).forEach(key => delete form[key]); Object.assign(form, { serviceName: '', serviceIntro: '', categoryId: '', cityId: '', carouselImages: '', price: 0, originalPrice: null, unitId: '', sortNum: 0, status: '1', detailContent: '' }) }
+function getServiceImage (images) {
+  if (Array.isArray(images)) return images[0] || ''
+  if (typeof images !== 'string') return ''
+  return images.split(',').map(image => image.trim()).find(Boolean) || ''
+}
 function openForm (id) { blank(); activeTab.value = 'base'; formVisible.value = true; if (id) getService(id).then(res => Object.assign(form, res.data)) }
 function save () { const action = form.serviceId ? updateService : addService; action(form).then(() => { ElMessage.success('保存成功'); formVisible.value = false; load() }) }
 function remove (ids) { ElMessageBox.confirm('确认删除选中的服务吗？', '提示', { type: 'warning' }).then(() => deleteService(ids.join(',')).then(() => { ElMessage.success('删除成功'); load() })) }
 function removeSelected () { remove(selected.value.map(item => item.serviceId)) }
-onMounted(() => { Promise.all([listCategory({ pageSize: 100 }), listUnit({ pageSize: 100 })]).then(([c, u]) => { categories.value = c.rows || []; units.value = u.rows || [] }); load() })
+onMounted(() => { Promise.all([listCategory({ pageSize: 100 }), listUnit({ pageSize: 100 }), listCity({ pageSize: 500 })]).then(([c, u, ct]) => { categories.value = c.rows || []; units.value = u.rows || []; cityOptions.value = ct.rows || [] }); load() })
 </script>
 
 <style scoped>.detail-preview{border:1px solid #ebeef5;padding:16px;min-height:80px}.form-tip{color:#909399;font-size:12px}.mb8{margin-bottom:8px}</style>

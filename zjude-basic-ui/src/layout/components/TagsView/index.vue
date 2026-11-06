@@ -269,66 +269,75 @@ function handleScroll () {
 
 <style lang='scss' scoped>
 .tags-view-container {
-  height: 34px;
+  height: 38px;
   width: 100%;
-  background: #071d2d;
-  border-bottom: 1px solid rgba(125, 211, 252, 0.16);
-  box-shadow: 0 4px 14px rgba(2, 20, 35, 0.18);
+  background: #fff;
+  border-bottom: 1px solid #f2ede9;
   .tags-view-wrapper {
     .tags-view-item {
       display: inline-block;
       position: relative;
       cursor: pointer;
       height: 26px;
-      line-height: 26px;
-      border: 1px solid rgba(125, 211, 252, 0.2);
-      color: rgba(224, 242, 254, 0.72);
-      background: rgba(7, 35, 56, 0.72);
-      padding: 0 8px;
-      font-size: 12px;
+      line-height: 24px;
+      border: 1px solid #ece6e1;
+      border-radius: 999px;
+       color: #3d3733;
+      background: #fbf8f6;
+       padding: 0 13px;
+       font-size: 14px;
+       font-weight: 500;
       margin-left: 5px;
-      margin-top: 4px;
+      margin-top: 6px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
       &:first-of-type {
         margin-left: 15px;
       }
       &:last-of-type {
         margin-right: 15px;
       }
+      &:hover {
+        color: #c9582d;
+        border-color: #f9d5c5;
+      }
       &.active {
-        background-color: #0ea5e9;
-        color: #fff;
-        border-color: #38bdf8;
+        background-color: #fdece4;
+         color: #3b241b;
+        border-color: #f9d5c5;
+        font-weight: 600;
         &::before {
           content: "";
-          background: #dbeafe;
+           background: #3b241b;
           display: inline-block;
-          width: 8px;
-          height: 8px;
+          width: 6px;
+          height: 6px;
           border-radius: 50%;
           position: relative;
-          margin-right: 5px;
+          margin-right: 6px;
         }
       }
     }
   }
   .contextmenu {
     margin: 0;
-    background: #0a2940;
+    background: #fff;
     z-index: 3000;
     position: absolute;
     list-style-type: none;
     padding: 5px 0;
-    border-radius: 4px;
+    border-radius: 10px;
+    border: 1px solid #ece6e1;
     font-size: 12px;
     font-weight: 400;
-    color: #dbeafe;
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
+    color: #3d3733;
+    box-shadow: 0 6px 24px rgba(31, 28, 26, 0.1);
     li {
       margin: 0;
       padding: 7px 16px;
       cursor: pointer;
       &:hover {
-        background: rgba(34, 211, 238, 0.12);
+        color: #c9582d;
+        background: #fff7f3;
       }
     }
   }
@@ -353,8 +362,8 @@ function handleScroll () {
         vertical-align: -3px;
       }
       &:hover {
-        background-color: #b4bccc;
-        color: #fff;
+        background-color: #f9d5c5;
+        color: #c9582d;
         width: 12px !important;
         height: 12px !important;
       }

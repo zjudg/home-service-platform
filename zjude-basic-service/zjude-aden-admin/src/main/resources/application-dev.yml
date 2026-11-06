@@ -12,6 +12,9 @@ zjude:
   addressEnabled: false
   # 验证码类型 math 数字计算 char 字符验证
   captchaType: math
+  security:
+    # 敏感字段（如身份证号）加密密钥，仅用于本地开发
+    field-key: dev-only-field-key-not-for-production-2026-zjude-aden
 
 #jasypt配置
 jasypt:
@@ -23,7 +26,7 @@ jasypt:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为9528
-  port: 8379
+  port: 8888
   servlet:
     # 应用的访问路径
     context-path: /
@@ -61,8 +64,8 @@ token:
   header: Authorization
   # 令牌密钥
   secret: dev-only-token-secret-change-before-shared-deployment-2026-zjude-aden
-  # 令牌有效期（默认60分钟）
-  expireTime: 60
+  # 令牌有效期（分钟），525600 分钟 = 365 天
+  expireTime: 525600
 
 # MyBatis配置
 mybatis:

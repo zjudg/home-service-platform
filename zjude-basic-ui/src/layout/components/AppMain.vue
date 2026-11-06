@@ -27,28 +27,26 @@ const tagsViewStore = useTagsViewStore()
 
 <style lang="scss" scoped>
 .app-main {
-  /* 50= navbar  50  */
-  min-height: calc(100vh - 50px);
+  /* 56= navbar  */
+  min-height: calc(100vh - 56px);
   width: 100%;
   position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(14, 165, 233, 0.06), transparent 38%),
-    #071d2d;
+  background: #faf7f5;
 }
 
 .fixed-header + .app-main {
-  padding-top: 50px;
+  padding-top: 56px;
 }
 
 .hasTagsView {
   .app-main {
-    /* 84 = navbar + tags-view = 50 + 34 */
-    min-height: calc(100vh - 84px);
+    /* 94 = navbar + tags-view = 56 + 38 */
+    min-height: calc(100vh - 94px);
   }
 
   .fixed-header + .app-main {
-    padding-top: 84px;
+    padding-top: 94px;
   }
 }
 </style>
@@ -67,11 +65,15 @@ const tagsViewStore = useTagsViewStore()
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #071d2d;
+  background-color: #faf7f5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #1d5873;
+  background-color: #d8cfc8;
   border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #c4bcb6;
 }
 </style>

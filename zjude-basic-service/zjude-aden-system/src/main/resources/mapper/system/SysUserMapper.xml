@@ -9,6 +9,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="userId"       column="user_id"      />
         <result property="deptId"       column="dept_id"      />
         <result property="userName"     column="user_name"    />
+        <result property="wxOpenid"     column="wx_openid"    />
+        <result property="wxUnionid"    column="wx_unionid"   />
         <result property="nickName"     column="nick_name"    />
         <result property="email"        column="email"        />
         <result property="phoneNumber"  column="phone_number"  />
@@ -48,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 	
 	<sql id="selectUserVo">
-        select u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.avatar, u.phone_number, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
+        select u.user_id, u.dept_id, u.user_name, u.wx_openid, u.wx_unionid, u.nick_name, u.email, u.avatar, u.phone_number, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
         d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.status as dept_status,
         r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.status as role_status
         from sys_user u
@@ -85,6 +87,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
 	</select>
+
+    <select id="selectMiniRecipients" resultType="map">
+        select user_id as userId, nick_name as nickName, phone_number as phoneNumber
+        from sys_user
+        where del_flag='0' and status='0'
+          and (nick_name like concat('%', #{keyword}, '%') or phone_number like concat('%', #{keyword}, '%'))
+        order by create_time desc limit 30
+    </select>
+
+    <select id="selectOrderNotificationAdmins" resultType="com.zjude.common.core.domain.entity.SysUser">
+        select distinct u.user_id as userId, u.wx_openid as wxOpenid
+        from sys_user u
+        inner join sys_user_role ur on ur.user_id = u.user_id
+        inner join sys_role r on r.role_id = ur.role_id
+        where u.del_flag = '0' and u.status = '0'
+          and r.del_flag = '0' and r.status = '0'
+          and r.role_key in ('admin', 'mini_admin')
+          and u.wx_openid is not null and u.wx_openid != ''
+    </select>
 	
 	<select id="selectAllocatedList" parameterType="com.zjude.common.core.domain.entity.SysUser" resultMap="SysUserResult">
 	    select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phone_number, u.status, u.create_time
@@ -125,6 +146,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	    <include refid="selectUserVo"/>
 		where u.user_name = #{userName,jdbcType=VARCHAR} and u.del_flag = '0'
 	</select>
+
+	<select id="selectUserByPhoneNumber" parameterType="String" resultMap="SysUserResult">
+	    <include refid="selectUserVo"/>
+		where u.phone_number = #{phoneNumber,jdbcType=VARCHAR} and u.del_flag = '0' limit 1
+	</select>
+
+	<select id="selectUserByWxOpenid" parameterType="String" resultMap="SysUserResult">
+	    <include refid="selectUserVo"/>
+		where u.wx_openid = #{openid,jdbcType=VARCHAR} and u.del_flag = '0' limit 1
+	</select>
 	
 	<select id="selectUserById" parameterType="java.lang.String" resultMap="SysUserResult">
 		<include refid="selectUserVo"/>
@@ -148,6 +179,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="userId != null and userId != ''">user_id,</if>
  			<if test="deptId != null and deptId != ''">dept_id,</if>
  			<if test="userName != null and userName != ''">user_name,</if>
+			<if test="wxOpenid != null and wxOpenid != ''">wx_openid,</if>
+			<if test="wxUnionid != null and wxUnionid != ''">wx_unionid,</if>
  			<if test="nickName != null and nickName != ''">nick_name,</if>
  			<if test="email != null and email != ''">email,</if>
  			<if test="avatar != null and avatar != ''">avatar,</if>
@@ -162,6 +195,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="userId != null and userId != ''">#{userId},</if>
  			<if test="deptId != null and deptId != ''">#{deptId},</if>
  			<if test="userName != null and userName != ''">#{userName},</if>
+			<if test="wxOpenid != null and wxOpenid != ''">#{wxOpenid},</if>
+			<if test="wxUnionid != null and wxUnionid != ''">#{wxUnionid},</if>
  			<if test="nickName != null and nickName != ''">#{nickName},</if>
  			<if test="email != null and email != ''">#{email},</if>
  			<if test="avatar != null and avatar != ''">#{avatar},</if>
@@ -198,6 +233,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<update id="updateUserStatus" parameterType="com.zjude.common.core.domain.entity.SysUser">
  		update sys_user set status = #{status} where user_id = #{userId,jdbcType=VARCHAR}
+	</update>
+
+	<!-- 微信登录补写 openid：仅更新微信标识，不触碰其他用户资料 -->
+	<update id="updateUserWxIdentity" parameterType="com.zjude.common.core.domain.entity.SysUser">
+		update sys_user set wx_openid = #{wxOpenid,jdbcType=VARCHAR},
+			wx_unionid = #{wxUnionid,jdbcType=VARCHAR}, update_time = sysdate()
+		where user_id = #{userId,jdbcType=VARCHAR}
 	</update>
 	
 	<update id="updateUserAvatar" parameterType="com.zjude.common.core.domain.entity.SysUser">

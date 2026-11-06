@@ -25,6 +25,10 @@ export function getMiniProfile () {
   return request({ url: '/mini/config/profile', method: 'GET' })
 }
 
+export function getMiniSubscriptionTemplates () {
+  return request({ url: '/mini/config/subscription-templates', method: 'GET' })
+}
+
 // 轮播图来自后台「轮播图管理」(zjudg_banner)，只返回启用中且在有效期内的数据
 export function getMiniBanners (position = 'index') {
   return request({ url: '/mini/config/banners', method: 'GET', data: { position } })

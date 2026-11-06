@@ -74,7 +74,7 @@ const routers = computed(() => permissionStore.topbarRouters)
 // 顶部显示菜单
 const topMenus = computed(() => {
   const topMenus = []
-  routers.value.map((menu) => {
+  routers.value.forEach((menu) => {
     if (menu.hidden !== true) {
       // 兼容顶部栏一级菜单内部跳转
       if (menu.path === '/') {
@@ -90,7 +90,7 @@ const topMenus = computed(() => {
 // 设置子路由
 const childrenMenus = computed(() => {
   const childrenMenus = []
-  routers.value.map((router) => {
+  routers.value.forEach((router) => {
     for (const item in router.children) {
       if (router.children[item].parentPath === undefined) {
         if (router.path === '/') {
@@ -157,7 +157,7 @@ function handleSelect (key, keyPath) {
 function activeRoutes (key) {
   const routes = []
   if (childrenMenus.value && childrenMenus.value.length > 0) {
-    childrenMenus.value.map((item) => {
+    childrenMenus.value.forEach((item) => {
       if (key == item.parentPath || (key == 'index' && item.path == '')) {
         routes.push(item)
       }
@@ -186,31 +186,33 @@ onMounted(() => {
 <style lang="scss">
 .topmenu-container.el-menu--horizontal > .el-menu-item {
   float: left;
-  height: 50px !important;
-  line-height: 50px !important;
-  color: #999093 !important;
-  padding: 0 5px !important;
-  margin: 0 10px !important;
+  height: 56px !important;
+  line-height: 56px !important;
+  color: #7a726c !important;
+  padding: 0 10px !important;
+  margin: 0 8px !important;
+  font-weight: 500;
 }
 
 .topmenu-container.el-menu--horizontal > .el-menu-item.is-active, .el-menu--horizontal > .el-sub-menu.is-active .el-submenu__title {
   border-bottom: 2px solid #{'var(--theme)'} !important;
-  color: #303133;
+  color: #c9582d !important;
 }
 
 /* sub-menu item */
 .topmenu-container.el-menu--horizontal > .el-sub-menu .el-sub-menu__title {
   float: left;
-  height: 50px !important;
-  line-height: 50px !important;
-  color: #999093 !important;
-  padding: 0 5px !important;
-  margin: 0 10px !important;
+  height: 56px !important;
+  line-height: 56px !important;
+  color: #7a726c !important;
+  padding: 0 10px !important;
+  margin: 0 8px !important;
 }
 
 /* 背景色隐藏 */
 .topmenu-container.el-menu--horizontal>.el-menu-item:not(.is-disabled):focus, .topmenu-container.el-menu--horizontal>.el-menu-item:not(.is-disabled):hover, .topmenu-container.el-menu--horizontal>.el-submenu .el-submenu__title:hover {
-  background-color: #ffffff !important;
+  color: #e06a3d !important;
+  background-color: #faf7f5 !important;
 }
 
 /* 图标右间距 */

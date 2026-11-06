@@ -7,3 +7,18 @@
 *.iml
 .DS_Store
 Thumbs.db
+
+# 本地环境覆盖文件：不得提交，避免内网地址与个人配置入库
+*.local
+.env.local
+.env.*.local
+!.env.example
+
+# 密钥与证书
+*.pem
+*.p12
+*.pfx
+*.jks
+*.key
+apiclient_cert*
+apiclient_key*

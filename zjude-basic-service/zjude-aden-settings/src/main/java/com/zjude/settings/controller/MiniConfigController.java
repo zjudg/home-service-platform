@@ -3,11 +3,17 @@ package com.zjude.settings.controller;
 import com.zjude.common.core.domain.AjaxResult;
 import com.zjude.common.annotation.Anonymous;
 import com.zjude.settings.service.IMiniConfigService;
+import com.zjude.settings.domain.MiniLocationInfo;
+import com.zjude.settings.domain.MiniReverseGeocodeRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -73,6 +79,13 @@ public class MiniConfigController
         return AjaxResult.success(service.profile());
     }
 
+    @GetMapping("/subscription-templates")
+    @Operation(summary = "获取订阅消息模板", description = "仅返回小程序发起用户授权所需的模板 ID，不返回密钥")
+    public AjaxResult subscriptionTemplates()
+    {
+        return AjaxResult.success(service.subscriptionTemplates());
+    }
+
     @GetMapping("/payment/methods")
     @Operation(summary = "获取支付方式")
     public AjaxResult paymentMethods(@RequestParam(required = false) String platform)
@@ -85,5 +98,13 @@ public class MiniConfigController
     public AjaxResult uploadPolicy()
     {
         return AjaxResult.success(service.uploadPolicy());
+    }
+
+    @PostMapping("/location/reverse")
+    @Operation(summary = "小程序定位逆地理编码", description = "使用服务端配置的天地图 Key，将设备坐标转换为行政区划信息")
+    public AjaxResult reverseGeocode(@Valid @RequestBody MiniReverseGeocodeRequest request)
+    {
+        MiniLocationInfo location = service.reverseGeocode(request.getLongitude(), request.getLatitude());
+        return AjaxResult.success(location);
     }
 }

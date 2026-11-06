@@ -1,27 +1,29 @@
 version: '3.8'
 networks:
-  zjudeadennetwork:
+  zjudg-system-network:
     driver: overlay
     external: true
 services:
-  prod-api:
+  prod-api-instance:
     deploy:
       replicas: 1
       resources:
         limits:
           memory: 1G
       restart_policy:
-        condition: any
+        condition: on-failure
       update_config:
         parallelism: 2
-    image: registry.cn-hangzhou.aliyuncs.com/zjude_tech/zjude-aden-admin:v20260709_f1
+    image: crpi-e6fwkw3sau3mvpx9.cn-chengdu.personal.cr.aliyuncs.com/zjudg/zjudg-system-admin:v20261106_f1
     networks:
-      - zjudeadennetwork
+      - zjudg-system-network
+    depends_on:
+      - redis
     volumes:
-      - /app/zjude/docker/logs:/log
-      - /app/zjude/file/upload:/files
+      - /app/aden/docker/logs:/log
+      - /app/aden/file/upload:/files
       - /etc/localtime:/etc/localtime
-  nginx:
+  nginx-instance:
     deploy:
       placement:
         constraints:
@@ -31,24 +33,33 @@ services:
         condition: on-failure
       update_config:
         parallelism: 2
-    image: registry.cn-hangzhou.aliyuncs.com/zjude_tech/zjude-aden-nginx:v20260709_f1
+    image: crpi-e6fwkw3sau3mvpx9.cn-chengdu.personal.cr.aliyuncs.com/zjudg/zjudg-system-nginx:v20261105_f1
     networks:
-      - zjudeadennetwork
+      - zjudg-system-network
     ports:
-      - 80:80
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - prod-api
     volumes:
-      - /app/zjude/docker/logs:/data/log/nginx
-  redis:
+      - /app/aden/docker/logs:/data/log/nginx
+      - /app/aden/docker/nginx/ssl:/etc/nginx/ssl
+  redis-instance:
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
       update_config:
         parallelism: 2
-    image: redis:7.0.8
+    image: m.daocloud.io/docker.io/library/redis:7.0.8
     command: redis-server /etc/redis/redis.conf
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
     networks:
-      - zjudeadennetwork
+      - zjudg-system-network
     volumes:
-      - /app/zjude/docker/redis/redis.conf:/etc/redis/redis.conf
-      - /app/zjude/docker/redis/data:/data
+      - /app/aden/docker/redis/redis.conf:/etc/redis/redis.conf
+      - /app/aden/docker/redis/data:/data

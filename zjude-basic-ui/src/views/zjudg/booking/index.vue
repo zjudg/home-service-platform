@@ -71,6 +71,26 @@
           </template>
         </el-table-column>
         <el-table-column
+          label="适用城市"
+          width="200"
+        >
+          <template #default="{ row }">
+            <el-select
+              v-model="row.cityId"
+              placeholder="全部城市"
+              clearable
+              filterable
+            >
+              <el-option
+                v-for="item in cityOptions"
+                :key="item.cityId"
+                :label="item.cityName"
+                :value="item.cityId"
+              />
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column
           label="排序"
           width="210"
         >
@@ -127,6 +147,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { addBooking, deleteBooking, listBooking, updateBooking } from '@/api/zjudg/booking'
+import { listCity } from '@/api/zjudg/city'
 
 const loading = ref(false)
 const saving = ref(false)
@@ -134,6 +155,7 @@ const rows = ref([])
 const selected = ref([])
 const removedIds = ref([])
 const advanceDays = ref(3)
+const cityOptions = ref([])
 const timeOptions = []
 for (let minutes = 8 * 60; minutes <= 19 * 60; minutes += 30) {
   const hour = String(Math.floor(minutes / 60)).padStart(2, '0')
@@ -141,14 +163,17 @@ for (let minutes = 8 * 60; minutes <= 19 * 60; minutes += 30) {
   timeOptions.push(`${hour}:${minute}:00`)
 }
 const sortedRows = computed(() => [...rows.value].sort((a, b) => (a.sortNum || 0) - (b.sortNum || 0)))
-function presetRows () { const result = []; for (let index = 0; index < timeOptions.length - 1; index += 1) { const startTime = timeOptions[index]; const endTime = timeOptions[index + 1]; result.push({ slotName: `${startTime.slice(0, 5)}-${endTime.slice(0, 5)}`, startTime, endTime, maxReserve: 0, sortNum: index + 1, status: '0' }) } return result }
+function presetRows () { const result = []; for (let index = 0; index < timeOptions.length - 1; index += 1) { const startTime = timeOptions[index]; const endTime = timeOptions[index + 1]; result.push({ slotName: `${startTime.slice(0, 5)}-${endTime.slice(0, 5)}`, startTime, endTime, maxReserve: 0, sortNum: index + 1, status: '0', cityId: null }) } return result }
 function syncSlot (row) { row.slotName = `${row.startTime.slice(0, 5)}-${row.endTime.slice(0, 5)}` }
 function load () { loading.value = true; listBooking({ pageNum: 1, pageSize: 100, status: '0' }).then((res) => { rows.value = res.rows && res.rows.length ? res.rows : presetRows(); removedIds.value = [] }).finally(() => { loading.value = false }) }
-function addSlot () { const last = rows.value[rows.value.length - 1]; const startTime = last ? last.endTime : '08:00:00'; const startIndex = timeOptions.indexOf(startTime); const endTime = timeOptions[Math.min(startIndex + 1, timeOptions.length - 1)] || '08:30:00'; rows.value.push({ slotName: `${startTime.slice(0, 5)}-${endTime.slice(0, 5)}`, startTime, endTime, maxReserve: 0, sortNum: rows.value.length + 1, status: '0' }) }
+function addSlot () { const last = rows.value[rows.value.length - 1]; const startTime = last ? last.endTime : '08:00:00'; const startIndex = timeOptions.indexOf(startTime); const endTime = timeOptions[Math.min(startIndex + 1, timeOptions.length - 1)] || '08:30:00'; rows.value.push({ slotName: `${startTime.slice(0, 5)}-${endTime.slice(0, 5)}`, startTime, endTime, maxReserve: 0, sortNum: rows.value.length + 1, status: '0', cityId: null }) }
 function removeSlot (index) { const row = rows.value[index]; if (row.slotId) removedIds.value.push(row.slotId); rows.value.splice(index, 1) }
 function removeSelected () { const ids = selected.value.filter(row => row.slotId).map(row => row.slotId); removedIds.value.push(...ids); rows.value = rows.value.filter(row => !selected.value.includes(row)); selected.value = [] }
 function saveAll () { saving.value = true; const actions = rows.value.map((row, index) => { row.sortNum = index + 1; syncSlot(row); return row.slotId ? updateBooking(row) : addBooking(row) }); if (removedIds.value.length) actions.push(deleteBooking(removedIds.value.join(','))); Promise.all(actions).then(() => { ElMessage.success('保存成功'); load() }).finally(() => { saving.value = false }) }
-onMounted(load)
+onMounted(() => {
+  listCity({ pageSize: 500 }).then(res => { cityOptions.value = res.rows || [] }).catch(() => { cityOptions.value = [] })
+  load()
+})
 </script>
 
 <style scoped>

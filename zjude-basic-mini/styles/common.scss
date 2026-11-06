@@ -1,9 +1,168 @@
 @import './tokens.scss';
 
-.page { min-height: 100vh; padding: 32rpx; background: $app-bg; }
-.safe-bottom { padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); }
-.surface { background: $app-surface; border: 1rpx solid $app-border; border-radius: 20rpx; }
-.section-title { color: $app-text; font-size: 32rpx; font-weight: 700; }
-.muted { color: $app-muted; }
-.primary-button { background: $app-primary; color: #fff; font-size: 30rpx; font-weight: 600; line-height: 92rpx; border-radius: 16rpx; }
-.primary-button:active { background: $app-primary-dark; }
+// ============================================================
+// 全局基础样式：暖灰底 + 柔光卡片 + 统一文字层级
+// 页面级布局仍保留在各页面，这里只放跨页面共用的原子类。
+// ============================================================
+
+page {
+  min-height: 100%;
+  color: $ink-900;
+  background: $bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+view, text, button, input, textarea, scroll-view, swiper {
+  box-sizing: border-box;
+}
+
+.page {
+  min-height: 100vh;
+  padding: $space-3 $page-gutter;
+  color: $ink-900;
+  background: $bg;
+}
+
+.safe-bottom { padding-bottom: calc(#{$space-3} + env(safe-area-inset-bottom)); }
+.has-tabbar { padding-bottom: calc(140rpx + env(safe-area-inset-bottom)); }
+
+// ---------- 卡片三种层级 ----------
+.card {
+  background: $surface;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+.card--flat {
+  background: $surface;
+  border-radius: $radius-lg;
+  box-shadow: none;
+}
+.card--sunken {
+  background: $bg-sunken;
+  border-radius: $radius-md;
+  box-shadow: none;
+}
+
+// 兼容旧类名
+.surface { @extend .card; }
+.surface-flat { @extend .card--flat; }
+
+// ---------- 文字层级 ----------
+.text-display { font-size: $font-display; font-weight: $weight-heavy; color: $ink-900; letter-spacing: -0.5rpx; }
+.text-title { font-size: $font-title; font-weight: $weight-bold; color: $ink-900; }
+.text-body { font-size: $font-body; font-weight: $weight-medium; color: $ink-700; }
+.text-caption { font-size: $font-caption; color: $ink-500; }
+.text-micro { font-size: $font-micro; font-weight: $weight-medium; color: $ink-400; }
+
+.section-title { font-size: $font-title; font-weight: $weight-bold; color: $ink-900; }
+.muted { color: $ink-500; }
+
+// ---------- 按钮 ----------
+.primary-button {
+  color: #fff;
+  background: $brand-500;
+  font-size: $font-button;
+  font-weight: $weight-semibold;
+  line-height: 88rpx;
+  border: 0;
+  border-radius: $radius-pill;
+  box-shadow: 0 6rpx 18rpx rgba(224, 106, 61, 0.24);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.primary-button::after { border: 0; }
+.primary-button:active {
+  background: $brand-600;
+  transform: scale(0.98);
+}
+.primary-button[disabled] { opacity: 0.5; box-shadow: none; }
+
+.secondary-button {
+  color: $brand-600;
+  background: $brand-100;
+  font-size: $font-button;
+  font-weight: $weight-semibold;
+  line-height: 88rpx;
+  border: 0;
+  border-radius: $radius-pill;
+}
+.secondary-button::after { border: 0; }
+.secondary-button:active { background: $brand-200; }
+
+.ghost-button {
+  color: $ink-700;
+  background: $surface;
+  font-size: $font-caption;
+  font-weight: $weight-semibold;
+  line-height: 64rpx;
+  padding: 0 $space-4;
+  border: 1rpx solid $line;
+  border-radius: $radius-pill;
+}
+.ghost-button::after { border: 0; }
+.ghost-button:active { background: $bg-sunken; }
+
+// ---------- 标签 ----------
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 $space-2;
+  height: 40rpx;
+  border-radius: $radius-sm;
+  font-size: $font-micro;
+  font-weight: $weight-medium;
+  background: $bg-sunken;
+  color: $ink-500;
+}
+.tag--brand { background: $brand-100; color: $brand-600; }
+.tag--success { background: $success-bg; color: $success; }
+.tag--warning { background: $warning-bg; color: $warning; }
+.tag--danger { background: $danger-bg; color: $danger; }
+
+// ---------- 空态 ----------
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 460rpx;
+  padding: $space-6 $space-4;
+  text-align: center;
+}
+.empty-state__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: $brand-50;
+}
+.empty-state__title {
+  margin-top: $space-3;
+  font-size: $font-body;
+  font-weight: $weight-semibold;
+  color: $ink-700;
+}
+.empty-state__desc {
+  margin-top: $space-1;
+  font-size: $font-caption;
+  color: $ink-400;
+  line-height: 1.6;
+}
+.empty-state__action { width: 280rpx; margin-top: $space-4; }
+
+// ---------- 骨架屏 ----------
+@keyframes soft-pulse {
+  0% { opacity: 0.55; }
+  50% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+.skeleton {
+  background: $bg-sunken;
+  border-radius: $radius-sm;
+  animation: soft-pulse 1.4s ease-in-out infinite;
+}
+
+// ---------- 分割 ----------
+.divider { height: 1rpx; background: $line-soft; }

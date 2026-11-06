@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <!-- 日志存放路径 -->
-	<property name="log.path" value="/home/bai/logs" />
+	<!-- 支持跨平台启动：生产环境可通过 LOG_PATH 指定目录，本地默认写入项目 logs 目录。 -->
+	<property name="log.path" value="${LOG_PATH:-./logs}" />
     <!-- 日志输出格式 -->
 	<property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
 

@@ -85,8 +85,7 @@ function handleClickOutside () {
 }
 
 .drawer-bg {
-  background: #000;
-  opacity: 0.3;
+  background: rgba(31, 28, 26, 0.45);
   width: 100%;
   top: 0;
   height: 100%;
@@ -104,7 +103,7 @@ function handleClickOutside () {
 }
 
 .hideSidebar .fixed-header {
-  width: calc(100% - 54px);
+  width: calc(100% - 64px);
 }
 
 .sidebarHide .fixed-header {

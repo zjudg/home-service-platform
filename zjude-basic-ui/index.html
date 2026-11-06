@@ -7,7 +7,7 @@
   <meta name="renderer" content="webkit">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="icon" href="/favicon.ico">
-  <title>Zjude 工作台</title>
+  <title>妙洁家政服务管理平台</title>
   <!--[if lt IE 11]><script>window.location.href='/html/ie.html';</script><![endif]-->
   <style>
     html,
@@ -34,33 +34,35 @@
       justify-content: center;
       overflow: hidden;
       background:
-        linear-gradient(135deg, rgba(14, 165, 233, 0.08), transparent 42%),
-        linear-gradient(315deg, rgba(37, 99, 235, 0.16), transparent 54%),
-        #061827;
+        radial-gradient(circle at 88% 6%, rgba(249, 213, 197, 0.55), transparent 32%),
+        radial-gradient(circle at 30% 82%, rgba(253, 236, 228, 0.9), transparent 44%),
+        #faf7f5;
+      transition: opacity 0.45s ease;
     }
 
     #loader-wrapper::before {
       content: "";
       position: absolute;
       inset: 0;
-      opacity: 0.3;
+      opacity: 0.85;
       background-image:
-        linear-gradient(rgba(125, 211, 252, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(125, 211, 252, 0.08) 1px, transparent 1px);
-      background-size: 46px 46px;
-      mask-image: linear-gradient(to bottom, black, transparent 88%);
+        linear-gradient(rgba(224, 106, 61, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(224, 106, 61, 0.06) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 90%);
     }
 
     #loader {
       position: relative;
       width: min(460px, calc(100% - 40px));
       padding: 34px 38px 32px;
-      border: 1px solid rgba(125, 211, 252, 0.28);
-      border-radius: 10px;
-      background: rgba(7, 31, 50, 0.88);
-      box-shadow: 0 28px 100px rgba(0, 0, 0, 0.38);
+      border: 1px solid #f2ede9;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 16px 48px rgba(31, 28, 26, 0.08);
       text-align: left;
       z-index: 1001;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
     #loader::after {
@@ -70,7 +72,8 @@
       right: 0;
       top: 0;
       height: 2px;
-      background: linear-gradient(90deg, #22d3ee, #2563eb, #22d3ee);
+      border-radius: 20px 20px 0 0;
+      background: linear-gradient(90deg, #f58a5f, #e06a3d, #f58a5f);
       background-size: 200% 100%;
       animation: scan 2.4s linear infinite;
     }
@@ -78,28 +81,31 @@
     .loader-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      color: #f0f9ff;
-      font: 700 18px/1 Arial, sans-serif;
-      letter-spacing: 0.16em;
+      gap: 11px;
+      color: #1f1c1a;
+      font: 700 18px/1 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      letter-spacing: 0.06em;
     }
 
     .loader-brand small {
-      margin-left: 4px;
-      color: #7dd3fc;
+      margin-left: 2px;
+      color: #c9582d;
       font-size: 9px;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.2em;
+      font-weight: 700;
     }
 
     .loader-mark {
       display: inline-flex;
-      width: 30px;
-      height: 30px;
+      width: 34px;
+      height: 34px;
       align-items: center;
       justify-content: center;
-      border-radius: 7px;
+      border-radius: 11px;
       color: #fff;
-      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      background: #e06a3d;
+      box-shadow: 0 6px 16px rgba(224, 106, 61, 0.24);
+      font-size: 17px;
       letter-spacing: 0;
     }
 
@@ -107,9 +113,9 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 36px;
-      color: #dbeafe;
-      font: 600 14px/1.4 Arial, sans-serif;
+      margin-top: 32px;
+      color: #1f1c1a;
+      font: 600 14px/1.4 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
     }
 
     .loader-status::before {
@@ -117,33 +123,41 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #22d3ee;
-      box-shadow: 0 0 14px #22d3ee;
+      background: #2f9e6b;
       animation: pulse 1.4s ease-in-out infinite;
     }
 
     .loader-subtitle {
       margin-top: 7px;
-      color: rgba(186, 230, 253, 0.62);
-      font: 11px/1.5 Arial, sans-serif;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      color: #a39b95;
+      font: 11px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", Arial, sans-serif;
+      letter-spacing: 0.06em;
     }
 
     .loader-track {
-      height: 4px;
-      margin-top: 26px;
+      height: 6px;
+      margin-top: 24px;
       overflow: hidden;
-      background: rgba(125, 211, 252, 0.12);
+      border-radius: 999px;
+      background: #f2ede9;
     }
 
     .loader-track span {
       display: block;
-      width: 42%;
+      width: 0;
       height: 100%;
-      background: linear-gradient(90deg, #22d3ee, #2563eb);
-      box-shadow: 0 0 14px rgba(34, 211, 238, 0.8);
-      animation: progress 1.8s ease-in-out infinite;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f58a5f, #e06a3d);
+      /* 约 2 秒推进到 100%，随后保持满格等待应用挂载 */
+      animation: progress 2s cubic-bezier(0.35, 0, 0.2, 1) forwards;
+    }
+
+    .loader-percent {
+      margin-top: 10px;
+      color: #a39b95;
+      font: 600 11px/1 Arial, sans-serif;
+      letter-spacing: 0.08em;
+      text-align: right;
     }
 
     @keyframes scan {
@@ -155,23 +169,21 @@
     }
 
     @keyframes progress {
-      0% { transform: translateX(-120%); }
-      100% { transform: translateX(300%); }
+      0% { width: 4%; }
+      35% { width: 46%; }
+      70% { width: 78%; }
+      100% { width: 100%; }
     }
 
     .loaded #loader {
       opacity: 0;
-      -webkit-transition: all 0.3s ease-out;
-      transition: all 0.3s ease-out;
+      transform: translateY(-6px);
     }
 
     .loaded #loader-wrapper {
+      opacity: 0;
       visibility: hidden;
-      -webkit-transform: translateY(-100%);
-      -ms-transform: translateY(-100%);
-      transform: translateY(-100%);
-      -webkit-transition: all 0.3s 1s ease-out;
-      transition: all 0.3s 1s ease-out;
+      pointer-events: none;
     }
 
     .no-js #loader-wrapper {
@@ -182,6 +194,17 @@
       color: #222222;
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      #loader::after,
+      .loader-status::before {
+        animation: none;
+      }
+      .loader-track span {
+        animation: none;
+        width: 100%;
+      }
+    }
+
   </style>
 </head>
 
@@ -190,13 +213,14 @@
     <div id="loader-wrapper">
       <div id="loader">
         <div class="loader-brand">
-          <span class="loader-mark">J</span>
-          <span>ZJUDE</span>
-          <small>WORKSPACE</small>
+          <span class="loader-mark">妙</span>
+          <span>妙洁家政</span>
+          <small>服务管理平台</small>
         </div>
-        <div class="loader-status">正在启动 Zjude 工作台</div>
-        <div class="loader-subtitle">Initializing workspace services</div>
+        <div class="loader-status">正在加载妙洁家政服务管理平台</div>
+        <div class="loader-subtitle">Loading MiaoJie Home Service Platform</div>
         <div class="loader-track"><span></span></div>
+        <div class="loader-percent">LOADING</div>
       </div>
     </div>
   </div>

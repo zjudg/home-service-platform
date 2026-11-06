@@ -4,7 +4,7 @@
       <template #header>
         <PageHeader
           title="支付设置"
-          hint="商城支付方式及支付参数配置"
+          hint="家政服务支付方式及支付参数配置"
         >
           <el-button
             type="primary"
@@ -17,9 +17,9 @@
       </template>
 
       <NoticePanel>
-        <div>* 商城支付方式设置，不同应用场景支持的支付方式不同。</div>
+        <div>* 家政服务支付方式设置，不同应用场景支持的支付方式不同。</div>
         <div>* 请前往微信支付和支付宝平台申请对应的支付端口。</div>
-        <div>* 微信支付使用 API v3，需填写商户证书、证书序列号和 APIv3 密钥。</div>
+        <div>* 微信支付使用 API v3，需填写商户私钥、商户证书序列号、微信支付公钥和 APIv3 密钥。</div>
         <div>* 支付宝使用 RSA2，私钥和公钥请粘贴完整内容。</div>
       </NoticePanel>
 
@@ -38,10 +38,10 @@
       :method="activeMethod"
       :fields="activeFields"
       :form="form"
-    :saving="saving"
-    @save="saveDialog"
-    @validate="validateMethod(activeMethod)"
-  />
+      :saving="saving"
+      @save="saveDialog"
+      @validate="validateMethod(activeMethod)"
+    />
   </div>
 </template>
 
@@ -104,7 +104,7 @@ const commonFields = [
     label: '支付简称',
     type: 'text',
     placeholder: '请输入支付名称',
-    tip: '会员在商城看到的支付名称'
+    tip: '用户在服务下单页看到的支付名称'
   },
   {
     key: 'iconKey',
@@ -125,16 +125,20 @@ const commonFields = [
   }
 ]
 
+const wechatStatusField = commonFields.find(field => field.key === 'statusKey')
+
 const providerFields = {
   wechat: [
     { key: 'payment.wechat.appId', label: '微信 AppID', type: 'text', placeholder: '请输入微信公众平台或小程序 AppID' },
     { key: 'payment.wechat.mchId', label: '微信支付商户号', type: 'text', placeholder: '请输入微信支付商户号' },
-    { key: 'payment.wechat.apiV3Key', label: 'APIv3 密钥', type: 'text', secret: true, placeholder: '请输入 32 位 APIv3 密钥' },
-    { key: 'payment.wechat.certificate', label: '商户证书内容', type: 'textarea', secret: true, placeholder: '请粘贴 apiclient_cert.pem 完整内容', tip: '证书内容仅保存到服务端配置，不会上传到对象存储' },
-    { key: 'payment.wechat.privateKey', label: '商户私钥内容', type: 'textarea', secret: true, placeholder: '请粘贴 apiclient_key.pem 完整内容', tip: '私钥内容仅保存到服务端配置，不会上传到对象存储' },
-    { key: 'payment.wechat.certificateSerialNo', label: '证书序列号', type: 'text', placeholder: '请输入商户证书序列号' },
-    { key: 'payment.wechat.notifyUrl', label: '异步通知地址', type: 'text', placeholder: 'https://example.com/api/payment/wechat/notify' },
-    { key: 'payment.wechat.authDirectory', label: '支付授权目录', type: 'text', placeholder: '请输入支付授权目录' }
+    { key: 'payment.wechat.certificateSerialNo', label: '商户证书序列号', type: 'text', placeholder: '请输入商户 API 证书序列号' },
+    { key: 'payment.wechat.privateKey', label: '微信支付商户私钥', type: 'textarea', secret: true, placeholder: '请粘贴商户 API 私钥完整 PEM 内容' },
+    { key: 'payment.wechat.publicKeyId', label: '微信支付公钥 ID', type: 'text', placeholder: 'PUB_KEY_ID_ 开头的公钥 ID' },
+    { key: 'payment.wechat.publicKey', label: '微信支付公钥', type: 'textarea', secret: true, placeholder: '请粘贴微信支付公钥完整 PEM 内容' },
+    { key: 'payment.wechat.apiV3Key', label: 'APIv3 密钥', type: 'text', secret: true, placeholder: '请输入 32 字节 APIv3 密钥' },
+    { key: 'payment.wechat.notifyUrl', label: '支付通知地址', type: 'text', placeholder: 'https://你的域名/api/mini/pay/notify' },
+    { key: 'payment.wechat.refundNotifyUrl', label: '退款通知地址', type: 'text', placeholder: 'https://你的域名/api/mini/pay/refund-notify' },
+    { key: 'payment.wechat.orderDescriptionPrefix', label: '订单描述前缀', type: 'text', placeholder: '订单描述前缀' }
   ],
   alipay: [
     { key: 'payment.alipay.appId', label: '应用ID', type: 'text', placeholder: '请输入支付宝应用ID' },
@@ -150,8 +154,8 @@ const providerFields = {
 
 const secretKeys = new Set([
   'payment.wechat.apiV3Key',
-  'payment.wechat.certificate',
   'payment.wechat.privateKey',
+  'payment.wechat.publicKey',
   'payment.alipay.privateKey',
   'payment.alipay.publicKey'
 ])
@@ -168,6 +172,9 @@ const paymentRows = computed(() => methods
 
 const activeFields = computed(() => {
   if (!activeMethod.value) return []
+  if (activeMethod.value.key === 'wechat') {
+    return [...providerFields.wechat, { ...wechatStatusField, key: activeMethod.value.statusKey }]
+  }
   const fields = commonFields.map(field => ({
     ...field,
     key: activeMethod.value[field.key]
@@ -221,7 +228,9 @@ async function validateMethod (method) {
 }
 
 async function saveMethod (method) {
-  const keys = [method.nameKey, method.iconKey, method.sortKey, method.statusKey]
+  const keys = method.key === 'wechat'
+    ? [method.statusKey]
+    : [method.nameKey, method.iconKey, method.sortKey, method.statusKey]
   if (method.key !== 'balance') providerFields[method.key].forEach(field => keys.push(field.key))
   const payload = {}
   keys.forEach(key => {
@@ -256,7 +265,9 @@ async function saveAll () {
 }
 
 function methodPayload (method) {
-  const keys = [method.nameKey, method.iconKey, method.sortKey, method.statusKey]
+  const keys = method.key === 'wechat'
+    ? [method.statusKey]
+    : [method.nameKey, method.iconKey, method.sortKey, method.statusKey]
   if (method.key !== 'balance') providerFields[method.key].forEach(field => keys.push(field.key))
   return keys.reduce((payload, key) => {
     payload[key] = String(form[key] ?? '')

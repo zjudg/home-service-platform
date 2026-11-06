@@ -5,7 +5,7 @@
         <div class="page-header">
           <div class="page-header__title">
             <span>分享设置</span>
-            <span class="page-header__hint">配置 H5 商城和小程序商城的分享内容</span>
+            <span class="page-header__hint">配置 H5 端和小程序端的分享内容</span>
           </div>
           <el-button
             type="primary"
@@ -22,7 +22,7 @@
         class="share-tabs"
       >
         <el-tab-pane
-          label="H5商城"
+          label="H5端"
           name="h5"
         >
           <el-form
@@ -37,7 +37,7 @@
                 clearable
               />
               <div class="setting-tip">
-                H5商城分享页面时，显示的分享标题
+                H5端分享页面时，显示的分享标题
               </div>
             </el-form-item>
             <el-form-item label="分享简介">
@@ -47,7 +47,7 @@
                 clearable
               />
               <div class="setting-tip">
-                H5商城分享页面时，显示的分享简介
+                H5端分享页面时，显示的分享简介
               </div>
             </el-form-item>
             <el-form-item label="分享图片">
@@ -63,7 +63,7 @@
         </el-tab-pane>
 
         <el-tab-pane
-          label="小程序商城"
+          label="小程序端"
           name="mini"
         >
           <el-form
@@ -78,7 +78,7 @@
                 clearable
               />
               <div class="setting-tip">
-                小程序商城分享页面时，显示的分享标题
+                小程序端分享页面时，显示的分享标题
               </div>
             </el-form-item>
             <el-form-item label="分享图片">
@@ -111,28 +111,28 @@ const configRecords = ref({})
 const settings = [
   {
     key: 'share.h5.title',
-    label: 'H5商城分享标题',
-    tip: 'H5商城分享页面时，显示的分享标题'
+    label: 'H5端分享标题',
+    tip: 'H5端分享页面时，显示的分享标题'
   },
   {
     key: 'share.h5.description',
-    label: 'H5商城分享简介',
-    tip: 'H5商城分享页面时，显示的分享简介'
+    label: 'H5端分享简介',
+    tip: 'H5端分享页面时，显示的分享简介'
   },
   {
     key: 'share.h5.image',
-    label: 'H5商城分享图片',
-    tip: 'H5商城分享页面时，显示的分享图片'
+    label: 'H5端分享图片',
+    tip: 'H5端分享页面时，显示的分享图片'
   },
   {
     key: 'share.mini.title',
-    label: '小程序商城分享标题',
-    tip: '小程序商城分享页面时，显示的分享标题'
+    label: '小程序端分享标题',
+    tip: '小程序端分享页面时，显示的分享标题'
   },
   {
     key: 'share.mini.image',
-    label: '小程序商城分享图片',
-    tip: '小程序商城分享页面时，显示的分享图片'
+    label: '小程序端分享图片',
+    tip: '小程序端分享页面时，显示的分享图片'
   }
 ]
 

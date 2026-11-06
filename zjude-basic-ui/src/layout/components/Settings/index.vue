@@ -177,7 +177,7 @@ const showSettings = ref(false)
 const theme = ref(settingsStore.theme)
 const sideTheme = ref(settingsStore.sideTheme)
 const storeSettings = computed(() => settingsStore)
-const predefineColors = ref(['#409EFF', '#ff4500', '#ff8c00', '#ffd700', '#90ee90', '#00ced1', '#1e90ff', '#c71585'])
+const predefineColors = ref(['#e06a3d', '#c9582d', '#f58a5f', '#2f9e6b', '#d98a1f', '#d9503f', '#4a7fb5', '#7a726c'])
 
 /** 是否需要topnav */
 function topNavChange (val) {
@@ -226,11 +226,11 @@ defineExpose({
 <style lang='scss' scoped>
 .setting-drawer-title {
   margin-bottom: 12px;
-  color: rgba(0, 0, 0, 0.85);
+  color: #1f1c1a;
   line-height: 22px;
-  font-weight: bold;
+  font-weight: 600;
   .drawer-title {
-    font-size: 14px;
+    font-size: 15px;
   }
 }
 .setting-drawer-block-checbox {
@@ -243,18 +243,22 @@ defineExpose({
   .setting-drawer-block-checbox-item {
     position: relative;
     margin-right: 16px;
-    border-radius: 2px;
+    border-radius: 10px;
     cursor: pointer;
+    border: 1px solid #ece6e1;
+    overflow: hidden;
 
     img {
-      width: 48px;
+      display: block;
+      width: 64px;
       height: 48px;
+      object-fit: cover;
     }
 
     .custom-img {
-      width: 48px;
-      height: 38px;
-      border-radius: 5px;
+      width: 64px;
+      height: 48px;
+      border-radius: 10px;
       box-shadow: 1px 1px 2px #898484;
     }
 
@@ -266,7 +270,7 @@ defineExpose({
       height: 100%;
       padding-top: 15px;
       padding-left: 24px;
-      color: #1890ff;
+      color: #e06a3d;
       font-weight: 700;
       font-size: 14px;
     }
@@ -274,7 +278,7 @@ defineExpose({
 }
 
 .drawer-item {
-  color: rgba(0, 0, 0, 0.65);
+  color: #3d3733;
   padding: 12px 0;
   font-size: 14px;
 

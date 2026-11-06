@@ -5,7 +5,8 @@ import {
   getMiniHome,
   getMiniNavigation,
   getMiniProfile,
-  getMiniSite
+  getMiniSite,
+  getMiniSubscriptionTemplates
 } from '@/api/mini'
 
 function payload (response) {
@@ -18,42 +19,51 @@ export const useConfigStore = defineStore('config', () => {
   const home = ref({ navItems: [], banners: [] })
   const category = ref({})
   const profile = ref({ navItems: [], orderItems: [] })
+  const subscribeTemplates = ref({ enabled: false, accepted: '', finished: '', paid: '', adminCreated: '', adminAccepted: '' })
   const loading = ref(false)
   const loaded = ref(false)
   const error = ref('')
+  let loadPromise = null
   const appTitle = computed(() => site.value.shopName || '应用')
   const navigationReady = computed(() => loaded.value && navigation.value.items.length > 0)
 
-  async function load () {
-    if (loading.value || loaded.value) return
+  function load () {
+    if (loaded.value) return Promise.resolve()
+    if (loadPromise) return loadPromise
     loading.value = true
     error.value = ''
-    try {
-      const responses = await Promise.allSettled([
-        getMiniSite(),
-        getMiniNavigation(),
-        getMiniHome(),
-        getMiniCategory(),
-        getMiniProfile()
-      ])
-      const [siteResponse, navigationResponse, homeResponse, categoryResponse, profileResponse] = responses
-      site.value = valueOr(siteResponse, site.value)
-      navigation.value = normalizeNavigation(valueOr(navigationResponse, navigation.value))
-      home.value = normalizePage(valueOr(homeResponse, home.value))
-      category.value = valueOr(categoryResponse, category.value)
-      profile.value = normalizePage(valueOr(profileResponse, profile.value))
-      const failed = responses.find(response => response.status === 'rejected')
-      if (failed) error.value = failed.reason?.message || '部分页面配置加载失败'
-      if (!navigation.value.items.length) {
-        throw new Error('后台暂未配置底部导航')
+    loadPromise = (async () => {
+      try {
+        const responses = await Promise.allSettled([
+          getMiniSite(),
+          getMiniNavigation(),
+          getMiniHome(),
+          getMiniCategory(),
+          getMiniProfile(),
+          getMiniSubscriptionTemplates()
+        ])
+        const [siteResponse, navigationResponse, homeResponse, categoryResponse, profileResponse, subscribeResponse] = responses
+        site.value = valueOr(siteResponse, site.value)
+        navigation.value = normalizeNavigation(valueOr(navigationResponse, navigation.value))
+        home.value = normalizePage(valueOr(homeResponse, home.value))
+        category.value = valueOr(categoryResponse, category.value)
+        profile.value = normalizePage(valueOr(profileResponse, profile.value))
+        subscribeTemplates.value = valueOr(subscribeResponse, subscribeTemplates.value)
+        const failed = responses.find(response => response.status === 'rejected')
+        if (failed) error.value = failed.reason?.message || '部分页面配置加载失败'
+        if (!navigation.value.items.length) {
+          throw new Error('后台暂未配置底部导航')
+        }
+        loaded.value = true
+      } catch (requestError) {
+        error.value = requestError.message || '页面配置加载失败'
+        throw requestError
+      } finally {
+        loading.value = false
+        loadPromise = null
       }
-      loaded.value = true
-    } catch (requestError) {
-      error.value = requestError.message || '页面配置加载失败'
-      throw requestError
-    } finally {
-      loading.value = false
-    }
+    })()
+    return loadPromise
   }
 
   function valueOr (response, fallback) {
@@ -80,5 +90,11 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
-  return { site, navigation, home, category, profile, loading, loaded, error, appTitle, navigationReady, load }
+  async function refreshSubscriptionTemplates () {
+    const response = await getMiniSubscriptionTemplates()
+    subscribeTemplates.value = response?.data || response || subscribeTemplates.value
+    return subscribeTemplates.value
+  }
+
+  return { site, navigation, home, category, profile, subscribeTemplates, loading, loaded, error, appTitle, navigationReady, load, refreshSubscriptionTemplates }
 })

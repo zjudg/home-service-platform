@@ -38,6 +38,9 @@ public class WebsiteSettingsServiceImpl implements IWebsiteSettingsService
         request.setAdminLogo(values.get("website.adminLogo"));
         request.setMemberDefaultAvatar(values.get("website.memberDefaultAvatar"));
         request.setGoodsDefaultImage(values.get("website.goodsDefaultImage"));
+        request.setServicePhone(values.get("website.servicePhone"));
+        request.setServiceHours(values.get("website.serviceHours"));
+        request.setServiceQrCode(values.get("website.serviceQrCode"));
         return request;
     }
 
@@ -50,17 +53,20 @@ public class WebsiteSettingsServiceImpl implements IWebsiteSettingsService
             throw new ServiceException("网站设置不能为空");
         }
         Map<String, SysConfig> records = records();
-        save(records, "website.shopName", "商城名称", request.getShopName(), username);
-        save(records, "website.favicon", "商城浏览器图标", request.getFavicon(), username);
+        save(records, "website.shopName", "站点名称", request.getShopName(), username);
+        save(records, "website.favicon", "站点浏览器图标", request.getFavicon(), username);
         save(records, "website.mobileLoginLogo", "移动端登录页Logo", request.getMobileLoginLogo(), username);
-        save(records, "website.mobileLogo", "移动端商城Logo", request.getMobileLogo(), username);
-        save(records, "website.pcLogo", "PC端商城Logo", request.getPcLogo(), username);
+        save(records, "website.mobileLogo", "移动端Logo", request.getMobileLogo(), username);
+        save(records, "website.pcLogo", "PC端Logo", request.getPcLogo(), username);
         save(records, "website.adminLoginLogo", "管理后台登录页Logo", request.getAdminLoginLogo(), username);
         save(records, "website.adminHomeImage", "管理后台首页主题", request.getAdminHomeImage(), username);
         save(records, "website.adminLoginName", "管理后台登录页名称", request.getAdminLoginName(), username);
         save(records, "website.adminLogo", "管理后台Logo", request.getAdminLogo(), username);
         save(records, "website.memberDefaultAvatar", "会员默认头像", request.getMemberDefaultAvatar(), username);
-        save(records, "website.goodsDefaultImage", "商品默认封面", request.getGoodsDefaultImage(), username);
+        save(records, "website.goodsDefaultImage", "服务默认封面", request.getGoodsDefaultImage(), username);
+        save(records, "website.servicePhone", "客服电话", request.getServicePhone(), username);
+        save(records, "website.serviceHours", "客服服务时间", request.getServiceHours(), username);
+        save(records, "website.serviceQrCode", "客服二维码", request.getServiceQrCode(), username);
         configService.resetConfigCache();
     }
 

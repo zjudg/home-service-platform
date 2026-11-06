@@ -2,20 +2,26 @@ package com.zjude.settings.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.zjude.common.enums.BannerLinkType;
+import com.zjude.common.exception.ServiceException;
 import com.zjude.common.utils.StringUtils;
+import com.zjude.integrated.wechat.WechatConfigKeys;
 import com.zjude.settings.domain.MiniBanner;
 import com.zjude.settings.domain.MiniBootstrapConfig;
 import com.zjude.settings.domain.MiniPaymentMethod;
+import com.zjude.settings.domain.MiniLocationInfo;
 import com.zjude.settings.service.IMiniConfigService;
 import com.zjude.settings.service.MiniPaymentPolicy;
 import com.zjude.system.domain.ZjudgBanner;
+import com.zjude.system.domain.ZjudgCity;
 import com.zjude.system.service.ISysConfigService;
 import com.zjude.system.service.IZjudgBannerService;
+import com.zjude.system.service.IZjudgCityService;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +32,12 @@ public class MiniConfigServiceImpl implements IMiniConfigService
 
     @Resource
     private IZjudgBannerService bannerService;
+
+    @Resource
+    private IZjudgCityService cityService;
+
+    @Resource
+    private TiandituGeocoder tiandituGeocoder;
 
     @Override
     public MiniBootstrapConfig bootstrap()
@@ -46,6 +58,10 @@ public class MiniConfigServiceImpl implements IMiniConfigService
         result.put("mobileLogo", value("website.mobileLogo"));
         result.put("memberDefaultAvatar", value("website.memberDefaultAvatar"));
         result.put("goodsDefaultImage", value("website.goodsDefaultImage"));
+        result.put("servicePhone", value("website.servicePhone"));
+        result.put("serviceHours", value("website.serviceHours"));
+        // 客服二维码：用户可在小程序内长按识别添加，作为电话之外的备用联系方式
+        result.put("serviceQrCode", value("website.serviceQrCode"));
         return result;
     }
 
@@ -121,6 +137,19 @@ public class MiniConfigServiceImpl implements IMiniConfigService
     }
 
     @Override
+    public Map<String, Object> subscriptionTemplates()
+    {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("enabled", "1".equals(value(WechatConfigKeys.SUBSCRIBE_ENABLED)));
+        result.put("accepted", value(WechatConfigKeys.TEMPLATE_ACCEPTED));
+        result.put("finished", value(WechatConfigKeys.TEMPLATE_FINISHED));
+        result.put("paid", value(WechatConfigKeys.TEMPLATE_PAID));
+        result.put("adminCreated", value(WechatConfigKeys.TEMPLATE_ADMIN_CREATED));
+        result.put("adminAccepted", value(WechatConfigKeys.TEMPLATE_ADMIN_ACCEPTED));
+        return result;
+    }
+
+    @Override
     public List<MiniPaymentMethod> paymentMethods()
     {
         return paymentMethods("WECHAT");
@@ -182,6 +211,24 @@ public class MiniConfigServiceImpl implements IMiniConfigService
             result.add(item);
         }
         return result;
+    }
+
+    @Override
+    public MiniLocationInfo reverseGeocode(BigDecimal longitude, BigDecimal latitude)
+    {
+        MiniLocationInfo location = tiandituGeocoder.reverseGeocode(longitude, latitude);
+        ZjudgCity query = new ZjudgCity();
+        query.setStatus("0");
+        query.setCityName(location.getCityName());
+        ZjudgCity city = cityService.selectList(query).stream()
+                .filter(item -> location.getCityName().equals(item.getCityName()))
+                .findFirst()
+                .orElseThrow(() -> new ServiceException("定位城市暂未开通服务"));
+
+        location.setCityId(city.getCityId());
+        location.setCityName(city.getCityName());
+        location.setProvinceName(city.getProvinceName());
+        return location;
     }
 
     private MiniPaymentMethod payment(String type, String nameKey, String defaultName)

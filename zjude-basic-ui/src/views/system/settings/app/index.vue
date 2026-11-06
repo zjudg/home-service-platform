@@ -31,9 +31,12 @@
             <el-input
               v-model="form[item.key]"
               :placeholder="item.placeholder"
+              :type="item.secret ? 'password' : 'text'"
+              :show-password="item.secret"
               clearable
             />
             <el-button
+              v-if="!item.secret"
               v-copyText="form[item.key]"
               v-copyText:callback="copySuccess"
               type="primary"
@@ -120,6 +123,19 @@ const textSettings = [
     placeholder: '请输入 APP 下载引导文案',
     default: '欢迎点击下载APP~',
     tip: 'APP下载引导文案，默认文案：欢迎点击下载APP~'
+  },
+  {
+    key: 'app.wechat.appId',
+    label: '小程序 AppID',
+    placeholder: '请输入微信小程序 AppID',
+    tip: '微信公众平台 → 开发管理 → 开发设置中获取，用于小程序登录与订阅消息'
+  },
+  {
+    key: 'app.wechat.appSecret',
+    label: '小程序 AppSecret',
+    placeholder: '请输入微信小程序 AppSecret',
+    tip: '与 AppID 配对，属于敏感信息，仅在服务端使用',
+    secret: true
   }
 ]
 

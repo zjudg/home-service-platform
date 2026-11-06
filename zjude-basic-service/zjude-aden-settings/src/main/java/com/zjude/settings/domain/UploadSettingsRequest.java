@@ -73,6 +73,7 @@ public class UploadSettingsRequest
         private String endpoint;
         private String accessKeyId;
         private String accessKeySecret;
+        private String dir;
         private String domain;
 
         public String getBucket() { return bucket; }
@@ -83,6 +84,8 @@ public class UploadSettingsRequest
         public void setAccessKeyId(String accessKeyId) { this.accessKeyId = accessKeyId; }
         public String getAccessKeySecret() { return accessKeySecret; }
         public void setAccessKeySecret(String accessKeySecret) { this.accessKeySecret = accessKeySecret; }
+        public String getDir() { return dir; }
+        public void setDir(String dir) { this.dir = dir; }
         public String getDomain() { return domain; }
         public void setDomain(String domain) { this.domain = domain; }
     }

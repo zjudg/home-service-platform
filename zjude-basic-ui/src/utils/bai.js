@@ -72,12 +72,7 @@ export function selectDictLabel (datas, value) {
     return ''
   }
   const actions = []
-  Object.keys(datas).some((key) => {
-    if (datas[key].value == ('' + value)) {
-      actions.push(datas[key].label)
-      return true
-    }
-  })
+  Object.keys(datas).some((key) => { if (datas[key].value == ('' + value)) { actions.push(datas[key].label); return true } return false })
   if (actions.length === 0) {
     actions.push(value)
   }
@@ -95,9 +90,9 @@ export function selectDictLabels (datas, value, separator) {
   const actions = []
   const currentSeparator = undefined === separator ? ',' : separator
   const temp = value.split(currentSeparator)
-  Object.keys(value.split(currentSeparator)).some((val) => {
+  Object.keys(value.split(currentSeparator)).forEach((val) => {
     let match = false
-    Object.keys(datas).some((key) => {
+    Object.keys(datas).forEach((key) => {
       if (datas[key].value == ('' + temp[val])) {
         actions.push(datas[key].label + currentSeparator)
         match = true

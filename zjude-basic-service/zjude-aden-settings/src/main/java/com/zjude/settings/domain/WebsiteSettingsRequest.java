@@ -16,6 +16,9 @@ public class WebsiteSettingsRequest
     private String adminLogo;
     private String memberDefaultAvatar;
     private String goodsDefaultImage;
+    private String servicePhone;
+    private String serviceHours;
+    private String serviceQrCode;
 
     public String getShopName() { return shopName; }
     public void setShopName(String shopName) { this.shopName = shopName; }
@@ -39,4 +42,10 @@ public class WebsiteSettingsRequest
     public void setMemberDefaultAvatar(String memberDefaultAvatar) { this.memberDefaultAvatar = memberDefaultAvatar; }
     public String getGoodsDefaultImage() { return goodsDefaultImage; }
     public void setGoodsDefaultImage(String goodsDefaultImage) { this.goodsDefaultImage = goodsDefaultImage; }
+    public String getServicePhone() { return servicePhone; }
+    public void setServicePhone(String servicePhone) { this.servicePhone = servicePhone; }
+    public String getServiceHours() { return serviceHours; }
+    public void setServiceHours(String serviceHours) { this.serviceHours = serviceHours; }
+    public String getServiceQrCode() { return serviceQrCode; }
+    public void setServiceQrCode(String serviceQrCode) { this.serviceQrCode = serviceQrCode; }
 }

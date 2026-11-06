@@ -1,36 +1,650 @@
 <template>
   <view class="login-page">
-    <view class="login-brand"><image class="brand-logo" src="/static/logo.png" mode="aspectFit" /><text class="brand-name">妙洁家政</text><text class="brand-subtitle">专业服务，放心到家</text></view>
-    <view class="login-panel surface">
-      <text class="panel-title">欢迎登录</text><text class="panel-subtitle">登录后即可预约并管理家政服务</text>
-      <button v-if="isWechat" class="wechat-button" open-type="chooseAvatar" @chooseavatar="onChooseAvatar"><uni-icons type="weixin" size="24" color="#fff" />微信授权登录</button>
-      <button v-else class="wechat-button" @click="startWechatAuth"><uni-icons type="weixin" size="24" color="#fff" />微信授权登录</button>
-      <view class="divider"><text>或使用账号登录</text></view>
-      <view class="field"><text class="field-label">账号</text><input v-model="form.username" class="field-input" placeholder="请输入账号" maxlength="64" /></view>
-      <view class="field"><text class="field-label">密码</text><input v-model="form.password" class="field-input" password placeholder="请输入密码" maxlength="64" @confirm="submit" /></view>
-      <view v-if="errorMessage" class="error-message">{{ errorMessage }}</view><button class="primary-button login-button" :loading="loading" @click="submit">账号登录</button>
+    <UiNavbar :back="true" title="" />
+
+    <view class="login-main">
+      <!-- 品牌区 -->
+      <view class="brand">
+        <view class="brand-logo-wrap">
+          <image class="brand-logo" src="/static/logo.png" mode="aspectFit" />
+        </view>
+        <text class="brand-name">{{ configStore.appTitle }}</text>
+        <text class="brand-subtitle">专业服务，放心到家</text>
+      </view>
+
+      <!-- 微信登录（默认方式） -->
+      <view class="login-card card">
+        <button class="wechat-btn" :disabled="!agreed" @click="onWechatLogin">
+          <uni-icons type="weixin" size="20" color="#ffffff" />
+          <text class="wechat-btn__text">微信授权登录</text>
+        </button>
+
+        <view class="agreement" @click="agreed = !agreed">
+          <view class="agreement-check" :class="{ 'agreement-check--on': agreed }">
+            <uni-icons v-if="agreed" type="checkmarkempty" size="11" color="#ffffff" />
+          </view>
+          <text class="agreement-text">我已阅读并同意</text>
+          <text class="agreement-link" @click.stop="showPolicy('用户协议')">《用户协议》</text>
+          <text class="agreement-text">和</text>
+          <text class="agreement-link" @click.stop="showPolicy('隐私政策')">《隐私政策》</text>
+        </view>
+
+        <view class="other-login" @click="openPhoneLogin">
+          <text class="other-login__text">其他方式登录</text>
+          <uni-icons type="right" size="12" color="#a39b95" />
+        </view>
+      </view>
+
+      <text class="footer-tip">登录即代表您同意我们保护您的个人信息</text>
     </view>
-    <view v-if="showWechatPanel" class="wechat-mask"><view class="wechat-panel surface"><text class="wechat-title">完善微信资料</text><text class="wechat-desc">授权后用于展示头像和称呼</text><button class="avatar-picker" open-type="chooseAvatar" @chooseavatar="onChooseAvatar"><image v-if="wechat.avatarUrl" :src="wechat.avatarUrl" /><uni-icons v-else type="person" size="38" color="#7b9b91" /></button><input v-model="wechat.nickname" type="nickname" class="nickname-input" placeholder="请输入昵称" @blur="onNicknameBlur" /><view class="wechat-actions"><button class="cancel-button" @click="showWechatPanel = false">取消</button><button class="confirm-button" :loading="wechatLoading" @click="confirmWechatLogin">确认授权</button></view></view></view>
+
+    <!-- 微信资料弹层 -->
+    <view v-if="showWechatPanel" class="wechat-mask" @tap.self="showWechatPanel = false">
+      <view class="wechat-panel" @tap.stop>
+        <view class="panel-handle" />
+        <text class="panel-title">完善个人信息</text>
+        <text class="panel-desc">头像和昵称将用于服务预约与订单展示</text>
+
+        <view class="avatar-section">
+          <button class="avatar-picker" open-type="chooseAvatar" @tap.stop @chooseavatar="onChooseAvatar">
+            <image v-if="wechat.avatarUrl" class="avatar-image" :src="wechat.avatarUrl" mode="aspectFill" />
+            <view v-else class="avatar-placeholder">
+              <view class="avatar-icon">
+                <uni-icons type="camera" size="25" color="#c9582d" />
+              </view>
+            </view>
+            <view class="avatar-edit">
+              <uni-icons type="compose" size="13" color="#ffffff" />
+            </view>
+          </button>
+          <text class="avatar-hint">{{ wechat.avatarUrl ? '点击更换头像' : '点击选择头像' }}</text>
+        </view>
+
+        <view class="nickname-field">
+          <text class="field-label">昵称</text>
+          <input
+            v-model="wechat.nickname"
+            type="nickname"
+            class="field-input"
+            placeholder="点击自动获取微信昵称"
+            placeholder-class="field-placeholder"
+            @blur="onNicknameBlur"
+          />
+        </view>
+
+        <view class="panel-actions">
+          <button class="ghost-button panel-cancel" @click="showWechatPanel = false">取消</button>
+          <button class="primary-button panel-confirm" :loading="wechatLoading" @click="confirmWechatLogin">确定</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 手机号登录弹层 -->
+    <view v-if="showPhonePanel" class="wechat-mask" @tap.self="closePhoneLogin">
+      <view class="wechat-panel" @tap.stop>
+        <view class="panel-handle" />
+        <text class="panel-title">手机号登录</text>
+        <text class="panel-desc">未注册的手机号将自动创建账号并登录</text>
+
+        <view class="phone-field">
+          <text class="phone-prefix">+86</text>
+          <input
+            v-model="phone.phone"
+            class="field-input"
+            type="number"
+            maxlength="11"
+            placeholder="请输入手机号"
+            placeholder-class="field-placeholder"
+          />
+        </view>
+
+        <view class="phone-field">
+          <text class="phone-prefix">码</text>
+          <input
+            v-model="phone.code"
+            class="field-input"
+            type="number"
+            maxlength="6"
+            placeholder="请输入验证码"
+            placeholder-class="field-placeholder"
+          />
+          <text
+            class="code-btn"
+            :class="{ 'code-btn--disabled': countdown > 0 || sending }"
+            @click="sendCode"
+          >{{ countdown > 0 ? `${countdown}s` : (sending ? '发送中' : '获取验证码') }}</text>
+        </view>
+
+        <text v-if="mockCode" class="mock-tip">开发环境验证码：{{ mockCode }}</text>
+
+        <view class="panel-actions">
+          <button class="ghost-button panel-cancel" @click="closePhoneLogin">取消</button>
+          <button class="primary-button panel-confirm" :loading="phoneLoading" @click="submitPhoneLogin">确定</button>
+        </view>
+      </view>
+    </view>
+
+    <AppFeedback />
   </view>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onUnload } from '@dcloudio/uni-app'
 import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'
+import UiNavbar from '@/components/ui/UiNavbar.vue'
+import AppFeedback from '@/components/AppFeedback.vue'
+import { requestSmsCode } from '@/api/auth'
 import { useAuthStore } from '@/stores/auth'
+import { useConfigStore } from '@/stores/config'
+import { HOME_PATH, sanitizeRedirect } from '@/utils/guard'
+import { showToast, toastSuccess } from '@/utils/feedback'
 
-const authStore = useAuthStore(); const loading = ref(false); const wechatLoading = ref(false); const errorMessage = ref(''); const showWechatPanel = ref(false); const redirect = ref(''); const isWechat = ref(false)
-const form = reactive({ username: '', password: '' }); const wechat = reactive({ avatarUrl: '', nickname: '' })
-onShow(() => { const options = getCurrentPages().at(-1)?.options || {}; redirect.value = options.redirect ? decodeURIComponent(options.redirect) : ''; isWechat.value = process.env.UNI_PLATFORM === 'mp-weixin'; if (authStore.isLoggedIn) redirectAfterLogin() })
-function onChooseAvatar (event) { wechat.avatarUrl = event.detail?.avatarUrl || ''; showWechatPanel.value = true }
-function onNicknameBlur (event) { if (event.detail?.value) wechat.nickname = event.detail.value }
-function startWechatAuth () { uni.showToast({ title: '请在微信小程序中完成授权', icon: 'none' }) }
-async function confirmWechatLogin () { if (!wechat.nickname.trim()) return uni.showToast({ title: '请输入昵称', icon: 'none' }); wechatLoading.value = true; errorMessage.value = ''; try { const loginResult = await new Promise((resolve, reject) => uni.login({ provider: 'weixin', success: resolve, fail: reject })); await authStore.signInWithWechat({ code: loginResult.code, nickname: wechat.nickname.trim(), avatarUrl: wechat.avatarUrl }); redirectAfterLogin() } catch (error) { errorMessage.value = error.message || '微信登录失败，请稍后重试' } finally { wechatLoading.value = false } }
-async function submit () { if (!form.username.trim() || !form.password) return (errorMessage.value = '请输入账号和密码'); loading.value = true; errorMessage.value = ''; try { await authStore.signIn({ username: form.username.trim(), password: form.password, code: '', uuid: '' }); redirectAfterLogin() } catch (error) { errorMessage.value = error.message || '登录失败，请稍后重试' } finally { loading.value = false } }
-function redirectAfterLogin () { const target = redirect.value || '/pages/home/index'; const tabPages = ['/pages/home/index', '/pages/category/index', '/pages/orders/index', '/pages/user/index']; if (tabPages.includes(target)) uni.reLaunch({ url: target }); else uni.redirectTo({ url: target }) }
+const authStore = useAuthStore()
+const configStore = useConfigStore()
+
+const redirect = ref('')
+const isWechat = ref(false)
+const agreed = ref(false)
+
+const showWechatPanel = ref(false)
+const wechatLoading = ref(false)
+const wechat = reactive({ avatarUrl: '', nickname: '' })
+
+const showPhonePanel = ref(false)
+const phoneLoading = ref(false)
+const sending = ref(false)
+const countdown = ref(0)
+const mockCode = ref('')
+const phone = reactive({ phone: '', code: '' })
+
+let ticker = null
+
+onShow(async () => {
+  await configStore.load().catch(() => {})
+  const options = getCurrentPages().at(-1)?.options || {}
+  redirect.value = options.redirect ? decodeURIComponent(options.redirect) : ''
+  isWechat.value = process.env.UNI_PLATFORM === 'mp-weixin'
+  if (authStore.isLoggedIn) redirectAfterLogin()
+})
+
+onUnload(() => stopCountdown())
+
+/* ---------- 协议 ---------- */
+function requireAgreement () {
+  if (agreed.value) return true
+  showToast('请先阅读并同意用户协议和隐私政策')
+  return false
+}
+
+function showPolicy (name) {
+  showToast(`${name}内容请在应用正式发布前配置`)
+}
+
+/* ---------- 微信登录 ---------- */
+function onWechatLogin () {
+  if (!requireAgreement()) return
+  if (!isWechat.value) {
+    showToast('请在微信小程序中进行授权登录')
+    return
+  }
+  wechat.avatarUrl = ''
+  wechat.nickname = ''
+  showWechatPanel.value = true
+}
+
+function onChooseAvatar (event) {
+  const avatarUrl = event.detail?.avatarUrl
+  if (avatarUrl) wechat.avatarUrl = avatarUrl
+}
+
+function onNicknameBlur (event) {
+  if (event.detail?.value) wechat.nickname = event.detail.value
+}
+
+async function confirmWechatLogin () {
+  if (!wechat.nickname.trim()) return showToast('请填写昵称')
+  wechatLoading.value = true
+  try {
+    const loginResult = await new Promise((resolve, reject) => uni.login({ provider: 'weixin', success: resolve, fail: reject }))
+    await authStore.signInWithWechat({
+      code: loginResult.code,
+      nickname: wechat.nickname.trim(),
+      avatarUrl: wechat.avatarUrl
+    })
+    showWechatPanel.value = false
+    redirectAfterLogin()
+  } catch (error) {
+    showToast(error.message || '微信登录失败，请稍后重试')
+  } finally {
+    wechatLoading.value = false
+  }
+}
+
+/* ---------- 手机号登录 ---------- */
+function openPhoneLogin () {
+  if (!requireAgreement()) return
+  phone.code = ''
+  mockCode.value = ''
+  showPhonePanel.value = true
+}
+
+function closePhoneLogin () {
+  showPhonePanel.value = false
+  stopCountdown()
+}
+
+function stopCountdown () {
+  if (ticker) clearInterval(ticker)
+  ticker = null
+  countdown.value = 0
+}
+
+function startCountdown (seconds) {
+  stopCountdown()
+  countdown.value = seconds
+  ticker = setInterval(() => {
+    countdown.value -= 1
+    if (countdown.value <= 0) stopCountdown()
+  }, 1000)
+}
+
+async function sendCode () {
+  if (countdown.value > 0 || sending.value) return
+  if (!/^1\d{10}$/.test(phone.phone)) return showToast('请输入正确的手机号')
+  sending.value = true
+  try {
+    const response = await requestSmsCode(phone.phone)
+    const data = response?.data || response || {}
+    mockCode.value = data.mockCode || ''
+    showToast(mockCode.value ? `验证码：${mockCode.value}` : '验证码已发送', { type: 'success' })
+    startCountdown(Number(data.resendIn) || 60)
+  } catch (error) {
+    showToast(error.message || '验证码发送失败')
+  } finally {
+    sending.value = false
+  }
+}
+
+async function submitPhoneLogin () {
+  if (!/^1\d{10}$/.test(phone.phone)) return showToast('请输入正确的手机号')
+  if (!/^\d{4,6}$/.test(phone.code)) return showToast('请输入验证码')
+  phoneLoading.value = true
+  try {
+    await authStore.signInWithSms({ phone: phone.phone, code: phone.code })
+    showPhonePanel.value = false
+    stopCountdown()
+    toastSuccess('登录成功')
+    redirectAfterLogin()
+  } catch (error) {
+    showToast(error.message || '登录失败，请稍后重试')
+  } finally {
+    phoneLoading.value = false
+  }
+}
+
+/* ---------- 登录后跳转 ---------- */
+function redirectAfterLogin () {
+  const target = sanitizeRedirect(redirect.value) || HOME_PATH
+  const path = target.split('?')[0]
+  const tabPages = ['/pages/home/index', '/pages/category/index', '/pages/services/index', '/pages/orders/index', '/pages/user/index']
+  if (tabPages.includes(path)) return uni.reLaunch({ url: target })
+  if (getCurrentPages().length > 1) return uni.redirectTo({ url: target })
+  uni.reLaunch({ url: HOME_PATH })
+  setTimeout(() => uni.navigateTo({ url: target, fail: () => uni.reLaunch({ url: HOME_PATH }) }), 0)
+}
 </script>
 
 <style lang="scss" scoped>
-.login-page{min-height:100vh;padding:120rpx 40rpx 48rpx;background:linear-gradient(155deg,#edf7f2 0%,#f8fbf9 50%,#f4f7f5 100%)}.login-brand{display:flex;flex-direction:column;align-items:center}.brand-logo{width:112rpx;height:112rpx;margin-bottom:26rpx;border-radius:24rpx;background:#fff}.brand-name{color:#245d55;font-size:42rpx;font-weight:800}.brand-subtitle{margin-top:12rpx;color:#7f9a91;font-size:26rpx}.login-panel{margin-top:72rpx;padding:44rpx 36rpx 40rpx;box-shadow:0 18rpx 50rpx rgba(38,90,72,.08)}.panel-title{display:block;color:$app-text;font-size:38rpx;font-weight:700}.panel-subtitle{display:block;margin-top:12rpx;color:$app-muted;font-size:25rpx}.wechat-button{display:flex;align-items:center;justify-content:center;gap:12rpx;width:100%;margin-top:38rpx;color:#fff;background:#2e806d;border-radius:14rpx;line-height:88rpx}.divider{display:flex;align-items:center;gap:16rpx;margin:34rpx 0;color:#a3b1ac;font-size:22rpx}.divider:before,.divider:after{content:'';height:1rpx;flex:1;background:#e4ebe7}.field{margin-top:28rpx;padding-bottom:18rpx;border-bottom:1rpx solid $app-border}.field-label{display:block;margin-bottom:14rpx;color:$app-muted;font-size:24rpx}.field-input{width:100%;height:54rpx;color:$app-text;font-size:30rpx}.error-message{margin-top:20rpx;color:#e45656;font-size:24rpx}.login-button{width:100%;margin-top:36rpx}.wechat-mask{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;background:rgba(24,48,39,.42)}.wechat-panel{width:100%;padding:42rpx 38rpx calc(34rpx + env(safe-area-inset-bottom));border-radius:28rpx 28rpx 0 0;text-align:center}.wechat-title{display:block;color:$app-text;font-size:34rpx;font-weight:700}.wechat-desc{display:block;margin-top:12rpx;color:$app-muted;font-size:23rpx}.avatar-picker{display:flex;align-items:center;justify-content:center;width:136rpx;height:136rpx;margin:30rpx auto 22rpx;padding:0;border-radius:50%;background:#e1f3ec;overflow:hidden}.avatar-picker image{width:100%;height:100%}.nickname-input{height:78rpx;padding:0 20rpx;border:1rpx solid $app-border;border-radius:12rpx;color:$app-text;text-align:left}.wechat-actions{display:flex;gap:18rpx;margin-top:28rpx}.cancel-button,.confirm-button{flex:1;line-height:78rpx;border-radius:12rpx;font-size:26rpx}.cancel-button{color:$app-muted;background:#f4f7f5}.confirm-button{color:#fff;background:#2e806d}
+@import '@/styles/tokens.scss';
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0 $page-gutter calc(#{$space-6} + env(safe-area-inset-bottom));
+  background: $bg;
+}
+
+.login-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: $space-6;
+}
+
+/* ---------- 品牌 ---------- */
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $space-6 0;
+}
+
+.brand-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 136rpx;
+  height: 136rpx;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: $shadow-card;
+}
+
+.brand-logo { width: 84rpx; height: 84rpx; }
+
+.brand-name {
+  margin-top: $space-3;
+  font-size: 36rpx;
+  font-weight: $weight-heavy;
+  color: $ink-900;
+  letter-spacing: 1rpx;
+}
+
+.brand-subtitle {
+  margin-top: 8rpx;
+  font-size: $font-micro;
+  color: $ink-400;
+  letter-spacing: 2rpx;
+}
+
+/* ---------- 登录卡片 ---------- */
+.login-card { padding: $space-4; }
+
+/* 协议 */
+.agreement {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4rpx;
+  margin-top: 40rpx;
+}
+
+.agreement-check {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 30rpx;
+  height: 30rpx;
+  margin-right: 4rpx;
+  border: 1rpx solid $ink-300;
+  border-radius: 50%;
+  line-height: 1;
+}
+.agreement-check--on {
+  border-color: $brand-500;
+  background: $brand-500;
+}
+.agreement-check :deep(.uni-icons) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.agreement-text { font-size: $font-micro; color: $ink-400; }
+.agreement-link { font-size: $font-micro; color: $brand-600; }
+
+/* 微信按钮 */
+.wechat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-1;
+  width: 100%;
+  height: 92rpx;
+  padding: 0;
+  border: 0;
+  border-radius: $radius-pill;
+  background: $brand-500;
+  box-shadow: 0 6rpx 18rpx rgba(224, 106, 61, 0.24);
+}
+.wechat-btn::after { border: 0; }
+.wechat-btn:active { background: $brand-600; transform: scale(0.98); }
+/* 未勾选协议：保留品牌色背景，仅降低透明度并禁止点击 */
+.wechat-btn[disabled] {
+  background: $brand-500;
+  color: #fff;
+  box-shadow: none;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.wechat-btn__text {
+  color: #fff;
+  font-size: $font-button;
+  font-weight: $weight-semibold;
+}
+
+/* 其他方式 */
+.other-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  margin-top: $space-4;
+  padding-top: $space-3;
+  border-top: 1rpx solid $line-soft;
+}
+
+.other-login__text {
+  font-size: $font-caption;
+  color: $ink-500;
+}
+
+/* 页脚 */
+.footer-tip {
+  display: block;
+  margin-top: $space-6;
+  text-align: center;
+  font-size: 18rpx;
+  color: $ink-300;
+}
+
+/* ---------- 底部弹层 ---------- */
+.wechat-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  padding-top: 72rpx;
+  background: $overlay;
+}
+
+.wechat-panel {
+  position: relative;
+  width: 100%;
+  padding: $space-3 $space-4 calc(#{$space-6} + env(safe-area-inset-bottom));
+  border-radius: 36rpx 36rpx 0 0;
+  background: $surface;
+  text-align: center;
+  box-shadow: 0 -12rpx 48rpx rgba(31, 28, 26, 0.12);
+  animation: panel-up 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes panel-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.panel-handle {
+  width: 72rpx;
+  height: 7rpx;
+  margin: 0 auto $space-3;
+  border-radius: $radius-pill;
+  background: #e6dfda;
+}
+
+.panel-title {
+  display: block;
+  font-size: $font-title;
+  font-weight: $weight-bold;
+  color: $ink-900;
+}
+
+.panel-desc {
+  display: block;
+  margin-top: 10rpx;
+  font-size: $font-micro;
+  color: $ink-400;
+}
+
+/* 头像 */
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: $space-4 0 $space-3;
+}
+
+.avatar-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 144rpx;
+  height: 144rpx;
+  padding: 0;
+  overflow: hidden;
+  border: 6rpx solid #fff;
+  border-radius: 50%;
+  background: #fff7f3;
+  box-shadow: 0 0 0 2rpx $brand-100, 0 8rpx 24rpx rgba(31, 28, 26, 0.08);
+}
+.avatar-picker::after { border: 0; }
+.avatar-picker:active { transform: scale(0.97); }
+.avatar-image { width: 100%; height: 100%; border-radius: 50%; }
+
+.avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.avatar-edit {
+  position: absolute;
+  right: 0;
+  bottom: 2rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  border: 4rpx solid $surface;
+  border-radius: 50%;
+  background: $brand-500;
+}
+
+.avatar-hint {
+  margin-top: $space-1;
+  font-size: $font-micro;
+  color: $ink-400;
+}
+
+/* 昵称 */
+.nickname-field {
+  padding: $space-3;
+  border: 1rpx solid $line-soft;
+  border-radius: 24rpx;
+  background: $bg-sunken;
+  text-align: left;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 10rpx;
+  font-size: $font-micro;
+  color: $ink-500;
+  font-weight: $weight-medium;
+}
+
+.field-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 56rpx;
+  font-size: $font-body;
+  color: $ink-900;
+}
+
+.field-placeholder { color: $ink-300; }
+
+/* 手机号 */
+.phone-field {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  margin-top: $space-3;
+  padding: 0 $space-3;
+  height: 96rpx;
+  border-radius: $radius-md;
+  background: $bg-sunken;
+  text-align: left;
+}
+
+.phone-prefix {
+  flex: 0 0 auto;
+  font-size: $font-caption;
+  color: $ink-500;
+  font-weight: $weight-medium;
+}
+
+.code-btn {
+  flex: 0 0 auto;
+  padding-left: $space-2;
+  border-left: 1rpx solid $line;
+  font-size: $font-micro;
+  color: $brand-600;
+  font-weight: $weight-semibold;
+}
+
+.code-btn--disabled { color: $ink-300; }
+
+.mock-tip {
+  display: block;
+  margin-top: $space-2;
+  font-size: 18rpx;
+  color: $warning;
+}
+
+/* 操作 */
+.panel-actions {
+  display: flex;
+  gap: $space-3;
+  margin-top: $space-4;
+}
+
+.panel-cancel {
+  flex: 1;
+  height: 88rpx;
+  border-radius: $radius-pill;
+  border-color: $line;
+  background: $surface-muted;
+  color: $ink-700;
+}
+
+.panel-confirm {
+  flex: 1.4;
+  height: 88rpx;
+  line-height: 88rpx;
+  margin: 0;
+  box-shadow: 0 8rpx 20rpx rgba(224, 106, 61, 0.2);
+}
 </style>

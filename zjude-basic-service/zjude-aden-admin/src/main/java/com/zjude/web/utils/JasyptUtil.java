@@ -53,9 +53,9 @@ public class JasyptUtil {
     }
 
     public static void main(String[] args) {
-        String encrypt = JasyptUtil.encrypt("123456");
+        String encrypt = JasyptUtil.encrypt("Root123456@2026");
         System.out.println(encrypt);
-        String decrypt = JasyptUtil.decrypt("3BsASig1UQEcjDMeX7Phs/SLRlRf5FreRnXXltbNTVM=");
+        String decrypt = JasyptUtil.decrypt("39s4VUkY7ILj57W6DF+5tB7fZSIbSUOec4PohJjVFb4=");
         System.out.println(decrypt);
         System.out.println(LocalDateTime.now().withNano(0));
     }

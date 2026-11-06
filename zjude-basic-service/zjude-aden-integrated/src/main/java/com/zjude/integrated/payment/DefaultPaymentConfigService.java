@@ -35,6 +35,12 @@ public class DefaultPaymentConfigService implements PaymentConfigService
                     "",
                     value(values, PaymentConfigKeys.WECHAT_AUTH_DIRECTORY),
                     "",
+                    value(values, PaymentConfigKeys.WECHAT_PLATFORM_CERTIFICATE),
+                    value(values, PaymentConfigKeys.WECHAT_PLATFORM_SERIAL_NO),
+                    value(values, PaymentConfigKeys.WECHAT_PUBLIC_KEY_ID),
+                    value(values, PaymentConfigKeys.WECHAT_PUBLIC_KEY),
+                    value(values, PaymentConfigKeys.WECHAT_REFUND_NOTIFY_URL),
+                    value(values, PaymentConfigKeys.WECHAT_ORDER_DESCRIPTION_PREFIX),
                     "1".equals(value(values, PaymentConfigKeys.WECHAT_ENABLED)));
         }
         if (provider == PaymentProvider.ALIPAY)
@@ -53,6 +59,12 @@ public class DefaultPaymentConfigService implements PaymentConfigService
                     value(values, PaymentConfigKeys.ALIPAY_RETURN_URL),
                     "",
                     value(values, PaymentConfigKeys.ALIPAY_PUBLIC_KEY),
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
                     "1".equals(value(values, PaymentConfigKeys.ALIPAY_ENABLED)));
         }
         throw new ServiceException("不支持的支付方式");
@@ -67,10 +79,12 @@ public class DefaultPaymentConfigService implements PaymentConfigService
             require(config.appId(), "微信支付 AppID");
             require(config.mchId(), "微信支付商户号");
             require(config.apiV3Key(), "微信支付 APIv3 密钥");
-            require(config.certificate(), "微信支付商户证书");
             require(config.privateKey(), "微信支付商户私钥");
             require(config.certificateSerialNo(), "微信支付证书序列号");
+            require(config.wechatPublicKeyId(), "微信支付公钥 ID");
+            require(config.wechatPublicKey(), "微信支付公钥");
             require(config.notifyUrl(), "微信支付回调地址");
+            require(config.refundNotifyUrl(), "微信退款回调地址");
         }
         else
         {

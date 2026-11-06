@@ -1,14 +1,17 @@
 <template>
-  <view class="page safe-bottom">
-    <view class="cart-hero surface">
-      <text class="cart-title">{{ pageTitle }}</text>
-      <text v-if="cartSubtitle" class="cart-subtitle">{{ cartSubtitle }}</text>
-    </view>
-    <view class="empty-panel surface">
-      <view class="empty-icon">{{ pageTitle.slice(0, 1) || '购' }}</view>
-      <text class="empty-title">{{ emptyTitle }}</text>
-      <text v-if="emptyDescription" class="empty-description">{{ emptyDescription }}</text>
-    </view>
+  <view class="cart-page has-tabbar">
+    <UiNavbar :back="false" title="购物车" />
+
+
+    <UiEmpty
+      icon="cart"
+      :title="emptyTitle || '还没有添加服务'"
+      :description="emptyDescription || '浏览服务并预约，让生活轻松一点'"
+    >
+      <button class="primary-button empty-action" @click="browseServices">去找服务</button>
+    </UiEmpty>
+
+    <AppFeedback />
     <AppTabBar current-key="cart" />
   </view>
 </template>
@@ -16,6 +19,9 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import AppTabBar from '@/components/AppTabBar.vue'
+import AppFeedback from '@/components/AppFeedback.vue'
+import UiNavbar from '@/components/ui/UiNavbar.vue'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import { useConfigStore } from '@/stores/config'
 
 const configStore = useConfigStore()
@@ -27,21 +33,36 @@ const emptyDescription = computed(() => cartConfig.value.emptyDescription || '')
 
 onMounted(async () => {
   await configStore.load().catch(() => {})
-  uni.setNavigationBarTitle({ title: pageTitle.value })
 })
 
 function findLabel (key) {
   return configStore.navigation.items.find(item => item.key === key)?.name
 }
+
+function browseServices () {
+  uni.navigateTo({ url: '/pages/services/index' })
+}
 </script>
 
 <style lang="scss" scoped>
-.cart-hero { padding: 34rpx 30rpx; background: $app-primary; color: #fff; }
-.cart-title, .cart-subtitle { display: block; }
-.cart-title { font-size: 38rpx; font-weight: 700; }
-.cart-subtitle { margin-top: 12rpx; opacity: .82; font-size: 25rpx; }
-.empty-panel { display: flex; flex-direction: column; align-items: center; margin-top: 24rpx; padding: 80rpx 30rpx; text-align: center; }
-.empty-icon { display: flex; align-items: center; justify-content: center; width: 100rpx; height: 100rpx; border-radius: 30rpx; background: $app-primary-soft; color: $app-primary; font-size: 42rpx; font-weight: 700; }
-.empty-title { margin-top: 28rpx; color: $app-text; font-size: 30rpx; font-weight: 600; }
-.empty-description { margin-top: 12rpx; color: $app-muted; font-size: 25rpx; }
+@import '@/styles/tokens.scss';
+
+.cart-page { min-height: 100vh; background: $bg; }
+
+.cart-head {
+  padding: $space-3 $page-gutter $space-3;
+  background: linear-gradient(180deg, #fdece4 0%, #fff7f3 70%, $bg 100%);
+}
+
+.head-title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: $weight-heavy;
+  color: $ink-900;
+  letter-spacing: -1rpx;
+}
+
+.head-sub { display: block; margin-top: 6rpx; font-size: $font-micro; color: $ink-500; }
+
+.empty-action { width: 280rpx; margin-top: $space-4; line-height: 80rpx; }
 </style>

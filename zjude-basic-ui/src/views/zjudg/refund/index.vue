@@ -1,149 +1,218 @@
 <template>
-  <div class="app-container refund-page">
-    <div class="refund-summary">
-      <div><span>累计退款金额（元）</span><strong>0.00</strong></div><div><span>退款中金额（元）</span><strong>0.00</strong></div><div><span>退款成功金额（元）</span><strong>0.00</strong></div><div><span>退款失败金额（元）</span><strong>0.00</strong></div>
-    </div><el-form
+  <div class="app-container">
+    <el-form
       :inline="true"
       :model="query"
-      class="filter-panel"
     >
-      <el-form-item label="退款编号">
+      <el-form-item label="退款单号">
         <el-input
           v-model="query.refundNo"
-          placeholder="请输入"
+          clearable
+          placeholder="退款单号"
         />
-      </el-form-item><el-form-item label="来源单号">
+      </el-form-item>
+      <el-form-item label="订单编号">
         <el-input
           v-model="query.orderNo"
-          placeholder="请输入"
-        />
-      </el-form-item><el-form-item label="买家信息">
-        <el-input
-          v-model="query.buyerInfo"
-          placeholder="请输入"
-        />
-      </el-form-item><el-form-item label="退款类型">
-        <el-select
-          v-model="query.type"
           clearable
+          placeholder="订单编号"
+        />
+      </el-form-item>
+      <el-form-item label="退款状态">
+        <el-select
+          v-model="query.refundStatus"
+          clearable
+          placeholder="全部"
         >
           <el-option
-            label="全部"
-            value=""
-          /><el-option
-            label="售后退款"
-            value="0"
-          /><el-option
-            label="主动退款"
-            value="1"
+            v-for="item in STATUS_OPTIONS"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
           />
         </el-select>
-      </el-form-item><el-form-item label="记录时间">
-        <el-date-picker
-          v-model="query.dateRange"
-          type="daterange"
-          value-format="YYYY-MM-DD"
-        />
-      </el-form-item><el-form-item>
+      </el-form-item>
+      <el-form-item>
         <el-button
           type="primary"
-          @click="search"
+          @click="handleQuery"
         >
           查询
-        </el-button><el-button @click="reset">
+        </el-button>
+        <el-button @click="resetQuery">
           重置
         </el-button>
       </el-form-item>
-    </el-form><el-tabs v-model="query.status">
-      <el-tab-pane
-        label="全部(0)"
-        name=""
-      /><el-tab-pane
-        label="退款中(0)"
-        name="0"
-      /><el-tab-pane
-        label="退款成功(0)"
-        name="1"
-      /><el-tab-pane
-        label="退款失败(0)"
-        name="2"
-      />
-    </el-tabs><el-table :data="rows">
+    </el-form>
+
+    <el-table
+      v-loading="loading"
+      :data="rows"
+    >
       <el-table-column
-        label="ID"
-        prop="refundId"
-      /><el-table-column
-        label="退款编号"
+        label="退款单号"
         prop="refundNo"
-      /><el-table-column
-        label="买家信息"
-        prop="buyerInfo"
-      /><el-table-column
-        label="来源单号"
+        min-width="160"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        label="订单编号"
         prop="orderNo"
-      /><el-table-column
+        min-width="140"
+      />
+      <el-table-column
         label="退款金额"
-        prop="amount"
-      /><el-table-column
-        label="退款类型"
-        prop="typeLabel"
-      /><el-table-column
+        width="110"
+      >
+        <template #default="{ row }">
+          ¥{{ row.refundAmount }}
+        </template>
+      </el-table-column>
+      <el-table-column
         label="退款状态"
-        prop="statusLabel"
-      /><el-table-column
-        label="记录时间"
+        width="100"
+      >
+        <template #default="{ row }">
+          <el-tag :type="statusTagType(row.refundStatus)">
+            {{ statusLabel(row.refundStatus) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="申请原因"
+        prop="remark"
+        min-width="140"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        label="失败/拒绝原因"
+        prop="failReason"
+        min-width="140"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        label="申请时间"
         prop="createTime"
-      /><el-table-column label="操作">
+        width="160"
+      />
+      <el-table-column
+        label="操作"
+        width="200"
+        fixed="right"
+      >
         <template #default="{ row }">
           <el-button
+            v-if="row.refundStatus === '0'"
             link
             type="primary"
-            @click="showDetail(row)"
+            @click="handleApprove(row)"
           >
-            详情
+            同意退款
+          </el-button>
+          <el-button
+            v-if="row.refundStatus === '0'"
+            link
+            type="danger"
+            @click="handleReject(row)"
+          >
+            拒绝
+          </el-button>
+          <el-button
+            v-if="row.refundStatus === '1'"
+            link
+            type="primary"
+            @click="handleSync(row)"
+          >
+            同步状态
           </el-button>
         </template>
       </el-table-column>
-    </el-table><pagination
-      v-show="rows.length"
-      :total="rows.length"
-      :page-size="10"
-    /><el-dialog
-      v-model="visible"
-      title="退款详情"
-      width="480px"
-    >
-      <el-descriptions
-        :column="1"
-        border
-      >
-        <el-descriptions-item label="退款编号">
-          {{ current.refundNo }}
-        </el-descriptions-item><el-descriptions-item label="来源单号">
-          {{ current.orderNo }}
-        </el-descriptions-item><el-descriptions-item label="退款金额">
-          {{ current.amount }}
-        </el-descriptions-item><el-descriptions-item label="退款状态">
-          {{ current.statusLabel }}
-        </el-descriptions-item>
-      </el-descriptions>
-    </el-dialog>
+    </el-table>
+
+    <pagination
+      v-show="total > 0"
+      v-model:page="query.pageNum"
+      v-model:limit="query.pageSize"
+      :total="total"
+      @pagination="load"
+    />
   </div>
 </template>
+
 <script setup>
-import { reactive, ref } from 'vue'; const visible = ref(false); const current = ref({}); const query = reactive({ refundNo: '', orderNo: '', buyerInfo: '', type: '', status: '', dateRange: [] }); const rows = ref([]); function search () {} function reset () { Object.assign(query, { refundNo: '', orderNo: '', buyerInfo: '', type: '', status: '', dateRange: [] }) } function showDetail (row) { current.value = row; visible.value = true }
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { listRefund, approveRefund, rejectRefund, syncRefund } from '@/api/zjudg/refund'
+
+const STATUS_LABELS = { 0: '待处理', 1: '退款中', 2: '已退款', 3: '退款失败', 4: '已拒绝' }
+const STATUS_TAGS = { 0: 'warning', 1: 'primary', 2: 'success', 3: 'danger', 4: 'info' }
+
+const STATUS_OPTIONS = Object.keys(STATUS_LABELS).map(value => ({
+  label: STATUS_LABELS[value],
+  value
+}))
+
+const statusLabel = value => STATUS_LABELS[String(value)] || '-'
+const statusTagType = value => STATUS_TAGS[String(value)] || 'info'
+
+const loading = ref(false)
+const rows = ref([])
+const total = ref(0)
+const query = reactive({ pageNum: 1, pageSize: 10, refundNo: '', orderNo: '', refundStatus: '' })
+
+function load () {
+  loading.value = true
+  listRefund(query)
+    .then(response => {
+      rows.value = response.rows || []
+      total.value = response.total || 0
+    })
+    .finally(() => { loading.value = false })
+}
+
+function handleQuery () {
+  query.pageNum = 1
+  load()
+}
+
+function resetQuery () {
+  Object.assign(query, { pageNum: 1, pageSize: 10, refundNo: '', orderNo: '', refundStatus: '' })
+  load()
+}
+
+function handleApprove (row) {
+  ElMessageBox.confirm(
+    `确认同意退款 ¥${row.refundAmount}？提交后将调用微信退款，资金原路退回。`,
+    '退款确认',
+    { type: 'warning' }
+  )
+    .then(() => approveRefund(row.refundId))
+    .then(() => {
+      ElMessage.success('退款已提交')
+      load()
+    })
+    .catch(() => {})
+}
+
+function handleReject (row) {
+  ElMessageBox.prompt('请填写拒绝原因', '拒绝退款', {
+    inputValidator: value => (value && value.trim() ? true : '拒绝原因不能为空')
+  })
+    .then(({ value }) => rejectRefund(row.refundId, value.trim()))
+    .then(() => {
+      ElMessage.success('已拒绝退款')
+      load()
+    })
+    .catch(() => {})
+}
+
+function handleSync (row) {
+  syncRefund(row.refundId)
+    .then(() => {
+      ElMessage.success('状态已同步')
+      load()
+    })
+}
+
+onMounted(load)
 </script>
-<style scoped>
-.refund-page { min-height: calc(100vh - 112px); color: var(--el-text-color-primary); }
-.refund-summary, .filter-panel { border: 1px solid var(--el-border-color-light); border-radius: 10px; background: var(--el-bg-color-overlay); box-shadow: 0 8px 24px rgba(0, 0, 0, .08); }
-.refund-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px; margin-bottom: 16px; }
-.refund-summary > div { padding: 14px 18px; border: 1px solid var(--el-border-color-light); border-radius: 8px; background: color-mix(in srgb, var(--el-bg-color) 70%, transparent); }
-.refund-summary span { display: block; color: var(--el-text-color-secondary); font-size: 13px; }
-.refund-summary strong { display: block; margin-top: 11px; color: var(--el-text-color-primary); font-size: 28px; font-weight: 600; }
-.filter-panel { display: flex; flex-wrap: wrap; align-items: center; padding: 18px 20px 2px; margin-bottom: 16px; }
-.filter-panel :deep(.el-form-item) { margin-right: 22px; margin-bottom: 16px; }
-.refund-page :deep(.el-tabs) { padding: 0 14px; border: 1px solid var(--el-border-color-light); border-radius: 10px 10px 0 0; background: var(--el-bg-color-overlay); }
-.refund-page :deep(.el-table) { border-right: 1px solid var(--el-border-color-light); border-bottom: 1px solid var(--el-border-color-light); border-left: 1px solid var(--el-border-color-light); border-radius: 0 0 10px 10px; overflow: hidden; }
-@media (max-width: 900px) { .refund-summary { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) { .refund-summary { grid-template-columns: 1fr; padding: 14px; }.filter-panel { padding: 16px 14px 2px; } }
-</style>

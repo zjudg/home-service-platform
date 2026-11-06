@@ -136,7 +136,7 @@ watch(valueId, () => {
 @use "@/assets/styles/variables" as *;
 .el-scrollbar .el-scrollbar__view .el-select-dropdown__item {
   padding: 0;
-  background-color: #0a263b;
+  background-color: #fff;
   height: auto;
 }
 
@@ -154,7 +154,7 @@ ul li .el-tree .el-tree-node__content {
 :deep(.el-tree-node__content:active),
 :deep(.is-current > div:first-child),
 :deep(.el-tree-node__content:focus) {
-  background-color: rgba(34, 211, 238, 0.12);
+  background-color: #fff7f3;
   color: $color-primary;
 }
 </style>

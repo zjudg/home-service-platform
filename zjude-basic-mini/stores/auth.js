@@ -10,6 +10,8 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(getStorage(USER_KEY, null))
   const loading = ref(false)
   const isLoggedIn = computed(() => Boolean(token.value))
+  const restored = ref(false)
+  let restorePromise = null
 
   function clearSession () {
     token.value = ''
@@ -48,6 +50,34 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function silentWechatSignIn (code) {
+    const response = await authApi.silentWechatLogin(code)
+    if (response.registered === false || response.data?.registered === false) {
+      clearSession()
+      return { registered: false }
+    }
+    const nextToken = response.token || response.data?.token
+    if (!nextToken) throw new Error('微信静默登录响应缺少令牌')
+    token.value = nextToken
+    setStorage(TOKEN_KEY, nextToken)
+    await loadUser()
+    return { ...response, registered: true }
+  }
+
+  async function signInWithSms (payload) {
+    loading.value = true
+    try {
+      const response = await authApi.smsLogin(payload)
+      const nextToken = response.token || response.data?.token
+      if (!nextToken) throw new Error('手机登录响应缺少令牌')
+      token.value = nextToken
+      setStorage(TOKEN_KEY, nextToken)
+      await loadUser()
+      return response
+    } finally {
+      loading.value = false
+    }
+  }
   async function loadUser () {
     const response = await authApi.getInfo()
     user.value = response.user || response.data?.user || null
@@ -64,19 +94,32 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function restore () {
-    if (!token.value) return false
-    try {
-      await loadUser()
-      return true
-    } catch (error) {
-      clearSession()
+    if (restored.value) return Boolean(token.value)
+    if (restorePromise) return restorePromise
+    if (!token.value) {
+      restored.value = true
       return false
     }
+
+    restorePromise = (async () => {
+      try {
+        await loadUser()
+        return true
+      } catch {
+        // A 401 clears the session through the request layer. Keep the saved
+        // token for network/server errors so a temporary outage doesn't log out the user.
+        return false
+      } finally {
+        restored.value = true
+        restorePromise = null
+      }
+    })()
+    return restorePromise
   }
 
   setUnauthorizedHandler(() => {
     clearSession()
   })
 
-  return { token, user, loading, isLoggedIn, signIn, signInWithWechat, loadUser, signOut, restore, clearSession }
+  return { token, user, loading, isLoggedIn, signIn, signInWithWechat, silentWechatSignIn, signInWithSms, loadUser, signOut, restore, clearSession }
 })

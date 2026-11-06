@@ -1,9 +1,9 @@
+import { API_BASE_URL } from '@/config'
+
+// 后端返回的相对图片地址补全为可访问地址；已是完整 URL 时原样返回
 export function assetUrl (value) {
   if (!value) return ''
-  if (/^https?:\/\//.test(value)) return value
-
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
-  if (value.startsWith('/api/')) return value
-  const prefix = baseUrl.replace(/\/$/, '')
-  return `${prefix}${value.startsWith('/') ? value : `/${value}`}`
+  if (/^(https?:)?\/\//.test(value) || value.startsWith('data:')) return value
+  const base = API_BASE_URL.replace(/\/+$/, '')
+  return `${base}${value.startsWith('/') ? value : `/${value}`}`
 }

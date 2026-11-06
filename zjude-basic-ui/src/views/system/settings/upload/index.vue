@@ -209,10 +209,16 @@ const providers = [
         placeholder: '请输入 AccessKeySecret'
       },
       {
+        key: 'upload.aliyun.dir',
+        label: '目录（Dir）',
+        placeholder: '例如 mall',
+        tip: '对象存储中的相对目录前缀；留空时文件直接放在 Bucket 根目录，不按日期分目录。'
+      },
+      {
         key: 'upload.aliyun.domain',
         label: '空间域名（Domain）',
-        placeholder: 'http://',
-        tip: '请补全http://或https://，例如https://static.cloud.com/'
+        placeholder: 'https://',
+        tip: '请补全 http:// 或 https://，例如 https://static.cloud.com/'
       }
     ]
   },
@@ -331,6 +337,7 @@ async function saveProvider () {
         endpoint: providerForm['upload.aliyun.endpoint'],
         accessKeyId: providerForm['upload.aliyun.accessKeyId'],
         accessKeySecret: providerForm['upload.aliyun.accessKeySecret'],
+        dir: providerForm['upload.aliyun.dir'],
         domain: providerForm['upload.aliyun.domain']
       },
       tencent: {

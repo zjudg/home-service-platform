@@ -15,6 +15,16 @@ public final class PaymentConfigKeys
     public static final String WECHAT_NOTIFY_URL = "payment.wechat.notifyUrl";
     public static final String WECHAT_AUTH_DIRECTORY = "payment.wechat.authDirectory";
 
+    /** 微信支付平台证书内容，用于回调验签 */
+    public static final String WECHAT_PLATFORM_CERTIFICATE = "payment.wechat.platformCertificate";
+
+    /** 微信支付平台证书序列号 */
+    public static final String WECHAT_PLATFORM_SERIAL_NO = "payment.wechat.platformSerialNo";
+    public static final String WECHAT_PUBLIC_KEY_ID = "payment.wechat.publicKeyId";
+    public static final String WECHAT_PUBLIC_KEY = "payment.wechat.publicKey";
+    public static final String WECHAT_REFUND_NOTIFY_URL = "payment.wechat.refundNotifyUrl";
+    public static final String WECHAT_ORDER_DESCRIPTION_PREFIX = "payment.wechat.orderDescriptionPrefix";
+
     public static final String ALIPAY_ENABLED = "payment.alipay.status";
     public static final String ALIPAY_APP_ID = "payment.alipay.appId";
     public static final String ALIPAY_PRIVATE_KEY = "payment.alipay.privateKey";

@@ -18,6 +18,12 @@ public record PaymentConfig(
         String returnUrl,
         String authDirectory,
         String publicKey,
+        String platformCertificate,
+        String platformSerialNo,
+        String wechatPublicKeyId,
+        String wechatPublicKey,
+        String refundNotifyUrl,
+        String orderDescriptionPrefix,
         boolean enabled)
 {
 }

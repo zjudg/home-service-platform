@@ -16,6 +16,8 @@ public class CacheConstants
      * 验证�?redis key
      */
     public static final String CAPTCHA_CODE_KEY = "captcha_codes:";
+    /** 短信验证码 */
+    public static final String SMS_CODE_KEY = "sms_codes:";
 
     /**
      * 参数管理 cache key
@@ -41,4 +43,9 @@ public class CacheConstants
      * 登录账户密码错误次数 redis key
      */
     public static final String PWD_ERR_CNT_KEY = "pwd_err_cnt:";
+
+    /**
+     * 微信小程序 access_token 缓存 key
+     */
+    public static final String WECHAT_ACCESS_TOKEN_KEY = "wechat:access_token:";
 }

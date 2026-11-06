@@ -1,27 +1,460 @@
 <template>
-  <view class="page safe-bottom">
-    <view class="service-head"><view><text class="eyebrow">HOME SERVICE</text><text class="title">找服务</text></view><view class="location" @click="chooseLocation"><uni-icons type="location" size="18" color="#2e806d" />{{ location }}</view></view>
-    <view class="search surface"><uni-icons type="search" size="20" color="#8b98aa" /><input v-model="keyword" placeholder="搜索保洁、家电清洗、陪护" confirm-type="search" /></view>
-    <scroll-view scroll-x class="category-scroll"><view v-for="item in categories" :key="item.categoryId" class="category-chip" :class="{ active: activeCategory === item.categoryId }" @click="activeCategory = item.categoryId">{{ item.categoryName }}</view></scroll-view>
-    <view class="section-head"><text class="section-title">推荐服务</text><text class="muted">{{ filteredServices.length }} 项服务</text></view>
-    <view v-if="loading" class="empty-panel surface">正在加载服务...</view>
-    <view v-else-if="filteredServices.length" class="service-list"><view v-for="item in filteredServices" :key="item.serviceId" class="service-card surface" @click="openDetail(item.serviceId)"><view class="service-cover"><image v-if="item.imageUrl" :src="item.imageUrl" mode="aspectFill" /><uni-icons v-else type="home" size="30" color="#2e806d" /></view><view class="service-copy"><text class="service-name">{{ item.serviceName }}</text><text class="service-intro">{{ item.serviceIntro || '暂无服务说明' }}</text><view class="service-bottom"><text class="price">¥{{ item.price }}<text class="unit">/{{ item.unitName || '次' }}</text></text><text class="sold">已预约 {{ item.reserveCount || 0 }} 人</text></view></view></view></view>
-    <view v-else class="empty-panel surface">{{ errorMessage || '没有找到匹配的服务' }}</view>
+  <view class="service-page">
+    <UiNavbar
+      :back="false"
+      title="服务"
+    />
+    <!-- 主体：左侧分类 + 右侧服务列表 -->
+    <view class="browser">
+      <scroll-view
+        class="menu"
+        scroll-y
+        :scroll-into-view="menuAnchor"
+        :show-scrollbar="false"
+        :enhanced="true"
+        :bounces="false"
+      >
+        <view
+          v-for="tab in categoryTabs"
+          :id="`menu-${tab.value || 'all'}`"
+          :key="tab.value || 'all'"
+          class="menu-item"
+          :class="{ 'menu-item--active': activeCategory === tab.value }"
+          @click="selectCategory(tab.value)"
+        >
+          <text class="menu-label">
+            {{ tab.label }}
+          </text>
+          <text
+            v-if="tab.count"
+            class="menu-count"
+          >
+            {{ tab.count }}
+          </text>
+        </view>
+      </scroll-view>
+
+      <scroll-view
+        class="results"
+        scroll-y
+        :show-scrollbar="false"
+        :enhanced="true"
+        :bounces="false"
+      >
+        <view class="result-head">
+          <view class="result-titles">
+            <text class="result-title">
+              {{ activeCategoryLabel }}
+            </text>
+            <text class="result-count">
+              {{ filteredServices.length }} 项可预约
+            </text>
+          </view>
+          <view class="sort-switch">
+            <text
+              v-for="item in sorts"
+              :key="item.value"
+              class="sort-item"
+              :class="{ 'sort-item--active': sortBy === item.value }"
+              @click="sortBy = item.value"
+            >
+              {{ item.label }}
+            </text>
+          </view>
+        </view>
+
+        <view
+          v-if="loading"
+          class="result-list"
+        >
+          <view
+            v-for="n in 3"
+            :key="`sk-${n}`"
+            class="result-card card"
+          >
+            <view class="skeleton result-thumb-skeleton" />
+            <view class="result-copy">
+              <view class="skeleton skeleton-line" />
+              <view class="skeleton skeleton-line skeleton-line--short" />
+              <view class="skeleton skeleton-line skeleton-line--tiny" />
+            </view>
+          </view>
+        </view>
+
+        <view
+          v-else-if="sortedServices.length"
+          class="result-list"
+        >
+          <view
+            v-for="item in sortedServices"
+            :key="item.serviceId"
+            class="result-card card"
+            @click="openDetail(item.serviceId)"
+          >
+            <view class="result-thumb">
+              <image
+                v-if="serviceImage(item)"
+                :src="assetUrl(serviceImage(item))"
+                mode="aspectFit"
+              />
+              <view
+                v-else
+                class="result-thumb__fallback"
+              >
+                <uni-icons
+                  type="home"
+                  size="22"
+                  color="#f9d5c5"
+                />
+              </view>
+              <view
+                v-if="Number(item.reserveCount) > 0"
+                class="result-badge"
+              >
+                热
+              </view>
+            </view>
+            <view class="result-copy">
+              <view class="result-title-row">
+                <text class="result-name">
+                  {{ item.serviceName }}
+                </text>
+                <UiPrice
+                  :value="item.price"
+                  :unit="item.unitName || '次'"
+                  size="sm"
+                />
+              </view>
+              <text class="result-intro">
+                {{ item.serviceIntro || '专业服务人员上门，标准流程作业' }}
+              </text>
+              <view class="result-foot">
+                <text class="result-booked">
+                  已约 {{ item.reserveCount || 0 }}
+                </text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view
+          v-else
+          class="result-empty"
+        >
+          <uni-icons
+            type="list"
+            size="28"
+            color="#c4bcb6"
+          />
+          <text class="result-empty__title">
+            {{ errorMessage || '该分类暂无服务' }}
+          </text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <AppFeedback />
     <AppTabBar current-key="category" />
   </view>
 </template>
+
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'
 import AppTabBar from '@/components/AppTabBar.vue'
+import AppFeedback from '@/components/AppFeedback.vue'
+import UiNavbar from '@/components/ui/UiNavbar.vue'
+import UiPrice from '@/components/ui/UiPrice.vue'
 import { listCategories, listServices } from '@/api/service'
-const keyword = ref(''); const activeCategory = ref(''); const location = ref('杭州'); const categories = ref([]); const services = ref([]); const loading = ref(false); const errorMessage = ref('')
-const filteredServices = computed(() => services.value.filter(item => (!activeCategory.value || item.categoryId === activeCategory.value) && (!keyword.value || `${item.serviceName}${item.serviceIntro}`.includes(keyword.value))))
+import { useCityStore } from '@/stores/city'
+import { assetUrl } from '@/utils/assets'
+
+const cityStore = useCityStore()
+
+const activeCategory = ref('')
+const sortBy = ref('default')
+const categories = ref([])
+const services = ref([])
+const loading = ref(true)
+const errorMessage = ref('')
+
+const sorts = [
+  { label: '综合', value: 'default' },
+  { label: '价格', value: 'price' },
+  { label: '热度', value: 'hot' }
+]
+
+const categoryTabs = computed(() => [
+  { label: '全部', value: '', count: services.value.length },
+  ...categories.value.map(item => ({
+    label: item.categoryName,
+    value: String(item.categoryId),
+    count: services.value.filter(service => String(service.categoryId) === String(item.categoryId)).length
+  }))
+])
+
+const menuAnchor = computed(() => `menu-${activeCategory.value || 'all'}`)
+
+const activeCategoryLabel = computed(() => {
+  if (!activeCategory.value) return '全部服务'
+  return categories.value.find(item => String(item.categoryId) === activeCategory.value)?.categoryName || '全部服务'
+})
+
+const filteredServices = computed(() => services.value.filter(item => !activeCategory.value || String(item.categoryId) === activeCategory.value))
+
+const sortedServices = computed(() => {
+  const list = [...filteredServices.value]
+  if (sortBy.value === 'price') return list.sort((a, b) => Number(a.price || 0) - Number(b.price || 0))
+  if (sortBy.value === 'hot') return list.sort((a, b) => Number(b.reserveCount || 0) - Number(a.reserveCount || 0))
+  return list
+})
+
 function responseList (response) { return response?.rows || response?.data?.rows || (Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : []) }
-onMounted(async () => { loading.value = true; const options = getCurrentPages().at(-1)?.options || {}; activeCategory.value = options.categoryId || ''; try { const [c, s] = await Promise.all([listCategories(), listServices()]); categories.value = responseList(c); services.value = responseList(s) } catch (e) { errorMessage.value = e.message || '服务数据加载失败' } finally { loading.value = false } uni.setNavigationBarTitle({ title: '服务' }) })
+function serviceImage (item) { const images = item?.carouselImages || item?.imageUrl || ''; return (Array.isArray(images) ? images : String(images).split(',')).map(value => String(value).trim()).find(Boolean) || '' }
+
+onMounted(async () => {
+  loading.value = true
+  await cityStore.initialize()
+  const options = getCurrentPages().at(-1)?.options || {}
+  activeCategory.value = options.categoryId ? String(options.categoryId) : ''
+  try {
+    const [c, s] = await Promise.all([listCategories(), listServices({ cityId: cityStore.currentCityId() })])
+    categories.value = responseList(c)
+    services.value = responseList(s)
+  } catch (e) {
+    errorMessage.value = e.message || '服务数据加载失败'
+  } finally {
+    loading.value = false
+  }
+  // 城市切换后重新拉取，避免展示其他城市的服务
+  uni.$on('city-changed', () => {
+    loadServices()
+  })
+})
+
+/**
+ * 按当前城市重新加载服务列表。
+ */
+async function loadServices () {
+  if (!cityStore.currentCityId() && !cityStore.cityName) return
+  loading.value = true
+  try {
+    const s = await listServices({ cityId: cityStore.currentCityId() })
+    services.value = responseList(s)
+  } catch (e) {
+    errorMessage.value = e.message || '服务数据加载失败'
+  } finally {
+    loading.value = false
+  }
+}
+
+function selectCategory (value) {
+  activeCategory.value = value
+}
 function openDetail (id) { uni.navigateTo({ url: `/pages/service-detail/index?id=${id}` }) }
-function chooseLocation () { uni.chooseLocation({ success: result => { location.value = result.name || result.address || location.value }, fail: () => uni.showToast({ title: '暂无法获取位置', icon: 'none' }) }) }
 </script>
+
 <style lang="scss" scoped>
-.service-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26rpx}.eyebrow{display:block;color:$app-primary;font-size:20rpx;letter-spacing:3rpx}.title{display:block;margin-top:8rpx;color:$app-text;font-size:44rpx;font-weight:800}.location{display:flex;align-items:center;gap:6rpx;color:$app-muted;font-size:24rpx}.search{display:flex;align-items:center;gap:16rpx;padding:0 24rpx;height:84rpx}.search input{flex:1;color:$app-text;font-size:28rpx}.category-scroll{white-space:nowrap;margin:26rpx -32rpx 0;padding:0 32rpx}.category-chip{display:inline-block;margin-right:16rpx;padding:16rpx 26rpx;border-radius:40rpx;background:#fff;color:$app-muted;font-size:25rpx}.category-chip.active{background:$app-primary-soft;color:$app-primary;font-weight:600}.section-head{display:flex;justify-content:space-between;align-items:center;margin:38rpx 4rpx 20rpx}.service-card{display:flex;margin-bottom:18rpx;padding:22rpx}.service-cover{display:flex;align-items:center;justify-content:center;width:150rpx;height:150rpx;border-radius:16rpx;background:$app-primary-tint}.service-copy{display:flex;flex:1;min-width:0;flex-direction:column;margin-left:22rpx}.service-name{color:$app-text;font-size:30rpx;font-weight:700}.service-intro{display:-webkit-box;margin-top:10rpx;color:$app-muted;font-size:24rpx;line-height:1.5;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}.service-bottom{display:flex;align-items:baseline;justify-content:space-between;margin-top:auto}.price{color:$app-accent;font-size:34rpx;font-weight:800}.unit{font-size:23rpx;font-weight:400}.sold{color:#9aa7a2;font-size:22rpx}.empty-panel{padding:72rpx 30rpx;text-align:center;color:$app-muted}
+@import '@/styles/tokens.scss';
+
+.service-page {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  overflow: hidden;
+  background: $bg;
+}
+
+/* ---------- 左右分栏 ---------- */
+.browser {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding-top: $space-2;
+}
+
+.menu {
+  flex: 0 0 188rpx;
+  width: 188rpx;
+  height: 100%;
+  padding: $space-1 0 calc(108rpx + env(safe-area-inset-bottom));
+  background: rgba(245, 241, 238, 0.6);
+}
+
+.menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  min-height: 104rpx;
+  padding: $space-2 $space-1;
+  font-size: $font-caption;
+  line-height: 1.3;
+  text-align: center;
+  color: $ink-500;
+  transition: color 0.2s ease;
+}
+
+.menu-item--active { color: $brand-600; font-weight: $weight-semibold; }
+.menu-item--active .menu-label { font-weight: $weight-semibold; }
+
+.menu-item--active::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 6rpx;
+  height: 36rpx;
+  transform: translateY(-50%);
+  border-radius: 0 $radius-pill $radius-pill 0;
+  background: $brand-500;
+}
+
+.menu-label { min-width: 0; }
+
+.menu-count {
+  flex: 0 0 auto;
+  font-size: 18rpx;
+  color: $ink-300;
+}
+.menu-item--active .menu-count { color: $brand-400; }
+
+.results {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 $page-gutter $space-6 $space-3;
+}
+
+.result-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $space-2;
+  padding: $space-1 0 $space-2;
+}
+
+.result-titles { display: flex; min-width: 0; flex-direction: column; }
+
+.result-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: $font-body;
+  font-weight: $weight-semibold;
+  color: $ink-900;
+}
+
+.result-count { margin-top: 4rpx; font-size: $font-micro; color: $ink-400; }
+
+.sort-switch { display: flex; flex: 0 0 auto; align-items: center; gap: $space-2; }
+
+.sort-item { font-size: $font-micro; color: $ink-400; }
+.sort-item--active { color: $brand-600; font-weight: $weight-semibold; }
+
+/* ---------- 结果列表 ---------- */
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  padding-bottom: calc(108rpx + env(safe-area-inset-bottom));
+}
+
+.result-card {
+  display: block;
+  padding: $space-2;
+  transition: transform 0.15s ease;
+}
+.result-card:active { transform: scale(0.99); }
+
+.result-thumb {
+  position: relative;
+  width: 100%;
+  height: 128rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background: transparent;
+}
+.result-thumb image { display: block; width: 320rpx; height: 128rpx; }
+.result-thumb-skeleton { width: 100%; height: 128rpx; border-radius: $radius-md; }
+
+.result-thumb__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 128rpx;
+  background: linear-gradient(135deg, $brand-50, $brand-100);
+}
+
+.result-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 8rpx;
+  border-radius: $radius-md 0 $radius-md 0;
+  background: $brand-500;
+  color: #fff;
+  font-size: 18rpx;
+  line-height: 30rpx;
+}
+
+.result-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: $space-2 4rpx 2rpx;
+}
+
+.result-title-row { display: flex; align-items: center; justify-content: space-between; gap: $space-2; }
+
+.result-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: $font-caption;
+  font-weight: $weight-semibold;
+  color: $ink-900;
+}
+
+.result-intro {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: $font-micro;
+  line-height: 30rpx;
+  color: $ink-400;
+}
+
+.result-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24rpx;
+}
+
+.result-booked { font-size: 18rpx; color: $ink-300; }
+
+/* ---------- 状态 ---------- */
+.result-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-8 $space-3;
+  text-align: center;
+}
+
+.result-empty__title { font-size: $font-caption; color: $ink-400; }
+.result-empty__link { font-size: $font-micro; color: $brand-600; }
+
+.skeleton-line { height: 26rpx; }
+.skeleton-line--short { width: 70%; }
+.skeleton-line--tiny { width: 40%; }
 </style>

@@ -7,9 +7,9 @@
       class="register-form"
     >
       <h3 class="title">
-        <span class="brand-mark">J</span>
-        <span>ZJUDE</span>
-        <small>WORKSPACE</small>
+        <span class="brand-mark">妙</span>
+        <span>妙洁家政</span>
+        <small>服务管理平台</small>
       </h3>
       <el-form-item prop="username">
         <el-input
@@ -111,7 +111,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-register-footer">
-      <span>© 2026 ZJUDE · Software Development Workspace</span>
+      <span>© 2026 妙洁家政服务管理平台 · 版权所有</span>
     </div>
   </div>
 </template>
@@ -205,32 +205,35 @@ getCode()
   height: 100%;
   overflow: hidden;
   background:
-    radial-gradient(circle at 14% 18%, rgb(56 189 248 / 14%), transparent 30%),
-    linear-gradient(135deg, #071a2b 0%, #0b2942 52%, #0e7490 100%);
+    radial-gradient(circle at 14% 16%, rgba(249, 213, 197, 0.5), transparent 32%),
+    radial-gradient(circle at 84% 82%, rgba(253, 236, 228, 0.85), transparent 38%),
+    #faf7f5;
 }
 
 .register::before {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.28;
+  opacity: 0.85;
   background-image:
-    linear-gradient(rgb(125 211 252 / 8%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(125 211 252 / 8%) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(rgba(224, 106, 61, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 106, 61, 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 92%);
 }
 .title {
   display: flex;
   align-items: baseline;
   gap: 9px;
-  margin: 0 auto 32px;
-  color: #0f172a;
-  font-size: 26px;
-  letter-spacing: 0.08em;
+  margin: 0 auto 28px;
+  color: #1f1c1a;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
 .title small {
-  color: #64748b;
+  color: #a39b95;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -242,10 +245,10 @@ getCode()
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #fff;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
-  font-size: 20px;
+  background: #e06a3d;
+  font-size: 18px;
   letter-spacing: 0;
 }
 
@@ -253,19 +256,19 @@ getCode()
   position: relative;
   z-index: 1;
   width: min(400px, calc(100% - 40px));
-  padding: 36px 34px 24px;
-  border: 1px solid rgb(255 255 255 / 60%);
-  border-radius: 14px;
-  background: rgb(255 255 255 / 96%);
-  box-shadow: 0 24px 70px rgb(2 20 35 / 32%);
+  padding: 34px 32px 22px;
+  border: 1px solid #f2ede9;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(31, 28, 26, 0.08);
   .el-input {
-    height: 40px;
+    height: 42px;
     input {
-      height: 40px;
+      height: 42px;
     }
   }
   .input-icon {
-    height: 39px;
+    height: 40px;
     width: 14px;
     margin-left: 0px;
   }
@@ -273,11 +276,11 @@ getCode()
 .register-tip {
   font-size: 13px;
   text-align: center;
-  color: #bfbfbf;
+  color: #a39b95;
 }
 .register-code {
   width: 33%;
-  height: 40px;
+  height: 42px;
   float: right;
   img {
     cursor: pointer;
@@ -291,7 +294,7 @@ getCode()
   bottom: 0;
   width: 100%;
   text-align: center;
-  color: rgb(226 232 240 / 72%);
+  color: #a39b95;
   font-family: Arial;
   font-size: 12px;
   letter-spacing: 1px;
@@ -299,5 +302,6 @@ getCode()
 .register-code-img {
   height: 40px;
   padding-left: 12px;
+  border-radius: 8px;
 }
 </style>

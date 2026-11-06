@@ -18,7 +18,17 @@ pnpm run dev:h5
 pnpm run dev:mp-weixin
 ```
 
-H5 开发环境默认通过 `/api` 代理到 `http://localhost:8379`。微信开发者工具或真机访问本地后端时，不能使用设备自身的 `localhost`；请在未纳入 Git 的 `.env.development.local` 中将 `VITE_API_BASE_URL` 配置为开发电脑的局域网 IP（例如 `http://192.168.1.10:8379`），并确保手机与电脑连接同一网络。生产和测试 API 地址分别配置在 `.env.production`、`.env.staging` 中，真实地址请通过本地环境变量覆盖，不要提交密钥。
+## 接口地址
+
+整个小程序只维护一个后端地址，位于 `config/index.js`：
+
+```js
+export const API_BASE_URL = 'http://localhost:8888'
+```
+
+- 所有 `api/` 模块只写业务路径（如 `/mini/services`），由 `utils/request.js` 统一拼成 `API_BASE_URL + /api + path`。
+- 微信开发者工具或真机调试时，把 `API_BASE_URL` 改成开发电脑的局域网 IP（例如 `http://192.168.1.10:8888`），手机与电脑需在同一网络；`localhost` 指向的是设备自身。
+- 生产发布时把它改成线上服务地址（建议 `https://`）即可，无需再维护多个环境变量文件。
 
 ## 构建
 
@@ -33,6 +43,7 @@ pnpm run build:app
 ## 目录约定
 
 - `api/`: 后端接口模块
+- `config/index.js`: 唯一的后端地址配置
 - `stores/`: Pinia 状态
 - `utils/request.js`: 唯一请求入口
 - `platform/`: 平台能力适配

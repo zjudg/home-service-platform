@@ -1,4 +1,5 @@
-@use './variables' as *;
+@use './_variables' as *;
+@use './tokens' as *;
 
 // the :export directive is the magic sauce for webpack
 // https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass
@@ -18,4 +19,9 @@
   dangerColor: $color-danger;
   infoColor: $color-info;
   warningColor: $color-warning;
+  bgColor: $bg;
+  surfaceColor: $surface;
+  borderColor: $line;
+  textColor: $ink-900;
+  textSecondaryColor: $ink-500;
 }

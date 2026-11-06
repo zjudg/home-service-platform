@@ -16,6 +16,7 @@ public final class UploadConfigKeys
     public static final String ALIYUN_ENDPOINT = "upload.aliyun.endpoint";
     public static final String ALIYUN_ACCESS_KEY_ID = "upload.aliyun.accessKeyId";
     public static final String ALIYUN_ACCESS_KEY_SECRET = "upload.aliyun.accessKeySecret";
+    public static final String ALIYUN_DIR = "upload.aliyun.dir";
     public static final String ALIYUN_DOMAIN = "upload.aliyun.domain";
 
     public static final String TENCENT_BUCKET = "upload.tencent.bucket";

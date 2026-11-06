@@ -51,7 +51,7 @@ def main():
             cursor.execute("""
                 INSERT IGNORE INTO zjudg_service_category (category_id,parent_id,category_name,image_url,sort_num,home_recommend,status,create_by,create_time) VALUES
                 ('ZC_CLEAN','0','保洁清洗','',1,'1','0','system',NOW()),('ZC_REPAIR','0','家电维修','',2,'1','0','system',NOW()),
-                ('ZC_INSTALL','0','上门安装','',3,'1','0','system',NOW()),('ZC_NANNY','0','月嫂育儿','',4,'1','0','system',NOW()),('ZC_CARE','0','老人陪护','',5,'1','0','system',NOW())
+                ('ZC_INSTALL','0','上门安装','',3,'1','0','system',NOW()),('ZC_NANNY','0','母婴护理','',4,'1','0','system',NOW()),('ZC_CARE','0','老人陪护','',5,'1','0','system',NOW())
             """)
             cursor.execute("""
                 INSERT IGNORE INTO zjudg_service_unit (unit_id,unit_name,sort_num,status,create_by,create_time) VALUES

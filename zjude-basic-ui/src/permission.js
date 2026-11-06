@@ -1,15 +1,13 @@
 import router from './router'
 import { ElMessage } from 'element-plus'
 import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+import '@/utils/progress'
 import { getToken } from '@/utils/auth'
 import { isHttp } from '@/utils/validate'
 import { isRelogin } from '@/utils/request'
 import useUserStore from '@/store/modules/user'
 import useSettingsStore from '@/store/modules/settings'
 import usePermissionStore from '@/store/modules/permission'
-
-NProgress.configure({ showSpinner: false })
 
 const whiteList = ['/login', '/register']
 let routeInitialization

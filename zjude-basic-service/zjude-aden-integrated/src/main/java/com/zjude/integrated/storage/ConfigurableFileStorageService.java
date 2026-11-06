@@ -112,7 +112,10 @@ public class ConfigurableFileStorageService implements FileStorageService
         String endpoint = required(UploadConfigKeys.ALIYUN_ENDPOINT);
         String accessKeyId = required(UploadConfigKeys.ALIYUN_ACCESS_KEY_ID);
         String accessKeySecret = required(UploadConfigKeys.ALIYUN_ACCESS_KEY_SECRET);
+        String dir = configService.selectConfigByKey(UploadConfigKeys.ALIYUN_DIR);
         String domain = required(UploadConfigKeys.ALIYUN_DOMAIN);
+        // Aliyun Dir is the complete relative prefix; an empty Dir means the bucket root.
+        String objectKey = prependDirectory(dir, fileNameOnly(key));
 
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         try (InputStream inputStream = file.getInputStream())
@@ -120,8 +123,8 @@ public class ConfigurableFileStorageService implements FileStorageService
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
             metadata.setContentType(file.getContentType());
-            ossClient.putObject(bucket, key, inputStream, metadata);
-            return result(joinDomain(domain, key), key, file);
+            ossClient.putObject(bucket, objectKey, inputStream, metadata);
+            return result(joinDomain(domain, objectKey), objectKey, file);
         }
         finally
         {
@@ -182,5 +185,29 @@ public class ConfigurableFileStorageService implements FileStorageService
             normalizedDomain = normalizedDomain.substring(0, normalizedDomain.length() - 1);
         }
         return normalizedDomain + "/" + key;
+    }
+
+    private String prependDirectory(String directory, String key)
+    {
+        if (StringUtils.isEmpty(directory))
+        {
+            return key;
+        }
+        String normalizedDirectory = directory.trim().replace('\\', '/');
+        while (normalizedDirectory.startsWith("/"))
+        {
+            normalizedDirectory = normalizedDirectory.substring(1);
+        }
+        while (normalizedDirectory.endsWith("/"))
+        {
+            normalizedDirectory = normalizedDirectory.substring(0, normalizedDirectory.length() - 1);
+        }
+        return normalizedDirectory.isEmpty() ? key : normalizedDirectory + "/" + key;
+    }
+
+    private String fileNameOnly(String key)
+    {
+        int separator = key.lastIndexOf('/');
+        return separator < 0 ? key : key.substring(separator + 1);
     }
 }

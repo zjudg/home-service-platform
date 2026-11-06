@@ -58,6 +58,12 @@ const usePermissionStore = defineStore(
 // 遍历后台传来的路由字符串，转换为组件对象
 function filterAsyncRouter (asyncRouterMap, lastRouter = false, type = false) {
   return asyncRouterMap.filter(route => {
+    // 默认列表页直接挂在模块地址下（例如 /zjudg/order）。
+    // 后端会省略空 path 字段，注册到 Vue Router 前必须还原为空字符串，
+    // 否则 addRoute 会因收到 undefined 而抛错，登录流程随后误触发 logout。
+    if (route.path === undefined || route.path === null) {
+      route.path = ''
+    }
     if (type && route.children) {
       route.children = filterChildren(route.children)
     }

@@ -2,10 +2,25 @@ spring:
   profiles:
     active: '@env@'
   flyway:
+    # 保持关闭，原因见 docs/cleanup-plan.md 第七章：
+    # 项目使用 Flyway 9.22.3（由 Spring Boot 3.2.2 BOM 管理），
+    # 该版本 Community Edition 已不再支持 MySQL 5.7，启用后启动即抛
+    # FlywayEditionUpgradeRequiredException，应用无法启动。
+    #
+    # 若要启用自动迁移，需先满足其一：
+    #   1. 生产与本地数据库升级到 MySQL 8.0+（推荐，长期方案）；
+    #   2. 将 flyway-core / flyway-mysql 降级到 9.x 中仍支持 5.7 的版本
+    #      （需自行锁定版本并承担失去上游修复的代价）；
+    #   3. 购买 Flyway Teams 授权。
+    #
+    # 在此之前请继续使用 scripts/check_migrations.ps1 做执行前核对。
     enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: true
-    baseline-version: 1
+    # 当前库已手工执行到 V30；一旦启用 Flyway，需把此值改为 30，
+    # 否则会把 V1..V30 全部重放。
+    baseline-version: 30
     validate-on-migrate: true
     clean-disabled: true
     encoding: UTF-8
+    out-of-order: false

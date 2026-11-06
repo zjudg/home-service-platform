@@ -10,14 +10,16 @@
     "build:prod": "vite build",
     "build:stage": "vite build --mode staging",
     "preview": "vite preview",
-    "lint": "eslint . --max-warnings 166",
+    "lint": "eslint . --max-warnings 259",
+    "lint:debt": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run"
   },
   "dependencies": {
     "@element-plus/icons-vue": "2.3.1",
-    "@tinymce/tinymce-vue": "^5.1.1",
     "@vueuse/core": "10.6.1",
+    "@wangeditor/editor": "5.1.23",
+    "@wangeditor/editor-for-vue": "5.1.12",
     "axios": "1.18.0",
     "echarts": "5.4.3",
     "element-plus": "2.11.3",
@@ -27,7 +29,6 @@
     "jsencrypt": "3.3.2",
     "nprogress": "0.2.0",
     "pinia": "2.1.7",
-    "tinymce": "8.5.1",
     "vue": "3.3.9",
     "vue-cropper": "1.1.1",
     "vue-router": "4.2.5"

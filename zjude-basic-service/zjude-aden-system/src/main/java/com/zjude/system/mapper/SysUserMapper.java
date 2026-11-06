@@ -1,6 +1,7 @@
 package com.zjude.system.mapper;
 
 import java.util.List;
+import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import com.zjude.common.core.domain.entity.SysUser;
 
@@ -10,6 +11,15 @@ import com.zjude.common.core.domain.entity.SysUser;
  */
 public interface SysUserMapper
 {
+    List<Map<String, Object>> selectMiniRecipients(@Param("keyword") String keyword);
+
+    /**
+     * 查询可接收订单通知的管理员账号（后台管理员及小程序业务管理员）。
+     * 只返回启用且已绑定小程序 openid 的账号。
+     *
+     * @return 管理员账号
+     */
+    List<SysUser> selectOrderNotificationAdmins();
     /**
      * 根据条件分页查询用户列表
      * 
@@ -38,6 +48,30 @@ public interface SysUserMapper
      * @param userName 用户�?     * @return 用户对象信息
      */
     SysUser selectUserByUserName(String userName);
+
+    /**
+     * 通过手机号查询用户
+     *
+     * @param phoneNumber 手机号
+     * @return 用户对象信息
+     */
+    SysUser selectUserByPhoneNumber(String phoneNumber);
+
+    /**
+     * 通过微信小程序 openid 查询用户，用于微信登录幂等与订阅消息定位用户。
+     *
+     * @param openid 微信 openid
+     * @return 用户对象信息
+     */
+    SysUser selectUserByWxOpenid(String openid);
+
+    /**
+     * 补写用户的微信身份标识（openid / unionid）。
+     *
+     * @param user 至少包含 userId、wxOpenid
+     * @return 影响行数
+     */
+    int updateUserWxIdentity(SysUser user);
 
     /**
      * 通过用户ID查询用户

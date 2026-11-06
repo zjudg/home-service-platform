@@ -16,6 +16,5 @@ public class ZjudeAdenApplication
     {
         System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(ZjudeAdenApplication.class, args);
-        System.out.println("Zjude Aden started successfully.");
     }
 }
