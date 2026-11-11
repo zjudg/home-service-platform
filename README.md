@@ -50,45 +50,47 @@ Zjude Aden 是一套面向家政、上门服务和本地生活服务场景的开
 
 后台管理系统用于配置服务、审核师傅、管理订单、处理退款和维护运营素材。
 
-![后台工作台](images/admin-dashboard.png)
-
-![服务列表](images/admin-services.png)
-
-![服务分类](images/admin-service-categories.png)
-
-![订单列表](images/admin-orders.png)
-
-![预约时间段](images/admin-booking-slots.png)
-
-![师傅列表](images/admin-masters.png)
-
-> 为避免公开展示个人联系方式，师傅列表截图中的手机号已脱敏。
-
-![退款记录](images/admin-refunds.png)
-
-![素材中心](images/admin-assets.png)
+<table>
+  <tr>
+    <td align="center"><a href="images/admin-dashboard.png"><img src="images/admin-dashboard.png" alt="后台工作台" width="360"></a><br>后台工作台</td>
+    <td align="center"><a href="images/admin-services.png"><img src="images/admin-services.png" alt="服务列表" width="360"></a><br>服务列表</td>
+    <td align="center"><a href="images/admin-service-categories.png"><img src="images/admin-service-categories.png" alt="服务分类" width="360"></a><br>服务分类</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="images/admin-orders.png"><img src="images/admin-orders.png" alt="订单列表" width="360"></a><br>订单列表</td>
+    <td align="center"><a href="images/admin-booking-slots.png"><img src="images/admin-booking-slots.png" alt="预约时间段" width="360"></a><br>预约时间段</td>
+    <td align="center"><a href="images/admin-masters.png"><img src="images/admin-masters.png" alt="师傅列表" width="360"></a><br>师傅列表（手机号已脱敏）</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="images/admin-refunds.png"><img src="images/admin-refunds.png" alt="退款记录" width="360"></a><br>退款记录</td>
+    <td align="center"><a href="images/admin-assets.png"><img src="images/admin-assets.png" alt="素材中心" width="360"></a><br>素材中心</td>
+    <td></td>
+  </tr>
+</table>
 
 ### 小程序用户端
 
 用户端提供服务浏览、预约下单、订单查询和个人中心等功能。
 
-![用户端首页](images/mini-user-home.png)
-
-![用户端服务列表](images/mini-user-services.png)
-
-![用户端我的订单](images/mini-user-orders.png)
+<table>
+  <tr>
+    <td align="center"><a href="images/mini-user-home.png"><img src="images/mini-user-home.png" alt="用户端首页" width="200"></a><br>用户端首页</td>
+    <td align="center"><a href="images/mini-user-services.png"><img src="images/mini-user-services.png" alt="用户端服务列表" width="200"></a><br>服务列表</td>
+    <td align="center"><a href="images/mini-user-orders.png"><img src="images/mini-user-orders.png" alt="用户端我的订单" width="200"></a><br>我的订单</td>
+  </tr>
+</table>
 
 ### 小程序师傅端
 
 师傅端提供接单大厅、我的订单和个人资料等功能。师傅认证通过后可进入师傅端，用户手动切换后的端身份会被记住。
 
-![师傅端接单大厅暂无数据](images/mini-master-order-hall-empty.png)
-
-![师傅端我的订单暂无数据](images/mini-master-orders-empty.png)
-
-![师傅端接单大厅](images/mini-master-order-hall.png)
-
-![师傅端我的页面](images/mini-master-profile.png)
+<table>
+  <tr>
+    <td align="center"><a href="images/mini-master-order-hall.png"><img src="images/mini-master-order-hall.png" alt="师傅端接单大厅" width="200"></a><br>接单大厅</td>
+    <td align="center"><a href="images/mini-master-orders-empty.png"><img src="images/mini-master-orders-empty.png" alt="师傅端我的订单暂无数据" width="200"></a><br>我的订单</td>
+    <td align="center"><a href="images/mini-master-profile.png"><img src="images/mini-master-profile.png" alt="师傅端我的页面" width="200"></a><br>我的页面</td>
+  </tr>
+</table>
 
 ### 微信小程序二维码
 
