@@ -13,6 +13,7 @@ Zjude Aden 是一套面向家政、上门服务和本地生活服务场景的开
 ## 目录
 
 - [核心特点](#核心特点)
+- [线上地址与界面预览](#线上地址与界面预览)
 - [功能介绍](#功能介绍)
   - [小程序用户端](#小程序用户端)
   - [小程序师傅端](#小程序师傅端)
@@ -36,6 +37,62 @@ Zjude Aden 是一套面向家政、上门服务和本地生活服务场景的开
 - **支持线下已收款需求**：管理员可以录入已经在线下收款的需求，并将服务任务发布到师傅接单大厅，不会再次发起微信支付，也不会自动指派师傅。
 - **对象存储支持**：文件上传统一经过后端存储服务，可配置本地存储、七牛云、阿里云 OSS 或腾讯云 COS。
 - **可扩展基础框架**：保留用户、角色、菜单、部门、字典、通知、日志、在线用户和代码生成等通用能力。
+
+## 线上地址与界面预览
+
+### 线上地址
+
+- **后台管理系统**：<https://miaoj.cc/admin/>
+- **小程序业务介绍页**：<https://miaoj.cc/>
+- **微信小程序**：请使用微信扫描下方二维码打开；小程序端包含用户端和师傅端，认证状态决定可用角色。
+
+### 后台管理系统
+
+后台管理系统用于配置服务、审核师傅、管理订单、处理退款和维护运营素材。
+
+![后台工作台](images/admin-dashboard.png)
+
+![服务列表](images/admin-services.png)
+
+![服务分类](images/admin-service-categories.png)
+
+![订单列表](images/admin-orders.png)
+
+![预约时间段](images/admin-booking-slots.png)
+
+![师傅列表](images/admin-masters.png)
+
+> 为避免公开展示个人联系方式，师傅列表截图中的手机号已脱敏。
+
+![退款记录](images/admin-refunds.png)
+
+![素材中心](images/admin-assets.png)
+
+### 小程序用户端
+
+用户端提供服务浏览、预约下单、订单查询和个人中心等功能。
+
+![用户端首页](images/mini-user-home.png)
+
+![用户端服务列表](images/mini-user-services.png)
+
+![用户端我的订单](images/mini-user-orders.png)
+
+### 小程序师傅端
+
+师傅端提供接单大厅、我的订单和个人资料等功能。师傅认证通过后可进入师傅端，用户手动切换后的端身份会被记住。
+
+![师傅端接单大厅暂无数据](images/mini-master-order-hall-empty.png)
+
+![师傅端我的订单暂无数据](images/mini-master-orders-empty.png)
+
+![师傅端接单大厅](images/mini-master-order-hall.png)
+
+![师傅端我的页面](images/mini-master-profile.png)
+
+### 微信小程序二维码
+
+![妙洁家政微信小程序二维码](images/mini-qrcode.jpg)
 
 ## 功能介绍
 
