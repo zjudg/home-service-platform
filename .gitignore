@@ -22,3 +22,6 @@ Thumbs.db
 *.key
 apiclient_cert*
 apiclient_key*
+
+# 本地部署文档和配置不提交到仓库
+/zjude-basic-service/sql/docker-deploy/app/zjude/docker/
