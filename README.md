@@ -8,6 +8,8 @@ Zjude Aden 是一套面向家政、上门服务和本地生活服务场景的开
 
 项目适合家政保洁、维修安装、陪护、月嫂、搬家以及其他按时间预约的上门服务业务。业务名称、服务分类、价格、城市和页面内容均可通过后台配置，不需要为每个行业重新开发一套系统。
 
+**搜索关键词：** 家政服务、上门服务、家政预约、师傅接单、接单大厅、微信小程序、双端合一、服务平台、订单管理、线下收款、OSS、Home Service、Housekeeping、Service Booking、Provider Platform、WeChat Mini Program、Spring Boot、Vue 3、uni-app。
+
 ## 目录
 
 - [核心特点](#核心特点)
