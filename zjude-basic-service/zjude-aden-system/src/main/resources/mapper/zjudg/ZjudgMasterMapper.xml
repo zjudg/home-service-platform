@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgMasterMapper">
+  <resultMap id="MasterResult" type="com.zjude.system.domain.ZjudgMaster">
+    <id property="masterId" column="master_id"/>
+    <result property="userId" column="user_id"/>
+    <result property="masterName" column="master_name"/>
+    <result property="realName" column="real_name"/>
+    <result property="idCardNo" column="id_card_no" typeHandler="com.zjude.common.config.EncryptedStringTypeHandler"/>
+    <result property="healthCertUrl" column="health_cert_url"/>
+    <result property="skillCertUrl" column="skill_cert_url"/>
+    <result property="skillCategoryIds" column="skill_category_ids"/>
+    <result property="skillNames" column="skill_names"/>
+    <result property="account" column="account"/>
+    <result property="phone" column="phone"/>
+    <result property="cityId" column="city_id"/>
+    <result property="cityName" column="city_name"/>
+    <result property="region" column="region"/>
+    <result property="avatarUrl" column="avatar_url"/>
+    <result property="status" column="status"/>
+    <result property="auditStatus" column="audit_status"/>
+    <result property="auditRemark" column="audit_remark"/>
+    <result property="auditTime" column="audit_time"/>
+    <result property="auditBy" column="audit_by"/>
+    <result property="homeRecommend" column="home_recommend"/>
+    <result property="rating" column="rating"/>
+    <result property="orderCount" column="order_count"/>
+    <result property="accepting" column="accepting"/>
+    <result property="remark" column="remark"/>
+    <result property="createBy" column="create_by"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateBy" column="update_by"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <sql id="columns">m.master_id,m.user_id,m.master_name,m.real_name,m.id_card_no,m.health_cert_url,m.skill_cert_url,m.skill_category_ids,(select group_concat(distinct sc.category_name order by sc.sort_num separator '、') from zjudg_service_category sc where find_in_set(sc.category_id,replace(m.skill_category_ids,' ',''))) as skill_names,m.account,m.phone,m.city_id,c.city_name,m.region,m.avatar_url,m.status,m.audit_status,m.audit_remark,m.audit_time,m.audit_by,m.home_recommend,m.rating,m.order_count,m.accepting,m.remark,m.create_by,m.create_time,m.update_by,m.update_time</sql>
+
+  <select id="selectList" resultMap="MasterResult">
+    select <include refid="columns"/> from zjudg_master m
+    left join zjudg_city c on c.city_id = m.city_id
+    <where>
+      <if test="masterName != null and masterName != ''">and m.master_name like concat('%',#{masterName},'%')</if>
+      <if test="phone != null and phone != ''">and m.phone like concat('%',#{phone},'%')</if>
+      <if test="account != null and account != ''">and m.account like concat('%',#{account},'%')</if>
+      <if test="userId != null and userId != ''">and m.user_id=#{userId}</if>
+      <if test="cityId != null and cityId != ''">and m.city_id=#{cityId}</if>
+      <if test="status != null and status != ''">and m.status=#{status}</if>
+      <if test="auditStatus != null and auditStatus != ''">and m.audit_status=#{auditStatus}</if>
+      <if test="accepting != null and accepting != ''">and m.accepting=#{accepting}</if>
+      <if test="homeRecommend != null and homeRecommend != ''">and m.home_recommend=#{homeRecommend}</if>
+      <if test="params.beginTime != null and params.beginTime != ''">and m.create_time &gt;= #{params.beginTime}</if>
+      <if test="params.endTime != null and params.endTime != ''">and m.create_time &lt; date_add(#{params.endTime},interval 1 day)</if>
+    </where>
+    order by m.create_time desc
+  </select>
+
+  <select id="selectById" resultMap="MasterResult">
+    select <include refid="columns"/> from zjudg_master m
+    left join zjudg_city c on c.city_id = m.city_id
+    where m.master_id=#{id}
+  </select>
+
+  <select id="selectByUserId" resultMap="MasterResult">
+    select <include refid="columns"/> from zjudg_master m
+    left join zjudg_city c on c.city_id = m.city_id
+    where m.user_id=#{userId} limit 1
+  </select>
+
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgMaster">
+    insert into zjudg_master(master_id,user_id,master_name,real_name,id_card_no,health_cert_url,skill_cert_url,skill_category_ids,account,phone,city_id,region,avatar_url,status,audit_status,audit_remark,audit_time,audit_by,home_recommend,rating,order_count,accepting,remark,create_by,create_time)
+    values(#{masterId},#{userId},#{masterName},#{realName},#{idCardNo,typeHandler=com.zjude.common.config.EncryptedStringTypeHandler},#{healthCertUrl},#{skillCertUrl},#{skillCategoryIds},#{account},#{phone},#{cityId},#{region},#{avatarUrl},#{status},#{auditStatus},#{auditRemark},#{auditTime},#{auditBy},#{homeRecommend},#{rating},#{orderCount},#{accepting},#{remark},#{createBy},sysdate())
+  </insert>
+
+  <update id="updateProfile">
+    update zjudg_master
+    set master_name=#{masterName},real_name=#{realName},id_card_no=#{idCardNo,typeHandler=com.zjude.common.config.EncryptedStringTypeHandler},health_cert_url=#{healthCertUrl},skill_cert_url=#{skillCertUrl},
+        skill_category_ids=#{skillCategoryIds},phone=#{phone},city_id=#{cityId},region=#{region},avatar_url=#{avatarUrl},accepting=#{accepting},
+        update_by=#{updateBy},update_time=sysdate()
+    where master_id=#{masterId}
+  </update>
+
+  <update id="update">
+    update zjudg_master
+    set master_name=#{masterName},real_name=#{realName},account=#{account},phone=#{phone},city_id=#{cityId},region=#{region},
+        avatar_url=#{avatarUrl},status=#{status},home_recommend=#{homeRecommend},accepting=#{accepting},
+        update_by=#{updateBy},update_time=sysdate()
+    where master_id=#{masterId}
+  </update>
+
+  <update id="updateAudit">
+    update zjudg_master
+    set audit_status=#{auditStatus},audit_remark=#{auditRemark},audit_by=#{auditBy},audit_time=sysdate(),
+        accepting=case when #{auditStatus}='2' then '0' else accepting end,
+        update_by=#{auditBy},update_time=sysdate()
+    where master_id=#{id} and audit_status=#{fromStatus}
+  </update>
+
+  <update id="updateAccepting">
+    update zjudg_master set accepting=#{accepting},update_by=#{updateBy},update_time=sysdate() where master_id=#{id}
+  </update>
+
+  <update id="updateStatistics">
+    update zjudg_master set rating=#{rating},order_count=#{orderCount},update_time=sysdate() where master_id=#{id}
+  </update>
+
+  <!-- 派单候选：只取审核通过、账号正常、接单开关打开的师傅 -->
+  <select id="selectDispatchCandidates" resultMap="MasterResult">
+    select <include refid="columns"/> from zjudg_master m
+    left join zjudg_city c on c.city_id = m.city_id
+    where m.audit_status='1' and m.status='0' and m.accepting='1'
+    <if test="cityId != null and cityId != ''">
+      and (m.city_id is null or m.city_id='' or m.city_id=#{cityId})
+    </if>
+    order by m.rating desc, m.order_count desc
+  </select>
+
+  <!-- 在途订单：已接单状态 4 与服务中状态 1 -->
+  <select id="countActiveOrders" resultType="int">
+    select count(1) from zjudg_order where master_id=#{masterId} and order_status in ('1','4')
+  </select>
+
+  <delete id="deleteByIds">
+    delete from zjudg_master where master_id in
+    <foreach collection="array" item="id" open="(" separator="," close=")">#{id}</foreach>
+  </delete>
+</mapper>

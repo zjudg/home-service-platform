@@ -2,30 +2,45 @@
 import { onLaunch, onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
+import { useMasterStore } from '@/stores/master'
 import { useConfigStore } from '@/stores/config'
 import { useCityStore } from '@/stores/city'
+import { HOME_PATH, isAuthenticated, sanitizeRedirect } from '@/utils/guard'
+import { isWeixin } from '@/utils/platform'
+import { bootstrapAuthSession } from '@/utils/auth-bootstrap'
+import {
+  getMiniProgramMode,
+  MINI_PROGRAM_MODE_CUSTOMER,
+  MINI_PROGRAM_MODE_MASTER,
+  resolveMiniProgramMode,
+  setMiniProgramMode
+} from '@/utils/mini-program-mode'
 
 const appStore = useAppStore()
 const authStore = useAuthStore()
 const configStore = useConfigStore()
 const cityStore = useCityStore()
+const masterStore = useMasterStore()
+let authBootstrapPromise = null
 
-async function silentWechatLogin () {
-  if (process.env.UNI_PLATFORM !== 'mp-weixin') return authStore.restore()
-  try {
-    const result = await new Promise((resolve, reject) => {
+function bootstrapAuth () {
+  if (authBootstrapPromise) return authBootstrapPromise
+
+  authBootstrapPromise = bootstrapAuthSession({
+    authStore,
+    isWeixin: isWeixin(),
+    login: () => new Promise((resolve, reject) => {
       uni.login({ provider: 'weixin', success: resolve, fail: reject })
     })
-    if (!result?.code) return authStore.restore()
-    const response = await authStore.silentWechatSignIn(result.code)
-    return response.registered ? 'authenticated' : 'login-required'
-  } catch {
-    // 网络异常时继续尝试使用上次会话；无可用会话则保留当前页面供用户重试。
-    return authStore.restore()
-  }
+  })
+
+  return authBootstrapPromise
 }
 
 onLaunch(async () => {
+  // 保留用户上次主动选择的端模式；访客可以直接浏览公开服务内容。
+  // 已注册的微信用户通过静默 code 换取 token，无需再次手动登录。
+  bootstrapAuth().catch(() => {})
   await Promise.all([
     cityStore.initialize(),
     configStore.load().catch(() => {})
@@ -33,16 +48,45 @@ onLaunch(async () => {
   appStore.markReady()
 })
 
+// 已通过审核的师傅默认进入师傅端；手动切换到用户端后会跨启动保留该选择。
 onShow(async () => {
-  const authResult = await silentWechatLogin()
-  if (authResult !== 'login-required') return
+  await bootstrapAuth()
+  const savedMode = getMiniProgramMode()
+  if (!isAuthenticated()) return
 
-  const pages = getCurrentPages()
-  const currentRoute = pages[pages.length - 1]?.route
-  // 通过服务费/合同分享链接进入时先展示业务内容，支付或签署动作再引导登录。
-  if (['pages/service-fee/index', 'pages/contract-sign/index'].includes(currentRoute)) return
-  if (currentRoute !== 'pages/login/index') uni.reLaunch({ url: '/pages/login/index' })
+  const currentPage = getCurrentPages().at(-1)
+  if (savedMode !== MINI_PROGRAM_MODE_CUSTOMER) {
+    try {
+      await authStore.restore()
+      if (!authStore.isLoggedIn) return
+
+      await masterStore.loadProfile()
+      const nextMode = resolveMiniProgramMode(savedMode, masterStore.applied && masterStore.isApproved)
+      if (nextMode !== savedMode) setMiniProgramMode(nextMode)
+      if (nextMode === MINI_PROGRAM_MODE_MASTER) {
+        if (!currentPage?.route?.startsWith('pages/master/')) {
+          uni.reLaunch({ url: '/pages/master/home/index' })
+        }
+        return
+      }
+    } catch (error) {
+      // 网络异常时保留当前页，不阻止访客/用户继续使用小程序。
+    }
+  }
+
+  // A silent login may finish after the login page's own onShow hook has run.
+  // Leave that page once the existing account has been authenticated.
+  if (currentPage?.route === 'pages/login/index') {
+    let target = currentPage.options?.redirect || ''
+    try {
+      if (target) target = decodeURIComponent(target)
+    } catch (error) {
+      target = ''
+    }
+    uni.reLaunch({ url: sanitizeRedirect(target) || HOME_PATH })
+  }
 })
+
 </script>
 
 <style lang="scss">

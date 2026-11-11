@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgCertificateProductMapper">
+  <resultMap id="ProductResult" type="com.zjude.system.domain.ZjudgCertificateProduct">
+    <id property="productId" column="product_id"/>
+    <result property="productName" column="product_name"/>
+    <result property="productIntro" column="product_intro"/>
+    <result property="price" column="price"/>
+    <result property="coverUrl" column="cover_url"/>
+    <result property="status" column="status"/>
+    <result property="sortNum" column="sort_num"/>
+    <result property="createBy" column="create_by"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateBy" column="update_by"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+  <sql id="columns">product_id,product_name,product_intro,price,cover_url,status,sort_num,create_by,create_time,update_by,update_time</sql>
+  <select id="selectList" resultMap="ProductResult">select <include refid="columns"/> from zjudg_certificate_product
+    <where>
+      <if test="productName != null and productName != ''">and product_name like concat('%',#{productName},'%')</if>
+      <if test="status != null and status != ''">and status=#{status}</if>
+    </where>
+    order by sort_num asc,create_time desc
+  </select>
+  <select id="selectPublishedList" resultMap="ProductResult">select <include refid="columns"/> from zjudg_certificate_product where status='0' order by sort_num asc,create_time desc</select>
+  <select id="selectById" resultMap="ProductResult">select <include refid="columns"/> from zjudg_certificate_product where product_id=#{id}</select>
+  <insert id="insert">insert into zjudg_certificate_product(product_id,product_name,product_intro,price,cover_url,status,sort_num,create_by,create_time)
+    values(#{productId},#{productName},#{productIntro},#{price},#{coverUrl},#{status},#{sortNum},#{createBy},sysdate())</insert>
+  <update id="update">update zjudg_certificate_product set product_name=#{productName},product_intro=#{productIntro},price=#{price},cover_url=#{coverUrl},status=#{status},sort_num=#{sortNum},update_by=#{updateBy},update_time=sysdate() where product_id=#{productId}</update>
+  <update id="deleteByIds">update zjudg_certificate_product set status='1',update_time=sysdate() where product_id in <foreach collection="array" item="id" open="(" separator="," close=")">#{id}</foreach></update>
+</mapper>

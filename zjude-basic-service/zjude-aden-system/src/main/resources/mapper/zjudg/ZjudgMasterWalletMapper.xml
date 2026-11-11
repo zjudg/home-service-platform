@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgMasterWalletMapper">
+  <resultMap id="WalletResult" type="com.zjude.system.domain.ZjudgMasterWallet">
+    <id property="walletId" column="wallet_id"/>
+    <result property="masterId" column="master_id"/>
+    <result property="balance" column="balance"/>
+    <result property="frozen" column="frozen"/>
+    <result property="totalIncome" column="total_income"/>
+    <result property="totalWithdraw" column="total_withdraw"/>
+    <result property="version" column="version"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <resultMap id="LogResult" type="com.zjude.system.domain.ZjudgMasterWalletLog">
+    <id property="logId" column="log_id"/>
+    <result property="masterId" column="master_id"/>
+    <result property="walletId" column="wallet_id"/>
+    <result property="bizType" column="biz_type"/>
+    <result property="amount" column="amount"/>
+    <result property="balanceAfter" column="balance_after"/>
+    <result property="bizId" column="biz_id"/>
+    <result property="bizNo" column="biz_no"/>
+    <result property="remark" column="remark"/>
+    <result property="createTime" column="create_time"/>
+    <result property="masterName" column="master_name"/>
+  </resultMap>
+
+  <sql id="walletColumns">wallet_id,master_id,balance,frozen,total_income,total_withdraw,version,create_time,update_time</sql>
+
+  <sql id="logColumns">log_id,master_id,wallet_id,biz_type,amount,balance_after,biz_id,biz_no,remark,create_time</sql>
+
+  <select id="selectByMasterId" resultMap="WalletResult">
+    select <include refid="walletColumns"/> from zjudg_master_wallet where master_id=#{masterId}
+  </select>
+
+  <!-- 行锁：钱包变动必须在事务内串行，避免并发下余额错乱 -->
+  <select id="selectByMasterIdForUpdate" resultMap="WalletResult">
+    select <include refid="walletColumns"/> from zjudg_master_wallet where master_id=#{masterId} for update
+  </select>
+
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgMasterWallet">
+    insert into zjudg_master_wallet(wallet_id,master_id,balance,frozen,total_income,total_withdraw,version,create_time)
+    values(#{walletId},#{masterId},0,0,0,0,0,sysdate())
+  </insert>
+
+  <update id="increaseIncome">
+    update zjudg_master_wallet
+    set balance=balance+#{amount},total_income=total_income+#{amount},version=version+1,update_time=sysdate()
+    where master_id=#{masterId}
+  </update>
+
+  <!-- 余额足够才允许冲回，避免扣成负数 -->
+  <update id="decreaseIncome">
+    update zjudg_master_wallet
+    set balance=balance-#{amount},total_income=greatest(total_income-#{amount},0),version=version+1,update_time=sysdate()
+    where master_id=#{masterId} and balance &gt;= #{amount}
+  </update>
+
+  <update id="freezeForWithdraw">
+    update zjudg_master_wallet
+    set balance=balance-#{amount},frozen=frozen+#{amount},version=version+1,update_time=sysdate()
+    where master_id=#{masterId} and balance &gt;= #{amount}
+  </update>
+
+  <update id="confirmWithdraw">
+    update zjudg_master_wallet
+    set frozen=frozen-#{amount},total_withdraw=total_withdraw+#{amount},version=version+1,update_time=sysdate()
+    where master_id=#{masterId} and frozen &gt;= #{amount}
+  </update>
+
+  <update id="refundWithdraw">
+    update zjudg_master_wallet
+    set frozen=frozen-#{amount},balance=balance+#{amount},version=version+1,update_time=sysdate()
+    where master_id=#{masterId} and frozen &gt;= #{amount}
+  </update>
+
+  <insert id="insertLog" parameterType="com.zjude.system.domain.ZjudgMasterWalletLog">
+    insert into zjudg_master_wallet_log(log_id,master_id,wallet_id,biz_type,amount,balance_after,biz_id,biz_no,remark,create_time)
+    values(#{logId},#{masterId},#{walletId},#{bizType},#{amount},#{balanceAfter},#{bizId},#{bizNo},#{remark},sysdate())
+  </insert>
+
+  <select id="selectLogs" resultMap="LogResult">
+    select <include refid="logColumns"/> from zjudg_master_wallet_log
+    where master_id=#{masterId}
+    <if test="bizType != null and bizType != ''">and biz_type=#{bizType}</if>
+    order by create_time desc
+  </select>
+
+  <select id="selectLogList" resultMap="LogResult">
+    select l.log_id,l.master_id,l.wallet_id,l.biz_type,l.amount,l.balance_after,l.biz_id,l.biz_no,l.remark,l.create_time,m.master_name
+    from zjudg_master_wallet_log l
+    left join zjudg_master m on m.master_id=l.master_id
+    <where>
+      <if test="masterId != null and masterId != ''">and l.master_id=#{masterId}</if>
+      <if test="bizType != null and bizType != ''">and l.biz_type=#{bizType}</if>
+      <if test="bizNo != null and bizNo != ''">and l.biz_no like concat('%',#{bizNo},'%')</if>
+    </where>
+    order by l.create_time desc
+  </select>
+</mapper>

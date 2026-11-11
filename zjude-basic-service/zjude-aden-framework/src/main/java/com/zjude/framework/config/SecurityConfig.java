@@ -113,9 +113,6 @@ public class SecurityConfig
                             .permitAll()
                             // 小程序登录与评价相关接口按方法放行
                             .requestMatchers(HttpMethod.POST, "/api/mini/auth/login", "/api/mini/auth/sms-code", "/api/mini/auth/sms-login").permitAll()
-                            // 分享链接先允许直接打开；支付、认领、填写和签署动作仍由控制器校验登录身份。
-                            .requestMatchers(HttpMethod.GET, "/api/mini/business/fees/mine").authenticated()
-                            .requestMatchers(HttpMethod.GET, "/api/mini/business/fees/*", "/api/mini/contracts/*/party").permitAll()
                             // 微信支付回调由微信服务器发起，无登录态，真实性由验签与主动查单保证
                             .requestMatchers(HttpMethod.POST, "/api/mini/pay/notify").permitAll()
                             // 健康检查供负载均衡与编排探活，必须匿名且不暴露内部细节

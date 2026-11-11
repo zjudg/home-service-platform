@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgMaterialGroupMapper">
+  <resultMap id="GroupResult" type="com.zjude.system.domain.ZjudgMaterialGroup">
+    <id property="groupId" column="group_id"/>
+    <result property="groupName" column="group_name"/>
+    <result property="sortNum" column="sort_num"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <sql id="columns">group_id,group_name,sort_num,create_time,update_time</sql>
+
+  <select id="selectAll" resultMap="GroupResult">
+    select <include refid="columns"/> from zjudg_material_group order by sort_num, create_time
+  </select>
+
+  <select id="selectById" resultMap="GroupResult">
+    select <include refid="columns"/> from zjudg_material_group where group_id = #{groupId}
+  </select>
+
+  <select id="selectByName" resultMap="GroupResult">
+    select <include refid="columns"/> from zjudg_material_group where group_name = #{groupName} limit 1
+  </select>
+
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgMaterialGroup">
+    insert into zjudg_material_group(group_id,group_name,sort_num,create_time)
+    values(#{groupId},#{groupName},#{sortNum},sysdate())
+  </insert>
+
+  <update id="update" parameterType="com.zjude.system.domain.ZjudgMaterialGroup">
+    update zjudg_material_group set group_name = #{groupName}, sort_num = #{sortNum}, update_time = sysdate()
+    where group_id = #{groupId}
+  </update>
+
+  <delete id="deleteById">
+    delete from zjudg_material_group where group_id = #{groupId} and group_id &lt;&gt; 'MG_UNGROUPED'
+  </delete>
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgDispatchRecordMapper">
+  <resultMap id="DispatchResult" type="com.zjude.system.domain.ZjudgDispatchRecord">
+    <id property="recordId" column="record_id"/>
+    <result property="orderId" column="order_id"/>
+    <result property="orderNo" column="order_no"/>
+    <result property="masterId" column="master_id"/>
+    <result property="score" column="score"/>
+    <result property="result" column="result"/>
+    <result property="reason" column="reason"/>
+    <result property="createTime" column="create_time"/>
+    <result property="masterName" column="master_name"/>
+  </resultMap>
+
+  <sql id="columns">d.record_id,d.order_id,d.order_no,d.master_id,d.score,d.result,d.reason,d.create_time,m.master_name</sql>
+
+  <insert id="insertBatch">
+    insert into zjudg_dispatch_record(record_id,order_id,order_no,master_id,score,result,reason,create_time) values
+    <foreach collection="records" item="item" separator=",">
+      (#{item.recordId},#{item.orderId},#{item.orderNo},#{item.masterId},#{item.score},#{item.result},#{item.reason},sysdate())
+    </foreach>
+  </insert>
+
+  <select id="selectByOrderId" resultMap="DispatchResult">
+    select <include refid="columns"/> from zjudg_dispatch_record d
+    left join zjudg_master m on m.master_id=d.master_id
+    where d.order_id=#{orderId}
+    order by d.score desc
+  </select>
+
+  <select id="selectList" resultMap="DispatchResult">
+    select <include refid="columns"/> from zjudg_dispatch_record d
+    left join zjudg_master m on m.master_id=d.master_id
+    <where>
+      <if test="orderId != null and orderId != ''">and d.order_id=#{orderId}</if>
+      <if test="orderNo != null and orderNo != ''">and d.order_no like concat('%',#{orderNo},'%')</if>
+      <if test="masterId != null and masterId != ''">and d.master_id=#{masterId}</if>
+      <if test="result != null and result != ''">and d.result=#{result}</if>
+    </where>
+    order by d.create_time desc
+  </select>
+
+  <update id="updateResult">
+    update zjudg_dispatch_record set result=#{result},reason=#{reason} where record_id=#{recordId}
+  </update>
+
+  <!-- 只统计 result='2'（被拒）的记录，索引 idx_zjudg_dispatch_master (master_id, create_time) 可覆盖 -->
+  <select id="countRejected" resultType="int">
+    select count(1) from zjudg_dispatch_record
+    where master_id=#{masterId} and result='2' and create_time &gt;= #{since}
+  </select>
+
+  <!-- 同一订单可能有多条候选记录，取最新一条回写被拒结果 -->
+  <select id="selectRecordIdByOrderAndMaster" resultType="string">
+    select record_id from zjudg_dispatch_record
+    where order_id=#{orderId} and master_id=#{masterId}
+    order by create_time desc
+    limit 1
+  </select>
+</mapper>

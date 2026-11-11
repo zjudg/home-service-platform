@@ -17,8 +17,6 @@ services:
     image: crpi-e6fwkw3sau3mvpx9.cn-chengdu.personal.cr.aliyuncs.com/zjudg/zjudg-system-admin:v20261106_f1
     networks:
       - zjudg-system-network
-    depends_on:
-      - redis
     volumes:
       - /app/aden/docker/logs:/log
       - /app/aden/file/upload:/files
@@ -39,8 +37,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    depends_on:
-      - prod-api
     volumes:
       - /app/aden/docker/logs:/data/log/nginx
       - /app/aden/docker/nginx/ssl:/etc/nginx/ssl

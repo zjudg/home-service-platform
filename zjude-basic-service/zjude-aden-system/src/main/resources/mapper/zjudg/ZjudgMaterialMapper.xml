@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgMaterialMapper">
+  <resultMap id="MaterialResult" type="com.zjude.system.domain.ZjudgMaterial">
+    <id property="materialId" column="material_id"/>
+    <result property="groupId" column="group_id"/>
+    <result property="materialName" column="material_name"/>
+    <result property="materialType" column="material_type"/>
+    <result property="materialUrl" column="material_url"/>
+    <result property="fileSize" column="file_size"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <sql id="columns">material_id,group_id,material_name,material_type,material_url,file_size,create_time,update_time</sql>
+
+  <select id="selectList" parameterType="com.zjude.system.domain.ZjudgMaterial" resultMap="MaterialResult">
+    select <include refid="columns"/> from zjudg_material
+    <where>
+      <if test="groupId != null and groupId != ''">and group_id = #{groupId}</if>
+      <if test="materialType != null and materialType != ''">and material_type = #{materialType}</if>
+      <if test="materialName != null and materialName != ''">
+        and material_name like concat('%', #{materialName}, '%')
+      </if>
+    </where>
+    order by create_time desc, material_id desc
+  </select>
+
+  <select id="selectById" resultMap="MaterialResult">
+    select <include refid="columns"/> from zjudg_material where material_id = #{materialId}
+  </select>
+
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgMaterial">
+    insert into zjudg_material(material_id,group_id,material_name,material_type,material_url,file_size,create_time)
+    values(#{materialId},#{groupId},#{materialName},#{materialType},#{materialUrl},#{fileSize},sysdate())
+  </insert>
+
+  <update id="update" parameterType="com.zjude.system.domain.ZjudgMaterial">
+    update zjudg_material
+    set group_id = #{groupId}, material_name = #{materialName}, material_type = #{materialType},
+        material_url = #{materialUrl}, file_size = #{fileSize}, update_time = sysdate()
+    where material_id = #{materialId}
+  </update>
+
+  <delete id="deleteByIds">
+    delete from zjudg_material where material_id in
+    <foreach collection="materialIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+  </delete>
+
+  <update id="moveToGroup">
+    update zjudg_material set group_id = #{groupId}, update_time = sysdate()
+    where material_id in
+    <foreach collection="materialIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+  </update>
+
+  <select id="countByGroup" resultType="int">
+    select count(1) from zjudg_material where group_id = #{groupId}
+  </select>
+</mapper>

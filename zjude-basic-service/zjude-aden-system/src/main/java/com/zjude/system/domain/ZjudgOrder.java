@@ -2,6 +2,7 @@ package com.zjude.system.domain;
 
 import java.io.Serial;
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zjude.common.core.domain.BaseEntity;
@@ -23,6 +24,8 @@ public class ZjudgOrder extends BaseEntity {
     private String cityId;
     private String userId;
     private String userInfo;
+    /** 未脱敏用户信息，仅管理端订单查询填充。 */
+    private String adminUserInfo;
     /** 承接师傅ID，为空表示待接单 */
     private String masterId;
     /** 派单状态（0未派单 1已派单 2派单失败） */
@@ -49,8 +52,12 @@ public class ZjudgOrder extends BaseEntity {
     /** 联系电话（用户下单时填写） */
     private String phone;
     private BigDecimal amount;
+    /** 下单时锁定的师傅总到手金额（元），按数量计算后快照。 */
+    private BigDecimal masterPrice;
     private String orderStatus;
     private String paymentStatus;
+    /** 收款渠道（WECHAT / OFFLINE）。 */
+    private String paymentSource;
     /** 结算状态（0未结算 1已结算 2已冲回） */
     private String settleStatus;
     /** 师傅本单收入（分） */
@@ -81,6 +88,9 @@ public class ZjudgOrder extends BaseEntity {
     public void setUserId(String value) { userId = value; }
     public String getUserInfo() { return userInfo; }
     public void setUserInfo(String value) { userInfo = value; }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getAdminUserInfo() { return adminUserInfo; }
+    public void setAdminUserInfo(String value) { adminUserInfo = value; }
     public String getMasterId() { return masterId; }
     public void setMasterId(String value) { masterId = value; }
     public String getDispatchStatus() { return dispatchStatus; }
@@ -119,10 +129,15 @@ public class ZjudgOrder extends BaseEntity {
     public void setPhone(String value) { phone = value; }
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal value) { amount = value; }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public BigDecimal getMasterPrice() { return masterPrice; }
+    public void setMasterPrice(BigDecimal value) { masterPrice = value; }
     public String getOrderStatus() { return orderStatus; }
     public void setOrderStatus(String value) { orderStatus = value; }
     public String getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(String value) { paymentStatus = value; }
+    public String getPaymentSource() { return paymentSource; }
+    public void setPaymentSource(String value) { paymentSource = value; }
     public Integer getReviewed() { return reviewed; }
     public void setReviewed(Integer value) { reviewed = value; }
 }

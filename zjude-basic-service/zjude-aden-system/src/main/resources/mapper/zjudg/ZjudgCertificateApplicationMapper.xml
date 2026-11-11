@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgCertificateApplicationMapper">
+  <resultMap id="ApplicationResult" type="com.zjude.system.domain.ZjudgCertificateApplication">
+    <id property="applicationId" column="application_id"/><result property="applicationNo" column="application_no"/><result property="productId" column="product_id"/><result property="productName" column="product_name"/><result property="userId" column="user_id"/><result property="contactPhone" column="contact_phone"/><result property="photoUrl" column="photo_url"/><result property="deliveryAddress" column="delivery_address"/><result property="amount" column="amount"/><result property="status" column="status"/><result property="trackingNo" column="tracking_no"/><result property="createTime" column="create_time"/>
+  </resultMap>
+  <select id="selectList" resultMap="ApplicationResult">select a.*,p.product_name from zjudg_certificate_application a left join zjudg_certificate_product p on p.product_id=a.product_id order by a.create_time desc</select>
+  <select id="selectById" resultMap="ApplicationResult">select a.*,p.product_name from zjudg_certificate_application a left join zjudg_certificate_product p on p.product_id=a.product_id where a.application_id=#{id}</select>
+  <select id="selectByIdAndUser" resultMap="ApplicationResult">select a.*,p.product_name from zjudg_certificate_application a left join zjudg_certificate_product p on p.product_id=a.product_id where a.application_id=#{id} and a.user_id=#{userId}</select>
+  <insert id="insert">insert into zjudg_certificate_application(application_id,application_no,product_id,user_id,contact_phone,photo_url,delivery_address,amount,status,create_time) values(#{applicationId},#{applicationNo},#{productId},#{userId},#{contactPhone},#{photoUrl},#{deliveryAddress},#{amount},#{status},sysdate())</insert>
+  <update id="updateStatus">update zjudg_certificate_application set status=#{toStatus},update_time=sysdate() where application_id=#{id} and status=#{fromStatus}</update>
+  <update id="updateFulfillment">update zjudg_certificate_application set tracking_no=coalesce(#{trackingNo},tracking_no),status=#{status},update_time=sysdate() where application_id=#{id} and status=#{fromStatus}</update>
+</mapper>

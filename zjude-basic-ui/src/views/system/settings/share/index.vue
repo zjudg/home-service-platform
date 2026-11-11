@@ -51,7 +51,7 @@
               </div>
             </el-form-item>
             <el-form-item label="分享图片">
-              <ImageUpload
+              <MaterialImageField
                 v-model="form['share.h5.image']"
                 :limit="1"
                 :file-size="5"
@@ -82,7 +82,7 @@
               </div>
             </el-form-item>
             <el-form-item label="分享图片">
-              <ImageUpload
+              <MaterialImageField
                 v-model="form['share.mini.image']"
                 :limit="1"
                 :file-size="5"
@@ -99,7 +99,7 @@
 
 <script setup name="ShareSettings">
 import { listConfig, saveConfig } from '@/api/settings/share'
-import ImageUpload from '@/components/ImageUpload'
+import MaterialImageField from '@/components/MaterialImageField'
 
 const { proxy } = getCurrentInstance()
 

@@ -170,6 +170,17 @@
               已评价
             </text>
           </view>
+          <view
+            v-if="String(order.orderStatus) === ORDER_STATUS.CANCELLED"
+            class="order-delete-action"
+            @click.stop="removeOrder(order)"
+          >
+            <uni-icons
+              type="trash"
+              size="19"
+              color="#a39b95"
+            />
+          </view>
         </view>
       </view>
 
@@ -204,7 +215,7 @@ import UiNavbar from '@/components/ui/UiNavbar.vue'
 import UiTabs from '@/components/ui/UiTabs.vue'
 import UiPrice from '@/components/ui/UiPrice.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
-import { cancelOrder, listOrders } from '@/api/service'
+import { cancelOrder, deleteOrder, listOrders } from '@/api/service'
 import { applyRefund } from '@/api/refund'
 import {
   USER_ORDER_TABS,
@@ -301,6 +312,24 @@ async function cancel (order) {
       showToast(e.message || '操作失败')
     }
   })
+}
+
+async function removeOrder (order) {
+  if (!isAuthenticated()) return goLogin()
+  const confirmed = await showDialog({
+    title: '删除订单',
+    content: '确定删除这笔已取消的订单吗？删除后无法恢复。',
+    confirmText: '删除',
+    danger: true
+  })
+  if (!confirmed) return
+  try {
+    await deleteOrder(order.orderId)
+    orders.value = orders.value.filter(item => item.orderId !== order.orderId)
+    toastSuccess('订单已删除')
+  } catch (e) {
+    showToast(e.message || '删除失败')
+  }
 }
 
 async function pay (order) {
@@ -505,6 +534,14 @@ function review (order) { requireLogin(() => uni.navigateTo({ url: `/pages/revie
   gap: 16rpx;
   padding-top: $space-2;
   border-top: 1rpx solid $line-soft;
+}
+
+.order-delete-action {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 48rpx;
+  padding-top: $space-1;
 }
 
 .order-action-button {

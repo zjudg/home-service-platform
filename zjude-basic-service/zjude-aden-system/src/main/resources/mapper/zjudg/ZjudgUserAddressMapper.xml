@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgUserAddressMapper">
+  <resultMap id="AddressResult" type="com.zjude.system.domain.ZjudgUserAddress">
+    <id property="addressId" column="address_id"/>
+    <result property="userId" column="user_id"/>
+    <result property="contactName" column="contact_name"/>
+    <result property="contactPhone" column="contact_phone"/>
+    <result property="cityId" column="city_id"/>
+    <result property="region" column="region"/>
+    <result property="detail" column="detail"/>
+    <result property="label" column="label"/>
+    <result property="isDefault" column="is_default"/>
+    <result property="status" column="status"/>
+    <result property="createBy" column="create_by"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateBy" column="update_by"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="remark" column="remark"/>
+  </resultMap>
+
+  <sql id="columns">address_id,user_id,contact_name,contact_phone,city_id,region,detail,label,is_default,status,create_by,create_time,update_by,update_time,remark</sql>
+
+  <select id="selectListByUser" resultMap="AddressResult">
+    select <include refid="columns"/> from zjudg_user_address
+    where user_id = #{userId} and status = '0'
+    order by is_default desc, create_time desc
+  </select>
+
+  <select id="selectByIdAndUser" resultMap="AddressResult">
+    select <include refid="columns"/> from zjudg_user_address
+    where address_id = #{addressId} and user_id = #{userId}
+  </select>
+
+  <select id="countByUser" resultType="int">
+    select count(1) from zjudg_user_address where user_id = #{userId} and status = '0'
+  </select>
+
+  <insert id="insert">
+    insert into zjudg_user_address(address_id,user_id,contact_name,contact_phone,city_id,region,detail,label,is_default,status,create_by,create_time,remark)
+    values(#{addressId},#{userId},#{contactName},#{contactPhone},#{cityId},#{region},#{detail},#{label},#{isDefault},'0',#{createBy},sysdate(),#{remark})
+  </insert>
+
+  <update id="update">
+    update zjudg_user_address
+    set contact_name = #{contactName}, contact_phone = #{contactPhone}, city_id = #{cityId},
+        region = #{region}, detail = #{detail}, label = #{label}, is_default = #{isDefault},
+        status = #{status}, update_by = #{updateBy}, update_time = sysdate(), remark = #{remark}
+    where address_id = #{addressId} and user_id = #{userId}
+  </update>
+
+  <delete id="deleteByIdAndUser">
+    delete from zjudg_user_address where address_id = #{addressId} and user_id = #{userId}</delete>
+
+  <update id="clearDefault">
+    update zjudg_user_address set is_default = '0', update_time = sysdate()
+    where user_id = #{userId} and is_default = '1'</update>
+
+  <update id="markDefault">
+    update zjudg_user_address set is_default = '1', update_time = sysdate()
+    where address_id = #{addressId} and user_id = #{userId}</update>
+</mapper>

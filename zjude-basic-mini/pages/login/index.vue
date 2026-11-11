@@ -6,9 +6,16 @@
       <!-- 品牌区 -->
       <view class="brand">
         <view class="brand-logo-wrap">
-          <image class="brand-logo" src="/static/logo.png" mode="aspectFit" />
+          <image
+            v-if="brandLogo"
+            class="brand-logo"
+            :src="brandLogo"
+            mode="aspectFit"
+          />
+          <text v-else class="brand-name">
+            {{ configStore.appTitle }}
+          </text>
         </view>
-        <text class="brand-name">{{ configStore.appTitle }}</text>
         <text class="brand-subtitle">专业服务，放心到家</text>
       </view>
 
@@ -46,7 +53,7 @@
         <text class="panel-desc">头像和昵称将用于服务预约与订单展示</text>
 
         <view class="avatar-section">
-          <button class="avatar-picker" open-type="chooseAvatar" @tap.stop @chooseavatar="onChooseAvatar">
+          <button class="avatar-picker" :disabled="avatarUploading" open-type="chooseAvatar" @tap.stop @chooseavatar="onChooseAvatar">
             <image v-if="wechat.avatarUrl" class="avatar-image" :src="wechat.avatarUrl" mode="aspectFill" />
             <view v-else class="avatar-placeholder">
               <view class="avatar-icon">
@@ -57,7 +64,7 @@
               <uni-icons type="compose" size="13" color="#ffffff" />
             </view>
           </button>
-          <text class="avatar-hint">{{ wechat.avatarUrl ? '点击更换头像' : '点击选择头像' }}</text>
+          <text class="avatar-hint">{{ avatarUploading ? '头像上传中...' : (wechat.avatarUrl ? '点击更换头像' : '点击选择头像') }}</text>
         </view>
 
         <view class="nickname-field">
@@ -74,7 +81,7 @@
 
         <view class="panel-actions">
           <button class="ghost-button panel-cancel" @click="showWechatPanel = false">取消</button>
-          <button class="primary-button panel-confirm" :loading="wechatLoading" @click="confirmWechatLogin">确定</button>
+          <button class="primary-button panel-confirm" :disabled="avatarUploading" :loading="wechatLoading" @click="confirmWechatLogin">确定</button>
         </view>
       </view>
     </view>
@@ -129,19 +136,30 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { onShow, onUnload } from '@dcloudio/uni-app'
 import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'
 import UiNavbar from '@/components/ui/UiNavbar.vue'
 import AppFeedback from '@/components/AppFeedback.vue'
 import { requestSmsCode } from '@/api/auth'
 import { useAuthStore } from '@/stores/auth'
+import { useMasterStore } from '@/stores/master'
 import { useConfigStore } from '@/stores/config'
+import { assetUrl } from '@/utils/assets'
+import { uploadAvatarToStorage } from '@/utils/user-avatar'
 import { HOME_PATH, sanitizeRedirect } from '@/utils/guard'
+import {
+  getMiniProgramMode,
+  MINI_PROGRAM_MODE_CUSTOMER,
+  MINI_PROGRAM_MODE_MASTER,
+  setMiniProgramMode
+} from '@/utils/mini-program-mode'
 import { showToast, toastSuccess } from '@/utils/feedback'
 
 const authStore = useAuthStore()
+const masterStore = useMasterStore()
 const configStore = useConfigStore()
+const brandLogo = computed(() => assetUrl(configStore.site?.mobileLoginLogo || configStore.site?.mobileLogo || ''))
 
 const redirect = ref('')
 const isWechat = ref(false)
@@ -149,6 +167,7 @@ const agreed = ref(false)
 
 const showWechatPanel = ref(false)
 const wechatLoading = ref(false)
+const avatarUploading = ref(false)
 const wechat = reactive({ avatarUrl: '', nickname: '' })
 
 const showPhonePanel = ref(false)
@@ -178,7 +197,11 @@ function requireAgreement () {
 }
 
 function showPolicy (name) {
-  showToast(`${name}内容请在应用正式发布前配置`)
+  const type = name === '隐私政策' ? 'privacy' : 'agreement'
+  uni.navigateTo({
+    url: `/pages/legal/index?type=${type}`,
+    fail: () => showToast(`${name}暂时无法打开，请稍后重试`)
+  })
 }
 
 /* ---------- 微信登录 ---------- */
@@ -193,9 +216,20 @@ function onWechatLogin () {
   showWechatPanel.value = true
 }
 
-function onChooseAvatar (event) {
-  const avatarUrl = event.detail?.avatarUrl
-  if (avatarUrl) wechat.avatarUrl = avatarUrl
+async function onChooseAvatar (event) {
+  // 微信只提供临时文件路径；它只作为上传输入，不绑定到 image，也不写入用户资料。
+  const filePath = event.detail?.avatarUrl
+  if (!filePath || avatarUploading.value) return
+  avatarUploading.value = true
+  try {
+    // 选择后立即上传，渲染状态只使用后台存储服务返回的永久 URL。
+    wechat.avatarUrl = await uploadAvatarToStorage(filePath)
+  } catch (error) {
+    wechat.avatarUrl = ''
+    showToast(error.message || '头像上传失败，请重试')
+  } finally {
+    avatarUploading.value = false
+  }
 }
 
 function onNicknameBlur (event) {
@@ -210,6 +244,8 @@ async function confirmWechatLogin () {
     await authStore.signInWithWechat({
       code: loginResult.code,
       nickname: wechat.nickname.trim(),
+      // This is either empty or the permanent URL returned by the configured
+      // storage provider; a wxfile:// temporary path never reaches the API.
       avatarUrl: wechat.avatarUrl
     })
     showWechatPanel.value = false
@@ -284,9 +320,24 @@ async function submitPhoneLogin () {
 }
 
 /* ---------- 登录后跳转 ---------- */
-function redirectAfterLogin () {
+async function redirectAfterLogin () {
   const target = sanitizeRedirect(redirect.value) || HOME_PATH
   const path = target.split('?')[0]
+  const isMasterDestination = path.startsWith('/pages/master/')
+  const shouldPreferMaster = isMasterDestination || getMiniProgramMode() !== MINI_PROGRAM_MODE_CUSTOMER
+
+  if (shouldPreferMaster) {
+    try {
+      await masterStore.loadProfile()
+      if (masterStore.applied && masterStore.isApproved) {
+        setMiniProgramMode(MINI_PROGRAM_MODE_MASTER)
+        return uni.reLaunch({ url: '/pages/master/home/index' })
+      }
+    } catch (error) {
+      // 审核状态暂时不可用时仍按用户传入的安全回跳地址继续。
+    }
+  }
+
   const tabPages = ['/pages/home/index', '/pages/category/index', '/pages/services/index', '/pages/orders/index', '/pages/user/index']
   if (tabPages.includes(path)) return uni.reLaunch({ url: target })
   if (getCurrentPages().length > 1) return uni.redirectTo({ url: target })
@@ -326,17 +377,13 @@ function redirectAfterLogin () {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 136rpx;
-  height: 136rpx;
-  border-radius: $radius-lg;
-  background: $surface;
-  box-shadow: $shadow-card;
+  width: 520rpx;
+  height: 240rpx;
 }
 
-.brand-logo { width: 84rpx; height: 84rpx; }
+.brand-logo { width: 100%; height: 100%; }
 
 .brand-name {
-  margin-top: $space-3;
   font-size: 36rpx;
   font-weight: $weight-heavy;
   color: $ink-900;
@@ -344,7 +391,7 @@ function redirectAfterLogin () {
 }
 
 .brand-subtitle {
-  margin-top: 8rpx;
+  margin-top: -8rpx;
   font-size: $font-micro;
   color: $ink-400;
   letter-spacing: 2rpx;

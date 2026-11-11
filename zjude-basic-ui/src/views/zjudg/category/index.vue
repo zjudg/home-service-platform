@@ -114,7 +114,7 @@
             />
           </el-select>
         </el-form-item><el-form-item label="分类图片">
-          <image-upload
+          <MaterialImageField
             v-model="form.imageUrl"
             :limit="1"
           />
@@ -150,6 +150,7 @@
   </div>
 </template>
 <script setup>
+import MaterialImageField from '@/components/MaterialImageField'
 import { ref, reactive, onMounted } from 'vue'; import { ElMessage, ElMessageBox } from 'element-plus'; import { listCategory, addCategory, updateCategory, deleteCategory } from '@/api/zjudg/category'
 const rows = ref([]); const total = ref(0); const loading = ref(false); const visible = ref(false); const query = reactive({ pageNum: 1, pageSize: 10, categoryName: '', status: '' }); const form = reactive({})
 const load = () => { loading.value = true; listCategory(query).then(r => { rows.value = r.rows || []; total.value = r.total || 0 }).finally(() => { loading.value = false }) }; const reset = () => { Object.assign(query, { pageNum: 1, categoryName: '', status: '' }); load() }; const open = (row) => { Object.keys(form).forEach(k => delete form[k]); Object.assign(form, row || { parentId: '0', sortNum: 0, homeRecommend: '0', status: '0', imageUrl: '' }); visible.value = true }; const save = () => { (form.categoryId ? updateCategory : addCategory)(form).then(() => { ElMessage.success('保存成功'); visible.value = false; load() }) }; const remove = (id) => ElMessageBox.confirm('确认删除此分类吗？', '提示', { type: 'warning' }).then(() => deleteCategory(id).then(() => { ElMessage.success('删除成功'); load() })); onMounted(load)

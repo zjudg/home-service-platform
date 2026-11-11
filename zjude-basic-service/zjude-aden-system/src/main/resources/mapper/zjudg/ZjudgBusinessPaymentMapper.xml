@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgBusinessPaymentMapper">
+  <resultMap id="PaymentResult" type="com.zjude.system.domain.ZjudgBusinessPayment">
+    <id property="paymentId" column="payment_id"/><result property="bizType" column="biz_type"/><result property="bizId" column="biz_id"/><result property="userId" column="user_id"/><result property="outTradeNo" column="out_trade_no"/><result property="transactionId" column="transaction_id"/><result property="amount" column="amount"/><result property="payStatus" column="pay_status"/><result property="prepayId" column="prepay_id"/><result property="paidTime" column="paid_time"/><result property="createTime" column="create_time"/>
+  </resultMap>
+  <insert id="insert">insert into zjudg_business_payment(payment_id,biz_type,biz_id,user_id,out_trade_no,amount,pay_status,create_time) values(#{paymentId},#{bizType},#{bizId},#{userId},#{outTradeNo},#{amount},#{payStatus},sysdate())</insert>
+  <select id="selectPending" resultMap="PaymentResult">select * from zjudg_business_payment where biz_type=#{bizType} and biz_id=#{bizId} and user_id=#{userId} and pay_status='0' order by create_time desc limit 1</select>
+  <select id="selectLatest" resultMap="PaymentResult">select * from zjudg_business_payment where biz_type=#{bizType} and biz_id=#{bizId} and user_id=#{userId} order by create_time desc limit 1</select>
+  <select id="selectByOutTradeNo" resultMap="PaymentResult">select * from zjudg_business_payment where out_trade_no=#{outTradeNo}</select>
+  <update id="updatePrepayId">update zjudg_business_payment set prepay_id=#{prepayId},update_time=sysdate() where out_trade_no=#{outTradeNo} and pay_status='0'</update>
+  <update id="markPaid">update zjudg_business_payment set pay_status='1',transaction_id=#{transactionId},paid_time=sysdate(),update_time=sysdate() where out_trade_no=#{outTradeNo} and pay_status='0'</update>
+</mapper>

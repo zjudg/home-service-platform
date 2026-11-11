@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgUserFavoriteMapper">
+  <resultMap id="FavoriteResult" type="com.zjude.system.domain.ZjudgUserFavorite">
+    <id property="favoriteId" column="favorite_id"/>
+    <result property="userId" column="user_id"/>
+    <result property="serviceId" column="service_id"/>
+    <result property="createTime" column="create_time"/>
+    <result property="serviceName" column="service_name"/>
+    <result property="serviceIntro" column="service_intro"/>
+    <result property="imageUrl" column="image_url"/>
+    <result property="price" column="price"/>
+    <result property="unitName" column="unit_name"/>
+    <result property="serviceStatus" column="service_status"/>
+  </resultMap>
+
+  <!-- 服务下架后收藏记录保留，用 status 字段标记，前端据此灰显而不是直接消失 -->
+  <select id="selectByUser" resultMap="FavoriteResult">
+    select f.favorite_id, f.user_id, f.service_id, f.create_time,
+           s.service_name, s.service_intro, s.product_image as image_url,
+           s.price, u.unit_name, s.status as service_status
+    from zjudg_user_favorite f
+    left join zjudg_service s on s.service_id = f.service_id
+    left join zjudg_service_unit u on u.unit_id = s.unit_id
+    where f.user_id = #{userId}
+    order by f.create_time desc
+  </select>
+
+  <select id="selectByUserAndService" resultMap="FavoriteResult">
+    select f.favorite_id, f.user_id, f.service_id, f.create_time
+    from zjudg_user_favorite f
+    where f.user_id = #{userId} and f.service_id = #{serviceId}
+    limit 1
+  </select>
+
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgUserFavorite">
+    insert into zjudg_user_favorite(favorite_id, user_id, service_id, create_time)
+    values(#{favoriteId}, #{userId}, #{serviceId}, sysdate())
+  </insert>
+
+  <delete id="deleteByUserAndService">
+    delete from zjudg_user_favorite where user_id = #{userId} and service_id = #{serviceId}
+  </delete>
+
+  <select id="countByUser" resultType="int">
+    select count(1) from zjudg_user_favorite where user_id = #{userId}
+  </select>
+
+  <select id="countByService" resultType="int">
+    select count(1) from zjudg_user_favorite where service_id = #{serviceId}
+  </select>
+</mapper>

@@ -49,7 +49,7 @@
           :key="group.groupId"
           class="group-item"
           :class="{ active: activeGroup === group.groupId }"
-          @click="activeGroup = group.groupId"
+          @click="selectGroup(group.groupId)"
         >
           <el-icon class="group-icon">
             <Folder />
@@ -196,7 +196,7 @@
             />
             <div class="preview-box">
               <el-image
-                v-if="item.materialType === 'image'"
+                v-if="normalizedMaterialType(item.materialType) === 'image'"
                 :src="assetUrl(item.materialUrl)"
                 fit="cover"
                 :preview-src-list="[assetUrl(item.materialUrl)]"
@@ -207,7 +207,7 @@
                 :src="assetUrl(item.materialUrl)"
                 controls
               />
-              <span class="type-badge">{{ item.materialType === 'image' ? '图片' : '视频' }}</span>
+              <span class="type-badge">{{ normalizedMaterialType(item.materialType) === 'image' ? '图片' : '视频' }}</span>
             </div>
             <div class="material-meta">
               <div
@@ -327,7 +327,13 @@ const uploadUrl = ref('')
 const uploadGroup = ref(UNGROUPED_ID)
 const uploadName = ref('')
 
-const filteredMaterials = computed(() => materials.value.filter(item => item.materialType === activeType.value))
+const filteredMaterials = computed(() => materials.value.filter(item => normalizedMaterialType(item.materialType) === activeType.value))
+
+function normalizedMaterialType (type) {
+  if (type === 'image' || type === '0') return 'image'
+  if (type === 'video' || type === '1') return 'video'
+  return type
+}
 
 // 上传与移动的目标分组不包含「全部」这个合成项
 const uploadTargets = computed(() => groups.value.filter(group => group.groupId !== 'all'))
@@ -365,6 +371,19 @@ async function loadMaterials () {
   materials.value = response.rows || response.data?.rows || []
   selected.value = []
   allChecked.value = false
+}
+
+async function selectGroup (groupId) {
+  if (activeGroup.value === groupId) return
+  activeGroup.value = groupId
+  loading.value = true
+  try {
+    await loadMaterials()
+  } catch (e) {
+    ElMessage.error(e?.message || '素材加载失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 async function reload () {

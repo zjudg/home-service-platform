@@ -38,7 +38,10 @@ import { useConfigStore } from '@/stores/config'
 import { assetUrl } from '@/utils/assets'
 import { showToast } from '@/utils/feedback'
 
-defineProps({ currentKey: { type: String, default: '' } })
+const props = defineProps({
+  currentKey: { type: String, default: '' },
+  items: { type: Array, default: () => [] }
+})
 
 const configStore = useConfigStore()
 
@@ -51,6 +54,7 @@ const defaultItems = [
 ]
 
 const items = computed(() => {
+  if (props.items.length) return props.items
   const configured = configStore.navigation.items || []
   return configured.length ? configured : defaultItems
 })
@@ -72,7 +76,10 @@ const routeMap = {
   category: '/pages/services/index',
   cart: '/pages/orders/index',
   profile: '/pages/user/index',
-  user: '/pages/user/index'
+  user: '/pages/user/index',
+  'master-pool': '/pages/master/pool/index',
+  'master-orders': '/pages/master/orders/index',
+  'master-profile': '/pages/master/profile/index'
 }
 
 const fallbackIcons = {
@@ -80,7 +87,10 @@ const fallbackIcons = {
   category: 'list',
   cart: 'list',
   profile: 'person',
-  user: 'person'
+  user: 'person',
+  'master-pool': 'paperplane',
+  'master-orders': 'list',
+  'master-profile': 'person'
 }
 
 function fallbackIcon (key) {

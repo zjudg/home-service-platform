@@ -20,6 +20,12 @@ public interface IZjudgOrderService
      */
     List<ZjudgOrder> selectList(ZjudgOrder query);
 
+    /** 管理端条件查询，允许查看完整用户昵称。 */
+    List<ZjudgOrder> selectAdminList(ZjudgOrder query);
+
+    /** 管理后台订单详情，允许查看用户完整昵称。 */
+    ZjudgOrder selectAdminById(String id);
+
     /** 查询当前用户订单列表，不使用管理端数据权限过滤。 */
     List<ZjudgOrder> selectListByUser(String userId, String orderStatus);
 
@@ -75,6 +81,11 @@ public interface IZjudgOrderService
     ZjudgOrder createOrder(String serviceId, String slotId, String appointmentDate, java.math.BigDecimal quantity,
             String remark, String address, String phone, String userId, String userInfo, String cityId);
 
+    /** 管理端录入已在线下收款的订单，订单直接进入师傅接单大厅。 */
+    ZjudgOrder createOfflinePaidOrder(String serviceId, String slotId, String appointmentDate,
+            java.math.BigDecimal quantity, String remark, String address, String phone, String customerName,
+            String cityId, String operator);
+
     /**
      * 取消订单，仅允许本人操作且订单未终结。
      *
@@ -111,6 +122,17 @@ public interface IZjudgOrderService
      * @return 变更影响行数
      */
     int updateStatus(String orderId, String target, String operator);
+
+    /**
+     * 删除未支付、未指派且没有关联履约或财务记录的已取消订单。
+     *
+     * @param query 订单主键与数据权限过滤条件
+     * @return 影响行数
+     */
+    int deleteAdminOrder(ZjudgOrder query);
+
+    /** 删除当前用户符合条件的已取消订单。 */
+    int deleteUserOrder(String orderId, String userId);
 
     /**
      * 查询用户在指定服务下已完成且尚未评价的订单。

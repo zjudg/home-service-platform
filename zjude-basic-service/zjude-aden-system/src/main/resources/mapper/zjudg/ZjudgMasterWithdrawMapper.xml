@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgMasterWithdrawMapper">
+  <resultMap id="WithdrawResult" type="com.zjude.system.domain.ZjudgMasterWithdraw">
+    <id property="withdrawId" column="withdraw_id"/>
+    <result property="withdrawNo" column="withdraw_no"/>
+    <result property="masterId" column="master_id"/>
+    <result property="amount" column="amount"/>
+    <result property="fee" column="fee"/>
+    <result property="actualAmount" column="actual_amount"/>
+    <result property="withdrawStatus" column="withdraw_status"/>
+    <result property="payChannel" column="pay_channel"/>
+    <result property="payAccount" column="pay_account"/>
+    <result property="auditBy" column="audit_by"/>
+    <result property="auditTime" column="audit_time"/>
+    <result property="auditRemark" column="audit_remark"/>
+    <result property="payTime" column="pay_time"/>
+    <result property="transferNo" column="transfer_no"/>
+    <result property="failReason" column="fail_reason"/>
+    <result property="masterName" column="master_name"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <sql id="columns">w.withdraw_id,w.withdraw_no,w.master_id,w.amount,w.fee,w.actual_amount,w.withdraw_status,w.pay_channel,w.pay_account,w.audit_by,w.audit_time,w.audit_remark,w.pay_time,w.transfer_no,w.fail_reason,w.create_time,w.update_time,m.master_name</sql>
+
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgMasterWithdraw">
+    insert into zjudg_master_withdraw(withdraw_id,withdraw_no,master_id,amount,fee,actual_amount,withdraw_status,pay_channel,pay_account,create_time)
+    values(#{withdrawId},#{withdrawNo},#{masterId},#{amount},#{fee},#{actualAmount},#{withdrawStatus},#{payChannel},#{payAccount},sysdate())
+  </insert>
+
+  <select id="selectById" resultMap="WithdrawResult">
+    select <include refid="columns"/> from zjudg_master_withdraw w
+    left join zjudg_master m on m.master_id=w.master_id
+    where w.withdraw_id=#{withdrawId}
+  </select>
+
+  <select id="selectByWithdrawNo" resultMap="WithdrawResult">
+    select <include refid="columns"/> from zjudg_master_withdraw w
+    left join zjudg_master m on m.master_id=w.master_id
+    where w.withdraw_no=#{withdrawNo} limit 1
+  </select>
+
+  <select id="selectInProgress" resultMap="WithdrawResult">
+    select <include refid="columns"/> from zjudg_master_withdraw w
+    left join zjudg_master m on m.master_id=w.master_id
+    where w.master_id=#{masterId} and w.withdraw_status in ('0','1')
+    order by w.create_time desc limit 1
+  </select>
+
+  <select id="selectList" resultMap="WithdrawResult">
+    select <include refid="columns"/> from zjudg_master_withdraw w
+    left join zjudg_master m on m.master_id=w.master_id
+    <where>
+      <if test="withdrawNo != null and withdrawNo != ''">and w.withdraw_no like concat('%',#{withdrawNo},'%')</if>
+      <if test="masterId != null and masterId != ''">and w.master_id=#{masterId}</if>
+      <if test="masterName != null and masterName != ''">and m.master_name like concat('%',#{masterName},'%')</if>
+      <if test="withdrawStatus != null and withdrawStatus != ''">and w.withdraw_status=#{withdrawStatus}</if>
+    </where>
+    order by w.create_time desc
+  </select>
+
+  <select id="selectByMaster" resultMap="WithdrawResult">
+    select <include refid="columns"/> from zjudg_master_withdraw w
+    left join zjudg_master m on m.master_id=w.master_id
+    where w.master_id=#{masterId}
+    order by w.create_time desc
+  </select>
+
+  <!-- 幂等：仅当状态与期望一致时才更新，重复操作不会产生副作用 -->
+  <update id="updateStatus">
+    update zjudg_master_withdraw
+    set withdraw_status=#{targetStatus},
+        audit_by=case when #{auditBy} is null then audit_by else #{auditBy} end,
+        audit_time=case when #{auditBy} is null then audit_time else sysdate() end,
+        audit_remark=case when #{auditRemark} is null then audit_remark else #{auditRemark} end,
+        transfer_no=case when #{transferNo} is null then transfer_no else #{transferNo} end,
+        pay_time=case when #{targetStatus}='2' then sysdate() else pay_time end,
+        fail_reason=case when #{failReason} is null then fail_reason else #{failReason} end,
+        update_time=sysdate()
+    where withdraw_id=#{withdrawId} and withdraw_status=#{fromStatus}
+  </update>
+</mapper>

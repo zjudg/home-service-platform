@@ -9,7 +9,8 @@ export default defineConfig(({ mode, command }) => {
   return {
     // 部署生产环境和开发环境下的URL�?    // 默认情况下，vite 会假设你的应用是被部署在一个域名的根路径上
     // 子路径部署时将 base 修改为对应路径，例如 /admin/
-    base: VITE_APP_ENV === 'production' ? '/' : '/',
+    // The management console is served from /admin/ in production; public site stays at /.
+    base: VITE_APP_ENV === 'production' ? '/admin/' : '/',
     plugins: createVitePlugins(env, command === 'build'),
     resolve: {
       // https://cn.vitejs.dev/config/#resolve-alias
@@ -29,8 +30,8 @@ export default defineConfig(({ mode, command }) => {
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy
         '/dev-api': {
-          // target: 'http://localhost:8888',
-          target: 'https://miaoj.cc/dev-api',
+          // target: 'https://miaoj.cc/dev-api',
+          target: 'http://localhost:8888',
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, '')
         }

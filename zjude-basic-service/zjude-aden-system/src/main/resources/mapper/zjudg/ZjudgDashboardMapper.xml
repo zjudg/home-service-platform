@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgDashboardMapper">
+
+  <!--
+    统计口径：
+      营业额 = 支付流水 pay_status='1' 的 amount，按 paid_time 归日
+      订单数 = 支付成功的流水条数（一个订单一条成功流水，out_trade_no 唯一）
+      退款   = 退款单按 refund_status 与 create_time 统计
+      结算   = 师傅钱包流水中 order_income 减去 order_reverse 的净额
+  -->
+
+  <select id="sumPaidAmount" resultType="java.math.BigDecimal">
+    select ifnull(sum(amount), 0) from zjudg_order_payment
+    where pay_status = '1' and paid_time &gt;= #{begin} and paid_time &lt; #{end}
+  </select>
+
+  <select id="countPaidOrders" resultType="int">
+    select count(1) from zjudg_order_payment
+    where pay_status = '1' and paid_time &gt;= #{begin} and paid_time &lt; #{end}
+  </select>
+
+  <select id="sumRefundedAmount" resultType="java.math.BigDecimal">
+    select ifnull(sum(refund_amount), 0) from zjudg_refund
+    where refund_status = '2' and create_time &gt;= #{begin} and create_time &lt; #{end}
+  </select>
+
+  <!-- 待处理 = 待审核(0) + 退款中(1)，失败的不会自动重试，不计入待处理 -->
+  <select id="sumPendingRefundAmount" resultType="java.math.BigDecimal">
+    select ifnull(sum(refund_amount), 0) from zjudg_refund
+    where refund_status in ('0', '1') and create_time &gt;= #{begin} and create_time &lt; #{end}
+  </select>
+
+  <select id="selectDailyPaidAmount" resultType="java.util.LinkedHashMap">
+    select date_format(paid_time, '%Y-%m-%d') as stat_date, ifnull(sum(amount), 0) as amount
+    from zjudg_order_payment
+    where pay_status = '1' and paid_time &gt;= #{begin} and paid_time &lt; #{end}
+    group by date_format(paid_time, '%Y-%m-%d')
+    order by stat_date
+  </select>
+
+  <select id="selectDailyPaidOrders" resultType="java.util.LinkedHashMap">
+    select date_format(paid_time, '%Y-%m-%d') as stat_date, count(1) as total
+    from zjudg_order_payment
+    where pay_status = '1' and paid_time &gt;= #{begin} and paid_time &lt; #{end}
+    group by date_format(paid_time, '%Y-%m-%d')
+    order by stat_date
+  </select>
+
+  <!-- 新增用户按 sys_user.create_time 统计，仅统计未删除且正常状态的平台用户 -->
+  <select id="selectDailyNewUsers" resultType="java.util.LinkedHashMap">
+    select date_format(create_time, '%Y-%m-%d') as stat_date, count(distinct user_id) as total
+    from sys_user
+    where del_flag = '0' and status = '0'
+      and create_time &gt;= #{begin} and create_time &lt; #{end}
+    group by date_format(create_time, '%Y-%m-%d')
+    order by stat_date
+  </select>
+
+  <!-- 活跃用户按登录成功记录去重，避免同一用户一天多次登录重复计数 -->
+  <select id="selectDailyActiveUsers" resultType="java.util.LinkedHashMap">
+    select date_format(l.login_time, '%Y-%m-%d') as stat_date, count(distinct u.user_id) as total
+    from sys_login_info l
+    inner join sys_user u on u.user_name = l.user_name
+    where l.status = '0' and u.del_flag = '0' and u.status = '0'
+      and l.login_time &gt;= #{begin} and l.login_time &lt; #{end}
+    group by date_format(l.login_time, '%Y-%m-%d')
+    order by stat_date
+  </select>
+
+  <select id="selectDailyRefundedAmount" resultType="java.util.LinkedHashMap">
+    select date_format(create_time, '%Y-%m-%d') as stat_date, ifnull(sum(refund_amount), 0) as amount
+    from zjudg_refund
+    where refund_status = '2' and create_time &gt;= #{begin} and create_time &lt; #{end}
+    group by date_format(create_time, '%Y-%m-%d')
+    order by stat_date
+  </select>
+
+  <select id="selectRefundStatusDistribution" resultType="java.util.LinkedHashMap">
+    select refund_status, count(1) as total, ifnull(sum(refund_amount), 0) as amount
+    from zjudg_refund
+    where create_time &gt;= #{begin} and create_time &lt; #{end}
+    group by refund_status
+  </select>
+
+  <!-- 订单与补时收入，加上冲回流水负数即得净结算额 -->
+  <select id="sumMasterIncome" resultType="java.math.BigDecimal">
+    select ifnull(sum(amount), 0) from zjudg_master_wallet_log
+    where biz_type in ('order_income', 'extra_time_income', 'order_reverse')
+      and create_time &gt;= #{begin} and create_time &lt; #{end}
+  </select>
+</mapper>

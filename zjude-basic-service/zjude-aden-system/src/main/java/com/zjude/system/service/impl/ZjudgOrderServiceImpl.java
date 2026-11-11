@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.zjude.common.annotation.DataScope;
 import com.zjude.common.enums.ZjudgOrderStatus;
+import com.zjude.common.enums.ZjudgOrderPaymentSource;
 import com.zjude.common.enums.ZjudgUnitMeasureType;
 import com.zjude.common.exception.ServiceException;
 import com.zjude.common.utils.StringUtils;
@@ -27,6 +28,7 @@ import com.zjude.system.mapper.ZjudgMasterMapper;
 import com.zjude.system.mapper.ZjudgOrderMapper;
 import com.zjude.system.mapper.ZjudgServiceMapper;
 import com.zjude.system.service.IZjudgNotifyService;
+import com.zjude.system.service.IZjudgCityScopeService;
 import com.zjude.system.service.IZjudgSettleService;
 import com.zjude.system.service.IZjudgOrderService;
 
@@ -44,6 +46,8 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
 
     /** 支付状态编码：未支付 */
     private static final String PAYMENT_UNPAID = "0";
+    /** 支付状态编码：已支付。 */
+    private static final String PAYMENT_PAID = "1";
 
     /** 订单号日期部分格式 */
     private static final String ORDER_NO_DATE_PATTERN = "yyyyMMdd";
@@ -70,6 +74,9 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
     private IZjudgSettleService settleService;
 
     @Resource
+    private IZjudgCityScopeService cityScopeService;
+
+    @Resource
     private BaseKeyGenerate keyGenerate;
 
     @Override
@@ -77,6 +84,19 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
     public List<ZjudgOrder> selectList(ZjudgOrder query)
     {
         return mapper.selectList(query);
+    }
+
+    @Override
+    @DataScope(userAlias = "o", createByAlias = "o")
+    public List<ZjudgOrder> selectAdminList(ZjudgOrder query)
+    {
+        return mapper.selectAdminList(query);
+    }
+
+    @Override
+    public ZjudgOrder selectAdminById(String id)
+    {
+        return mapper.selectAdminById(id);
     }
 
     @Override
@@ -118,14 +138,41 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
             throw new ServiceException("请先登录后再预约服务");
         }
         return createOrderInternal(serviceId, slotId, appointmentDate, quantity, remark, address, phone, userId,
-                userInfo, cityId);
+                userInfo, cityId, PAYMENT_UNPAID, ZjudgOrderPaymentSource.WECHAT, userId, true, false);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ZjudgOrder createOfflinePaidOrder(String serviceId, String slotId, String appointmentDate,
+            BigDecimal quantity, String remark, String address, String phone, String customerName, String cityId,
+            String operator)
+    {
+        String safeName = StringUtils.isEmpty(customerName) ? "" : customerName.trim();
+        String safePhone = StringUtils.isEmpty(phone) ? "" : phone.trim();
+        String safeAddress = StringUtils.isEmpty(address) ? "" : address.trim();
+        if (safeName.isEmpty() || !safePhone.matches("^1\\d{10}$") || safeAddress.isEmpty())
+        {
+            throw new ServiceException("请填写有效的线下客户姓名、联系电话和服务地址");
+        }
+        if (StringUtils.isEmpty(operator))
+        {
+            throw new ServiceException("无法识别当前管理员");
+        }
+        return createOrderInternal(serviceId, slotId, appointmentDate, quantity, remark, address, phone, null,
+                safeName, cityId, PAYMENT_PAID, ZjudgOrderPaymentSource.OFFLINE, operator, false, true);
     }
 
     private ZjudgOrder createOrderInternal(String serviceId, String slotId, String appointmentDate, BigDecimal quantity,
-            String remark, String address, String phone, String userId, String userInfo, String cityId)
+            String remark, String address, String phone, String userId, String userInfo, String cityId,
+            String paymentStatus, ZjudgOrderPaymentSource paymentSource, String createBy, boolean notifyAdmins,
+            boolean validateCityScope)
     {
         ZjudgService service = requireBookableService(serviceId);
         ZjudgBookingSlot slot = requireBookableSlot(slotId);
+        if (validateCityScope)
+        {
+            validateOfflineCityScope(service, slot, cityId);
+        }
         ZjudgUnitMeasureType measureType = ZjudgUnitMeasureType.fromCode(service.getMeasureType());
         if (measureType == null)
         {
@@ -172,16 +219,22 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
         // 金额只取服务端主数据，忽略客户端提交的价格
         order.setAmount((quantity == null ? service.getPrice() : service.getPrice().multiply(quantity))
                 .setScale(2, RoundingMode.HALF_UP));
+        BigDecimal payoutQuantity = quantity == null ? BigDecimal.ONE : quantity;
+        order.setMasterPrice(service.getMasterPrice().multiply(payoutQuantity).setScale(2, RoundingMode.HALF_UP));
         order.setOrderStatus(STATUS_PENDING);
-        order.setPaymentStatus(PAYMENT_UNPAID);
+        order.setPaymentStatus(paymentStatus);
+        order.setPaymentSource(paymentSource.getCode());
         order.setRemark(truncate(remark, 500));
-        order.setCreateBy(userId);
+        order.setCreateBy(createBy);
         mapper.insert(order);
 
         ZjudgOrder saved = mapper.selectById(order.getOrderId());
         ZjudgOrder result = saved == null ? order : saved;
-        // 通知失败不影响下单；管理员可收到订单已提交、待支付的提醒。
-        notifyService.notifyOrderCreatedToAdmins(result);
+        // 小程序下单提醒管理员继续跟进支付；线下单由管理员录入，不再重复通知管理员。
+        if (notifyAdmins)
+        {
+            notifyService.notifyOrderCreatedToAdmins(result);
+        }
         return result;
     }
 
@@ -219,6 +272,62 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
             throw new ServiceException("订单当前状态不允许变更为" + next.getLabel());
         }
         return mapper.updateStatus(orderId, next.getCode(), operator);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @DataScope(userAlias = "o", createByAlias = "o")
+    public int deleteAdminOrder(ZjudgOrder query)
+    {
+        if (query == null || StringUtils.isEmpty(query.getOrderId()))
+        {
+            throw new ServiceException("订单编号不能为空");
+        }
+        List<ZjudgOrder> visibleOrders = mapper.selectAdminList(query);
+        if (visibleOrders.isEmpty())
+        {
+            throw new ServiceException("订单不存在");
+        }
+        ZjudgOrder order = visibleOrders.get(0);
+        if (!ZjudgOrderStatus.CANCELLED.getCode().equals(order.getOrderStatus())
+                || !PAYMENT_UNPAID.equals(order.getPaymentStatus())
+                || StringUtils.isNotEmpty(order.getMasterId()))
+        {
+            throw new ServiceException("仅已取消、未支付且未指派的订单可以删除");
+        }
+        int rows = mapper.deleteAdminIfUnreferenced(query.getOrderId());
+        if (rows == 0)
+        {
+            throw new ServiceException("订单存在支付、退款、评价或履约记录，无法删除；请保留订单以维护业务记录");
+        }
+        return rows;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteUserOrder(String orderId, String userId)
+    {
+        if (StringUtils.isEmpty(orderId) || StringUtils.isEmpty(userId))
+        {
+            throw new ServiceException("订单不存在");
+        }
+        ZjudgOrder order = mapper.selectByIdAndUser(orderId, userId);
+        if (order == null)
+        {
+            throw new ServiceException("订单不存在");
+        }
+        if (!ZjudgOrderStatus.CANCELLED.getCode().equals(order.getOrderStatus())
+                || !PAYMENT_UNPAID.equals(order.getPaymentStatus())
+                || StringUtils.isNotEmpty(order.getMasterId()))
+        {
+            throw new ServiceException("仅已取消、未支付且未指派的订单可以删除");
+        }
+        int rows = mapper.deleteUserIfUnreferenced(orderId, userId);
+        if (rows == 0)
+        {
+            throw new ServiceException("订单存在支付、退款、评价或履约记录，无法删除");
+        }
+        return rows;
     }
 
     @Override
@@ -370,6 +479,10 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
         {
             throw new ServiceException("订单当前状态不可接单");
         }
+        if (!PAYMENT_PAID.equals(order.getPaymentStatus()))
+        {
+            throw new ServiceException("订单尚未完成收款，暂不可接单");
+        }
         // 禁止师傅承接自己下的订单，否则可自接自完刷单与评分
         ZjudgMaster master = masterMapper.selectById(masterId);
         if (master != null && StringUtils.isNotEmpty(master.getUserId())
@@ -500,9 +613,18 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
         {
             throw new ServiceException("服务不存在或已下架");
         }
+        if (Integer.valueOf(1).equals(service.getExtraTimeOnly()))
+        {
+            throw new ServiceException("补时专用商品只能从原订单详情中购买");
+        }
         if (service.getPrice() == null || service.getPrice().signum() < 0)
         {
             throw new ServiceException("服务价格异常，暂不可下单");
+        }
+        if (service.getMasterPrice() == null || service.getMasterPrice().signum() < 0
+                || service.getMasterPrice().compareTo(service.getPrice()) > 0)
+        {
+            throw new ServiceException("服务接单价配置异常，暂不可下单");
         }
         return service;
     }
@@ -526,6 +648,28 @@ public class ZjudgOrderServiceImpl implements IZjudgOrderService
             throw new ServiceException("预约时段不可用");
         }
         return slot;
+    }
+
+    /** 服务和预约时段必须都属于管理端选择的服务城市。 */
+    private void validateOfflineCityScope(ZjudgService service, ZjudgBookingSlot slot, String cityId)
+    {
+        if (StringUtils.isEmpty(cityId))
+        {
+            throw new ServiceException("请选择服务城市");
+        }
+        if (StringUtils.isNotEmpty(service.getCityId()) && !service.getCityId().equals(cityId))
+        {
+            throw new ServiceException("所选服务不适用于当前城市");
+        }
+        if (StringUtils.isNotEmpty(slot.getCityId()) && !slot.getCityId().equals(cityId))
+        {
+            throw new ServiceException("所选预约时段不适用于当前城市");
+        }
+        if (cityScopeService.strictFilterEnabled()
+                && (StringUtils.isEmpty(service.getCityId()) || StringUtils.isEmpty(slot.getCityId())))
+        {
+            throw new ServiceException("当前城市仅允许使用城市专属服务和时段");
+        }
     }
 
     /**

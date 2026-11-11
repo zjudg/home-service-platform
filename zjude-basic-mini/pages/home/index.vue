@@ -6,46 +6,17 @@
     <view class="startup-glow startup-glow--top" />
     <view class="startup-glow startup-glow--bottom" />
 
-    <view class="startup-header">
-      <view class="startup-logo-frame">
-        <image
-          class="startup-logo"
-          src="/static/logo.png"
-          mode="aspectFit"
-        />
-      </view>
-      <text class="startup-brand-name">
-        {{ appStore.appName }}
-      </text>
-    </view>
-
     <view class="startup-main">
-      <view class="startup-illustration">
-        <view class="startup-orbit startup-orbit--outer" />
-        <view class="startup-orbit startup-orbit--inner" />
-        <view class="startup-home-icon">
-          <uni-icons
-            type="home"
-            size="66"
-            color="#e06a3d"
-          />
-        </view>
-        <view class="startup-spark startup-spark--one">
-          ✦
-        </view>
-        <view class="startup-spark startup-spark--two">
-          ✦
-        </view>
-        <view class="startup-art-dot startup-art-dot--one" />
-        <view class="startup-art-dot startup-art-dot--two" />
-      </view>
+      <image
+        v-if="startupLogo"
+        class="startup-brand-logo"
+        :src="startupLogo"
+        mode="aspectFit"
+      />
 
       <view class="startup-copy">
         <text class="startup-title">
           首页加载中，请稍后
-        </text>
-        <text class="startup-message">
-          {{ configStore.loading ? '正在为您准备服务信息' : configStore.error }}
         </text>
       </view>
     </view>
@@ -319,6 +290,7 @@ import { assetUrl } from '@/utils/assets'
 import { toastInfo } from '@/utils/feedback'
 
 const appStore = useAppStore(); const configStore = useConfigStore(); const cityStore = useCityStore()
+const startupLogo = computed(() => assetUrl(configStore.site?.mobileLogo || ''))
 const location = ref('')
 const pageTitle = computed(() => configStore.site?.shopName || appStore.appName)
 const categories = ref([]); const services = ref([]); const loading = ref(true); const errorMessage = ref(''); const categoryError = ref('')
@@ -349,7 +321,7 @@ const trusts = [
 
 function responseList (response) { const payload = response?.data ?? response; if (Array.isArray(payload)) return payload; return payload?.rows || payload?.list || response?.rows || [] }
 function categoryLabel (item) { return item.categoryName || item.name || item.title || '家政' }
-function firstImage (item) { const value = item?.carouselImages || item?.imageUrl || ''; return Array.isArray(value) ? value[0] : String(value).split(',')[0] }
+function firstImage (item) { const value = item?.productImage || item?.carouselImages || item?.imageUrl || ''; return Array.isArray(value) ? value[0] : String(value).split(',')[0] }
 function bannerImage (banner) { return banner?.image || banner?.imageUrl || banner?.url || '' }
 function onBannerChange (event) { bannerIndex.value = event.detail?.current || 0 }
 function onBannerImageLoad (event, banner) {
@@ -716,36 +688,6 @@ function openCity () { uni.navigateTo({ url: `/pages/city/index?current=${encode
   background: radial-gradient(circle, rgba(47, 158, 107, 0.11) 0%, rgba(47, 158, 107, 0.035) 52%, rgba(47, 158, 107, 0) 74%);
 }
 
-.startup-header {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  min-height: 76rpx;
-}
-
-.startup-logo-frame {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 76rpx;
-  height: 76rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.9);
-  border-radius: 22rpx;
-  background: #fff;
-  box-shadow: 0 10rpx 28rpx rgba(31, 28, 26, 0.08);
-}
-
-.startup-logo { width: 58rpx; height: 58rpx; border-radius: 14rpx; }
-.startup-brand-name {
-  margin-left: 18rpx;
-  font-size: 32rpx;
-  font-weight: $weight-heavy;
-  color: $ink-900;
-  letter-spacing: 0.5rpx;
-}
-
 .startup-main {
   position: relative;
   z-index: 1;
@@ -758,78 +700,11 @@ function openCity () { uni.navigateTo({ url: `/pages/city/index?current=${encode
   padding: 24rpx 0 48rpx;
 }
 
-.startup-illustration {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 390rpx;
-  height: 360rpx;
+.startup-brand-logo {
+  width: 560rpx;
+  height: 560rpx;
   margin-bottom: 26rpx;
 }
-
-.startup-orbit {
-  position: absolute;
-  display: block;
-  border: 1rpx solid rgba(224, 106, 61, 0.12);
-  border-radius: 50%;
-}
-
-.startup-orbit--outer {
-  width: 350rpx;
-  height: 350rpx;
-  background: rgba(255, 255, 255, 0.24);
-  animation: startup-orbit-pulse 3.2s ease-in-out infinite;
-}
-
-.startup-orbit--inner {
-  width: 272rpx;
-  height: 272rpx;
-  border-color: rgba(224, 106, 61, 0.08);
-  background: rgba(255, 255, 255, 0.36);
-  animation: startup-orbit-pulse 3.2s ease-in-out -1.6s infinite;
-}
-
-.startup-home-icon {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 172rpx;
-  height: 172rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.95);
-  border-radius: 52rpx;
-  background: linear-gradient(145deg, #fff 12%, #fff6f0 100%);
-  box-shadow: 0 22rpx 54rpx rgba(180, 88, 50, 0.15), inset 0 1rpx 0 #fff;
-  animation: startup-home-float 2.8s ease-in-out infinite;
-}
-
-.startup-spark {
-  position: absolute;
-  z-index: 2;
-  color: $brand-400;
-  font-size: 36rpx;
-  line-height: 1;
-  animation: startup-sparkle 1.8s ease-in-out infinite;
-}
-
-.startup-spark--one { top: 48rpx; right: 76rpx; }
-.startup-spark--two { bottom: 66rpx; left: 62rpx; color: #83b998; font-size: 24rpx; }
-
-.startup-art-dot {
-  position: absolute;
-  z-index: 2;
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
-  background: #f5a27f;
-  box-shadow: 0 0 0 9rpx rgba(245, 162, 127, 0.13);
-  animation: startup-dot-pulse 1.8s ease-in-out infinite;
-}
-
-.startup-art-dot--one { top: 106rpx; left: 40rpx; }
-.startup-art-dot--two { right: 40rpx; bottom: 104rpx; width: 10rpx; height: 10rpx; background: #7bb58f; box-shadow: 0 0 0 8rpx rgba(123, 181, 143, 0.14); }
 
 .startup-copy {
   display: flex;
@@ -844,15 +719,6 @@ function openCity () { uni.navigateTo({ url: `/pages/city/index?current=${encode
   font-weight: $weight-bold;
   letter-spacing: 0.5rpx;
   color: $ink-900;
-}
-
-.startup-message {
-  max-width: 620rpx;
-  min-height: 36rpx;
-  margin-top: 14rpx;
-  font-size: $font-caption;
-  line-height: 1.6;
-  color: $ink-400;
 }
 
 .startup-bottom {
@@ -896,33 +762,8 @@ function openCity () { uni.navigateTo({ url: `/pages/city/index?current=${encode
   100% { transform: translateX(245%); }
 }
 
-@keyframes startup-orbit-pulse {
-  0%, 100% { opacity: 0.6; transform: scale(0.96); }
-  50% { opacity: 1; transform: scale(1.04); }
-}
-
-@keyframes startup-home-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10rpx); }
-}
-
-@keyframes startup-sparkle {
-  0%, 100% { opacity: 0.5; transform: scale(0.84) rotate(-8deg); }
-  50% { opacity: 1; transform: scale(1.12) rotate(8deg); }
-}
-
-@keyframes startup-dot-pulse {
-  0%, 100% { opacity: 0.65; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1.18); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .startup-progress-bar,
-  .startup-orbit--outer,
-  .startup-orbit--inner,
-  .startup-home-icon,
-  .startup-spark,
-  .startup-art-dot {
+  .startup-progress-bar {
     animation-duration: 4s;
   }
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgUserQueryMapper">
+
+  <!--
+    用户管理查询口径：
+      1. 只查小程序端用户，即 wx_openid 有值的账号；后台员工账号不在此列；
+      2. 注册来源由 wx_openid 是否为空推断，前端展示为「微信小程序 / 后台账号」；
+      3. 只查未删除账号（del_flag = '0'）。
+  -->
+  <sql id="userWhere">
+    where u.del_flag = '0' and u.wx_openid is not null and u.wx_openid &lt;&gt; ''
+    <if test="keyword != null and keyword != ''">
+      and (
+        u.nick_name like concat('%', #{keyword}, '%')
+        or u.user_name like concat('%', #{keyword}, '%')
+        or u.phone_number like concat('%', #{keyword}, '%')
+      )
+    </if>
+    <if test="beginTime != null and beginTime != ''">
+      and u.create_time &gt;= concat(#{beginTime}, ' 00:00:00')
+    </if>
+    <if test="endTime != null and endTime != ''">
+      and u.create_time &lt; date_add(concat(#{endTime}, ' 00:00:00'), interval 1 day)
+    </if>
+  </sql>
+
+  <select id="selectMiniUsers" resultType="java.util.LinkedHashMap">
+    select u.user_id as userId,
+           u.nick_name as nickName,
+           u.user_name as userName,
+           u.phone_number as phoneNumber,
+           u.avatar as avatar,
+           u.sex as sex,
+           u.status as status,
+           coalesce(concat_ws('', ua.region, ua.detail), '') as address,
+           coalesce(ua.contact_name, '') as addressContactName,
+           coalesce(ua.contact_phone, '') as addressContactPhone,
+           exists (select 1 from sys_user_role ur inner join sys_role r on r.role_id=ur.role_id
+                   where ur.user_id=u.user_id and r.role_key='mini_admin' and r.status='0' and r.del_flag='0') as miniAdmin,
+           date_format(u.create_time, '%Y-%m-%d %H:%i:%s') as createTime,
+           'mini_program' as source
+    from sys_user u
+    left join zjudg_user_address ua on ua.address_id = (
+      select a.address_id
+      from zjudg_user_address a
+      where a.user_id = u.user_id and a.status = '0'
+      order by a.is_default desc, a.create_time desc
+      limit 1
+    )
+    <include refid="userWhere"/>
+    order by u.create_time desc
+  </select>
+
+  <select id="countMiniUsers" resultType="int">
+    select count(1) from sys_user u
+    <include refid="userWhere"/>
+  </select>
+</mapper>

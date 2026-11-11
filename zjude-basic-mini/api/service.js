@@ -12,6 +12,8 @@ export const reverseGeocodeLocation = data => request({ url: '/mini/config/locat
 export const createOrder = data => request({ url: '/mini/user/orders', method: 'POST', data })
 export const listOrders = (params = {}) => request({ url: '/mini/user/orders', method: 'GET', data: params })
 export const getOrder = id => request({ url: `/mini/user/orders/${id}`, method: 'GET' })
+export const createExtraTimeOrder = (orderId, hours) => request({ url: `/mini/user/orders/${orderId}/extra-time`, method: 'POST', data: { hours } })
 export const cancelOrder = id => request({ url: `/mini/user/orders/${id}/cancel`, method: 'PUT' })
+export const deleteOrder = id => request({ url: `/mini/user/orders/${id}`, method: 'DELETE' })
 export const confirmOrder = id => request({ url: `/mini/user/orders/${id}/confirm`, method: 'PUT' })
 export const submitReview = data => request({ url: '/mini/user/reviews', method: 'POST', data })

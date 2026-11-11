@@ -3,21 +3,51 @@
 <mapper namespace="com.zjude.system.mapper.ZjudgServiceMapper">
   <resultMap id="ServiceResult" type="com.zjude.system.domain.ZjudgService">
     <id property="serviceId" column="service_id"/><result property="serviceName" column="service_name"/><result property="serviceIntro" column="service_intro"/>
-    <result property="categoryId" column="category_id"/><result property="categoryName" column="category_name"/><result property="carouselImages" column="carousel_images"/>
-    <result property="price" column="price"/><result property="commissionRate" column="commission_rate"/><result property="cityId" column="city_id"/><result property="cityName" column="city_name"/><result property="originalPrice" column="original_price"/><result property="unitId" column="unit_id"/><result property="unitName" column="unit_name"/><result property="measureType" column="measure_type"/>
+    <result property="categoryId" column="category_id"/><result property="categoryName" column="category_name"/><result property="carouselImages" column="carousel_images"/><result property="detailImage" column="detail_image"/><result property="productImage" column="product_image"/>
+    <result property="price" column="price"/><result property="masterPrice" column="master_price"/><result property="commissionType" column="commission_type"/><result property="commissionRate" column="commission_rate"/><result property="cityId" column="city_id"/><result property="cityName" column="city_name"/><result property="originalPrice" column="original_price"/><result property="unitId" column="unit_id"/><result property="unitName" column="unit_name"/><result property="measureType" column="measure_type"/>
     <result property="sortNum" column="sort_num"/><result property="status" column="status"/><result property="detailContent" column="detail_content"/><result property="reserveCount" column="reserve_count"/>
+    <result property="extraTimeOnly" column="extra_time_only"/>
     <result property="createBy" column="create_by"/><result property="createTime" column="create_time"/><result property="updateBy" column="update_by"/><result property="updateTime" column="update_time"/><result property="remark" column="remark"/>
   </resultMap>
-  <sql id="columns">s.service_id,s.service_name,s.service_intro,s.category_id,c.category_name,s.carousel_images,s.price,s.commission_rate,s.city_id,ct.city_name,s.original_price,s.unit_id,u.unit_name,u.measure_type,s.sort_num,s.status,s.detail_content,(select count(*) from zjudg_order o where o.service_id=s.service_id) reserve_count,s.create_by,s.create_time,s.update_by,s.update_time,s.remark</sql>
-  <sql id="cityScopeWhere"><if test="serviceName != null and serviceName != ''">and s.service_name like concat('%',#{serviceName},'%')</if><if test="categoryId != null and categoryId != ''">and s.category_id=#{categoryId}</if><if test="status != null and status != ''">and s.status=#{status}</if></sql>
+  <sql id="columns">s.service_id,s.service_name,s.service_intro,s.category_id,c.category_name,s.carousel_images,s.detail_image,s.product_image,s.price,s.master_price,s.commission_type,s.commission_rate,s.city_id,ct.city_name,s.original_price,s.unit_id,u.unit_name,u.measure_type,s.sort_num,s.status,s.detail_content,COALESCE(s.extra_time_only,0) extra_time_only,(select count(*) from zjudg_order o where o.service_id=s.service_id) reserve_count,s.create_by,s.create_time,s.update_by,s.update_time,s.remark</sql>
+  <sql id="cityScopeWhere">
+    <if test="serviceName != null and serviceName != ''">
+      and s.service_name like concat('%',#{serviceName},'%')
+    </if>
+    <if test="categoryId != null and categoryId != ''">
+      and s.category_id=#{categoryId}
+    </if>
+    <if test="status != null and status != ''">
+      and s.status=#{status}
+    </if>
+    <if test="extraTimeOnly != null">
+      and COALESCE(s.extra_time_only,0)=#{extraTimeOnly}
+    </if>
+  </sql>
   <!-- 宽松城市范围：全国服务 + 当前城市服务（默认） -->
   <select id="selectList" resultMap="ServiceResult">select <include refid="columns"/> from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id left join zjudg_service_unit u on u.unit_id=s.unit_id left join zjudg_city ct on ct.city_id=s.city_id
-    <where><include refid="cityScopeWhere"/><if test="cityId != null and cityId != ''">and (s.city_id is null or s.city_id='' or s.city_id=#{cityId})</if></where> order by s.sort_num asc,s.create_time desc</select>
+    <where>
+      <include refid="cityScopeWhere"/>
+      <if test="cityId != null and cityId != ''">
+        and (s.city_id is null or s.city_id='' or s.city_id=#{cityId})
+      </if>
+    </where>
+    order by s.sort_num asc,s.create_time desc
+  </select>
   <!-- 严格城市过滤（zjudg.city.strict=1）：只返回本地发布的服务，全国服务不参与 -->
   <select id="selectListByCity" resultMap="ServiceResult">select <include refid="columns"/> from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id left join zjudg_service_unit u on u.unit_id=s.unit_id left join zjudg_city ct on ct.city_id=s.city_id
-    <where><include refid="cityScopeWhere"/><if test="cityId != null and cityId != ''">and s.city_id=#{cityId}</if></where> order by s.sort_num asc,s.create_time desc</select>
+    <where>
+      <include refid="cityScopeWhere"/>
+      <if test="cityId != null and cityId != ''">
+        and s.city_id=#{cityId}
+      </if>
+    </where>
+    order by s.sort_num asc,s.create_time desc
+  </select>
   <select id="selectById" resultMap="ServiceResult">select <include refid="columns"/> from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id left join zjudg_service_unit u on u.unit_id=s.unit_id left join zjudg_city ct on ct.city_id=s.city_id where s.service_id=#{id}</select>
-  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgService">insert into zjudg_service(service_id,service_name,service_intro,category_id,city_id,carousel_images,price,commission_rate,original_price,unit_id,sort_num,status,detail_content,create_by,create_time,remark) values(#{serviceId},#{serviceName},#{serviceIntro},#{categoryId},#{cityId},#{carouselImages},#{price},#{commissionRate},#{originalPrice},#{unitId},#{sortNum},#{status},#{detailContent},#{createBy},sysdate(),#{remark})</insert>
-  <update id="update" parameterType="com.zjude.system.domain.ZjudgService">update zjudg_service set service_name=#{serviceName},service_intro=#{serviceIntro},category_id=#{categoryId},city_id=#{cityId},carousel_images=#{carouselImages},price=#{price},commission_rate=#{commissionRate},original_price=#{originalPrice},unit_id=#{unitId},sort_num=#{sortNum},status=#{status},detail_content=#{detailContent},update_by=#{updateBy},update_time=sysdate(),remark=#{remark} where service_id=#{serviceId}</update>
+  <select id="selectExtraTimeProduct" resultMap="ServiceResult">select <include refid="columns"/> from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id left join zjudg_service_unit u on u.unit_id=s.unit_id left join zjudg_city ct on ct.city_id=s.city_id where s.status='0' and COALESCE(s.extra_time_only,0)=1 and u.measure_type='HOUR' and (s.city_id=#{cityId} or s.city_id is null or s.city_id='') order by case when s.city_id=#{cityId} then 0 else 1 end,s.sort_num,s.create_time desc limit 1</select>
+  <select id="countExtraTimeProduct" resultType="int">select count(*) from zjudg_service s left join zjudg_service_unit u on u.unit_id=s.unit_id where COALESCE(s.extra_time_only,0)=1 and u.measure_type='HOUR' and ((#{cityId} is null and (s.city_id is null or s.city_id='')) or s.city_id=#{cityId}) and (#{excludeServiceId} is null or s.service_id&lt;&gt;#{excludeServiceId})</select>
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgService">insert into zjudg_service(service_id,service_name,service_intro,category_id,city_id,carousel_images,detail_image,product_image,price,master_price,commission_type,commission_rate,original_price,unit_id,sort_num,status,detail_content,extra_time_only,create_by,create_time,remark) values(#{serviceId},#{serviceName},#{serviceIntro},#{categoryId},#{cityId},#{carouselImages},#{detailImage},#{productImage},#{price},#{masterPrice},#{commissionType},#{commissionRate},#{originalPrice},#{unitId},#{sortNum},#{status},#{detailContent},COALESCE(#{extraTimeOnly},0),#{createBy},sysdate(),#{remark})</insert>
+  <update id="update" parameterType="com.zjude.system.domain.ZjudgService">update zjudg_service set service_name=#{serviceName},service_intro=#{serviceIntro},category_id=#{categoryId},city_id=#{cityId},carousel_images=#{carouselImages},detail_image=#{detailImage},product_image=#{productImage},price=#{price},master_price=#{masterPrice},commission_type=#{commissionType},commission_rate=#{commissionRate},original_price=#{originalPrice},unit_id=#{unitId},sort_num=#{sortNum},status=#{status},detail_content=#{detailContent},extra_time_only=COALESCE(#{extraTimeOnly},0),update_by=#{updateBy},update_time=sysdate(),remark=#{remark} where service_id=#{serviceId}</update>
   <delete id="deleteByIds">delete from zjudg_service where service_id in <foreach collection="array" item="id" open="(" separator="," close=")">#{id}</foreach></delete>
 </mapper>

@@ -1,0 +1,76 @@
+// ============================================================
+// 柔光卡片设计系统 · Soft Surface Design Tokens
+// 与小程序（zjude-basic-mini/styles/tokens.scss）保持同一套色板：
+// 暖灰底 + 降饱和暖橙 + 极淡阴影。后台不再维护第二套配色。
+// ============================================================
+
+// ---------- 品牌色：降饱和暖橙 ----------
+$brand-50: #fff7f3;
+$brand-100: #fdece4;
+$brand-200: #f9d5c5;
+$brand-400: #f58a5f;
+$brand-500: #e06a3d;
+$brand-600: #c9582d;
+$brand-700: #a84722;
+$brand-tint: rgba(224, 106, 61, 0.12);
+
+// ---------- 中性色：偏暖灰 ----------
+$ink-900: #1f1c1a;
+$ink-700: #3d3733;
+$ink-500: #7a726c;
+$ink-400: #a39b95;
+$ink-300: #c4bcb6;
+$line: #ece6e1;
+$line-soft: #f2ede9;
+
+// ---------- 表面层级 ----------
+$bg: #faf7f5;
+$bg-sunken: #f5f1ee;
+$surface: #ffffff;
+$surface-muted: #fbf8f6;
+$overlay: rgba(31, 28, 26, 0.45);
+
+// ---------- 语义色 ----------
+$success: #2f9e6b;
+$success-bg: #e8f6ef;
+$warning: #d98a1f;
+$warning-bg: #fdf3e3;
+$danger: #d9503f;
+$danger-bg: #fdeceb;
+$info: #4a7fb5;
+$info-bg: #edf3fa;
+
+// ---------- 字号 ----------
+$font-xs: 12px;
+$font-sm: 13px;
+$font-base: 14px;
+$font-md: 15px;
+$font-lg: 17px;
+$font-xl: 20px;
+
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-semibold: 600;
+$weight-bold: 700;
+
+// ---------- 间距（8pt 栅格） ----------
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-8: 32px;
+$page-gutter: 20px;
+
+// ---------- 圆角 ----------
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;
+$radius-xl: 20px;
+$radius-pill: 999px;
+
+// ---------- 阴影：柔光，只有两层 ----------
+$shadow-card: 0 2px 10px rgba(31, 28, 26, 0.05);
+$shadow-float: 0 6px 24px rgba(31, 28, 26, 0.1);
+$shadow-bar: 0 -2px 10px rgba(31, 28, 26, 0.05);

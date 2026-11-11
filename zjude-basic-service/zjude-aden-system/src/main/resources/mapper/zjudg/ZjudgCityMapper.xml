@@ -4,7 +4,17 @@
   <resultMap id="CityResult" type="com.zjude.system.domain.ZjudgCity">
     <id property="cityId" column="city_id"/><result property="cityName" column="city_name"/><result property="provinceName" column="province_name"/><result property="initialLetter" column="initial_letter"/><result property="isHot" column="is_hot"/><result property="status" column="status"/>
   </resultMap>
-  <select id="selectList" resultMap="CityResult">select city_id, city_name, province_name, initial_letter, is_hot, status from zjudg_city <where><if test="status != null and status != ''">and status = #{status}</if><if test="cityName != null and cityName != ''">and city_name like concat('%', #{cityName}, '%')</if><if test="provinceName != null and provinceName != ''">and province_name like concat('%', #{provinceName}, '%')</if><if test="initialLetter != null and initialLetter != ''">and initial_letter = #{initialLetter}</if></where> order by initial_letter, city_name</select>
+  <select id="selectList" resultMap="CityResult">
+    select city_id, city_name, province_name, initial_letter, is_hot, status
+    from zjudg_city
+    <where>
+      <if test="status != null and status != ''">and status = #{status}</if>
+      <if test="cityName != null and cityName != ''">and city_name like concat('%', #{cityName}, '%')</if>
+      <if test="provinceName != null and provinceName != ''">and province_name like concat('%', #{provinceName}, '%')</if>
+      <if test="initialLetter != null and initialLetter != ''">and initial_letter = #{initialLetter}</if>
+    </where>
+    order by initial_letter, city_name
+  </select>
 
   <select id="selectById" resultMap="CityResult">
     select city_id, city_name, province_name, initial_letter, is_hot, status from zjudg_city where city_id = #{cityId}

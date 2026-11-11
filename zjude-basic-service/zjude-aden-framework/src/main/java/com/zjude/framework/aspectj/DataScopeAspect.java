@@ -74,7 +74,7 @@ public class DataScopeAspect
             {
                 String permission = StringUtils.defaultIfEmpty(controllerDataScope.permission(), PermissionContextHolder.getContext());
                 dataScopeFilter(joinPoint, currentUser, controllerDataScope.deptAlias(),
-                        controllerDataScope.userAlias(), permission);
+                        controllerDataScope.userAlias(), controllerDataScope.createByAlias(), permission);
             }
         }
     }
@@ -88,7 +88,8 @@ public class DataScopeAspect
      * @param userAlias 用户别名
      * @param permission 权限字符
      */
-    public static void dataScopeFilter(JoinPoint joinPoint, SysUser user, String deptAlias, String userAlias, String permission)
+    public static void dataScopeFilter(JoinPoint joinPoint, SysUser user, String deptAlias, String userAlias,
+            String createByAlias, String permission)
     {
         StringBuilder sqlString = new StringBuilder();
         List<String> conditions = new ArrayList<String>();
@@ -137,6 +138,11 @@ public class DataScopeAspect
                 {
                     // 数据权限为仅本人且没有userAlias别名不查询任何数据
                     sqlString.append(StringUtils.format(" OR {}.dept_id = 0 ", deptAlias));
+                }
+                if (StringUtils.isNotBlank(createByAlias))
+                {
+                    sqlString.append(StringUtils.format(" OR {}.create_by = '{}' ", createByAlias,
+                            user.getUserName().replace("'", "''")));
                 }
             }
             conditions.add(dataScope);

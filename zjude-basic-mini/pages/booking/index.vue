@@ -396,7 +396,7 @@ const quantityHint = computed(() => ({
 }[measureType.value] || '请填写服务数量'))
 
 const serviceImage = computed(() => {
-  const images = service.value?.carouselImages || service.value?.imageUrl || ''
+  const images = service.value?.productImage || service.value?.carouselImages || service.value?.imageUrl || ''
   return (Array.isArray(images) ? images : String(images).split(',')).map(value => String(value).trim()).find(Boolean) || ''
 })
 

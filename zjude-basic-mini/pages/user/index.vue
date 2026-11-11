@@ -11,9 +11,21 @@
     <view class="user-body">
       <!-- 个人资料 -->
       <view class="profile-card card" @click="!loggedIn && goLogin()">
-        <view class="avatar">
-          <image v-if="authStore.user?.avatar" :src="assetUrl(authStore.user.avatar)" mode="aspectFill" />
-          <text v-else>{{ loggedIn ? initials : '?' }}</text>
+        <view
+          class="avatar"
+          @click.stop="editAvatar"
+        >
+          <image
+            v-if="loggedIn && userAvatar"
+            :src="userAvatar"
+            mode="aspectFill"
+          />
+          <image
+            v-else-if="!loggedIn && defaultAvatarLogo"
+            class="avatar-logo"
+            :src="defaultAvatarLogo"
+            mode="aspectFit"
+          />
         </view>
         <view class="profile-copy">
           <text class="profile-name">{{ loggedIn ? displayName : '点击登录' }}</text>
@@ -142,7 +154,6 @@ import ContactSheet from '@/components/ContactSheet.vue'
 import UiNavbar from '@/components/ui/UiNavbar.vue'
 import UiSection from '@/components/ui/UiSection.vue'
 import { listOrders } from '@/api/service'
-import { listMyContracts, listMyFees } from '@/api/business'
 import { assetUrl } from '@/utils/assets'
 import { ORDER_STATUS, PAYMENT_PENDING, canPayOrder, orderServiceIcon, userOrderStatusLabel } from '@/constants/order'
 import { useAuthStore } from '@/stores/auth'
@@ -151,21 +162,25 @@ import { useMasterStore, AUDIT_PENDING, AUDIT_REJECTED } from '@/stores/master'
 import { useAddressStore } from '@/stores/address'
 import { countFavorites } from '@/api/favorite'
 import { useIdentity } from '@/composables/useIdentity'
+import { saveUserAvatar } from '@/utils/user-avatar'
 import { goLogin as guardGoLogin, isAuthenticated, requireLogin as guardRequireLogin } from '@/utils/guard'
 import { showDialog, showToast } from '@/utils/feedback'
 import { requestSubscribe } from '@/composables/usePayment'
+import { MINI_PROGRAM_MODE_MASTER, setMiniProgramMode } from '@/utils/mini-program-mode'
 
 const authStore = useAuthStore()
 const configStore = useConfigStore()
+const userAvatar = computed(() => assetUrl(authStore.user?.avatar || authStore.user?.avatarUrl || ''))
+const defaultAvatarLogo = computed(() => assetUrl(
+  configStore.site?.mobileLogo || configStore.site?.mobileLoginLogo || configStore.site?.memberDefaultAvatar || ''
+))
+const avatarUploading = ref(false)
 const masterStore = useMasterStore()
 const addressStore = useAddressStore()
 const { canEnterMaster, roles } = useIdentity()
 const isAdmin = computed(() => roles.value.includes('admin') || roles.value.includes('mini_admin'))
 const loggedIn = computed(() => isAuthenticated())
 const displayName = computed(() => authStore.user?.nickName || authStore.user?.userName || '用户')
-const initials = computed(() => displayName.value.slice(0, 1).toUpperCase())
-const myFees = ref([])
-const myContracts = ref([])
 
 const orderStats = ref([
   { title: '待支付', status: PAYMENT_PENDING, value: 0 },
@@ -189,11 +204,8 @@ const serviceActions = computed(() => {
     { title: '服务评价', desc: '查看已完成的评价', icon: 'star', tone: 'warning', color: '#d98a1f', action: () => requireLogin(() => openOrders('2')) },
     { title: '联系客服', desc: supportHours.value || '客服电话将在后台配置后展示', icon: 'phone', tone: 'info', color: '#4a7fb5', action: contactSupport }
   ]
-  if (myFees.value.length) items.unshift({ title: '我的服务费', desc: '查看已支付服务费', icon: 'wallet', tone: 'brand', color: '#e06a3d', action: () => uni.navigateTo({ url: '/pages/my-business/index?tab=fees' }) })
-  if (myContracts.value.length) items.unshift({ title: '服务签约', desc: '查看已签署合同', icon: 'paperclip', tone: 'info', color: '#4a7fb5', action: () => uni.navigateTo({ url: '/pages/my-business/index?tab=contracts' }) })
   if (isAdmin.value) {
     items.unshift({ title: '订单消息提醒', desc: '授权接收新订单和师傅接单通知', icon: 'notification', tone: 'warning', color: '#d98a1f', action: requestAdminOrderNotifications })
-    items.unshift({ title: '合同与服务费', desc: '发起三方合同、服务费账单', icon: 'paperclip', tone: 'brand', color: '#e06a3d', action: () => uni.navigateTo({ url: '/pages/admin-tools/index' }) })
   }
   return items
 })
@@ -251,15 +263,12 @@ onShow(async () => {
     // 地址条数用于菜单说明文案，失败不影响页面
     addressStore.load().catch(() => {})
     loadFavoriteCount()
-    loadMyBusiness()
   } else {
     masterStore.reset()
     addressStore.reset()
     favoriteCount.value = null
     activeOrders.value = []
     finishedOrders.value = []
-    myFees.value = []
-    myContracts.value = []
     orderStats.value = orderStats.value.map(item => ({ ...item, value: 0 }))
   }
 })
@@ -276,12 +285,6 @@ function loadFavoriteCount () {
     })
 }
 
-async function loadMyBusiness () {
-  const [feeResult, contractResult] = await Promise.allSettled([listMyFees(), listMyContracts()])
-  myFees.value = feeResult.status === 'fulfilled' ? (feeResult.value?.data || feeResult.value || []) : []
-  myContracts.value = contractResult.status === 'fulfilled' ? (contractResult.value?.data || contractResult.value || []) : []
-}
-
 // 师傅入口的一句话说明，按审核进度区分
 const masterEntryDesc = computed(() => {
   if (!loggedIn.value) return '认证后接单上门，时间自由'
@@ -291,9 +294,12 @@ const masterEntryDesc = computed(() => {
   return '查看接单、开工与完工记录'
 })
 
-function openMasterCenter () {
+async function openMasterCenter () {
   if (!isAuthenticated()) return goLogin('/pages/master/apply/index')
+  // 用户可能在后台审核期间一直停留在小程序，点击入口时再次校验最新审核状态。
+  await masterStore.loadProfile().catch(() => {})
   if (canEnterMaster.value) {
+    setMiniProgramMode(MINI_PROGRAM_MODE_MASTER)
     uni.reLaunch({ url: '/pages/master/home/index' })
     return
   }
@@ -333,6 +339,35 @@ async function loadOrders () {
 
 function goLogin () { guardGoLogin('/pages/user/index') }
 function requireLogin (callback) { return guardRequireLogin(callback) }
+
+async function editAvatar () {
+  if (!loggedIn.value) return goLogin()
+  if (avatarUploading.value) return
+
+  try {
+    const result = await new Promise((resolve, reject) => {
+      uni.chooseImage({
+        count: 1,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: resolve,
+        fail: reject
+      })
+    })
+    const filePath = result?.tempFilePaths?.[0]
+    if (!filePath) return
+
+    avatarUploading.value = true
+    await saveUserAvatar(filePath, authStore)
+    showToast('头像已更新')
+  } catch (error) {
+    if (!String(error?.errMsg || error?.message || '').includes('cancel')) {
+      showToast(error.message || '头像上传失败，请重试')
+    }
+  } finally {
+    avatarUploading.value = false
+  }
+}
 
 // 预约时间：日期 + 时段，缺日期时给可读提示
 function appointmentText (order) {

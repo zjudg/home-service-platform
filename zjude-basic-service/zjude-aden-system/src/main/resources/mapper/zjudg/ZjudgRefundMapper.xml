@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgRefundMapper">
+  <resultMap id="RefundResult" type="com.zjude.system.domain.ZjudgRefund">
+    <id property="refundId" column="refund_id"/>
+    <result property="refundNo" column="refund_no"/>
+    <result property="orderId" column="order_id"/>
+    <result property="orderNo" column="order_no"/>
+    <result property="buyerInfo" column="buyer_info"/>
+    <result property="refundAmount" column="refund_amount"/>
+    <result property="refundType" column="refund_type"/>
+    <result property="refundStatus" column="refund_status"/>
+    <result property="wxRefundId" column="wx_refund_id"/>
+    <result property="failReason" column="fail_reason"/>
+    <result property="refundTime" column="refund_time"/>
+    <result property="remark" column="remark"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <sql id="columns">refund_id,refund_no,order_id,order_no,buyer_info,refund_amount,refund_type,refund_status,wx_refund_id,fail_reason,refund_time,remark,create_time,update_time</sql>
+
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgRefund">
+    insert into zjudg_refund(refund_id,refund_no,order_id,order_no,buyer_info,refund_amount,refund_type,
+        refund_status,wx_refund_id,fail_reason,refund_time,remark,create_time)
+    values(#{refundId},#{refundNo},#{orderId},#{orderNo},#{buyerInfo},#{refundAmount},#{refundType},
+        #{refundStatus},#{wxRefundId},#{failReason},#{refundTime},#{remark},sysdate())
+  </insert>
+
+  <select id="selectById" resultMap="RefundResult">
+    select <include refid="columns"/> from zjudg_refund where refund_id=#{refundId}
+  </select>
+
+  <select id="selectByRefundNo" resultMap="RefundResult">
+    select <include refid="columns"/> from zjudg_refund where refund_no=#{refundNo} limit 1
+  </select>
+
+  <select id="selectLatestByOrderId" resultMap="RefundResult">
+    select <include refid="columns"/> from zjudg_refund where order_id=#{orderId} order by create_time desc limit 1
+  </select>
+
+  <select id="selectList" resultMap="RefundResult">
+    select <include refid="columns"/> from zjudg_refund
+    <where>
+      <if test="refundNo != null and refundNo != ''">and refund_no like concat('%',#{refundNo},'%')</if>
+      <if test="orderNo != null and orderNo != ''">and order_no like concat('%',#{orderNo},'%')</if>
+      <if test="orderId != null and orderId != ''">and order_id=#{orderId}</if>
+      <if test="refundStatus != null and refundStatus != ''">and refund_status=#{refundStatus}</if>
+    </where>
+    order by create_time desc
+  </select>
+
+  <!-- 幂等：仅当状态仍为期望值时更新，重复回调不会产生副作用 -->
+  <update id="updateStatus">
+    update zjudg_refund
+    set refund_status=#{targetStatus},wx_refund_id=#{wxRefundId},fail_reason=#{failReason},
+        refund_time=case when #{targetStatus}='2' then sysdate() else refund_time end,
+        update_time=sysdate()
+    where refund_no=#{refundNo} and refund_status=#{fromStatus}
+  </update>
+</mapper>

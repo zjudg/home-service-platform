@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.zjude.common.exception.base.BaseException;
+import com.zjude.common.annotation.Anonymous;
+import com.zjude.common.annotation.RateLimiter;
+import com.zjude.common.enums.LimitType;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -16,6 +19,8 @@ import com.zjude.common.constant.Constants;
 import com.zjude.common.core.domain.AjaxResult;
 import com.zjude.common.utils.StringUtils;
 import com.zjude.common.utils.file.FileUtils;
+import com.zjude.common.utils.file.FileUploadUtils;
+import com.zjude.common.utils.file.MimeTypeUtils;
 import com.zjude.integrated.storage.FileStorageService;
 import com.zjude.integrated.storage.UploadFileResult;
 
@@ -81,6 +86,35 @@ public class CommonController
             ajax.put("fileName", result.fileName());
             ajax.put("newFileName", result.newFileName());
             ajax.put("originalFilename", result.originalFilename());
+            return ajax;
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
+
+    /** 首次完善小程序资料时上传头像；文件仍统一走后台配置的存储提供商。 */
+    @Anonymous
+    @RateLimiter(time = 60, count = 20, limitType = LimitType.IP)
+    @PostMapping(value = "/upload/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            headers = "content-type=multipart/form-data")
+    public AjaxResult uploadAvatar(@RequestPart("file") MultipartFile file) throws BaseException
+    {
+        try
+        {
+            if (file == null || file.isEmpty())
+            {
+                return AjaxResult.error("头像文件不能为空");
+            }
+            if (file.getSize() > 5 * 1024 * 1024)
+            {
+                return AjaxResult.error("头像文件不能超过5MB");
+            }
+            FileUploadUtils.assertAllowed(file, MimeTypeUtils.IMAGE_EXTENSION);
+            UploadFileResult result = fileStorageService.upload(file);
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("url", result.url());
             return ajax;
         }
         catch (Exception e)

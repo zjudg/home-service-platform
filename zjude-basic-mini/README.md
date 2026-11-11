@@ -23,11 +23,12 @@ pnpm run dev:mp-weixin
 整个小程序只维护一个后端地址，位于 `config/index.js`：
 
 ```js
-export const API_BASE_URL = 'http://localhost:8888'
+export const API_BASE_URL = 'http://127.0.0.1:8888'
 ```
 
-- 所有 `api/` 模块只写业务路径（如 `/mini/services`），由 `utils/request.js` 统一拼成 `API_BASE_URL + /api + path`。
-- 微信开发者工具或真机调试时，把 `API_BASE_URL` 改成开发电脑的局域网 IP（例如 `http://192.168.1.10:8888`），手机与电脑需在同一网络；`localhost` 指向的是设备自身。
+- 所有 `api/` 模块只写业务路径（如 `/mini/services`），由 `utils/request.js` 统一拼接小程序接口的 `/api` 前缀。
+- 微信开发者工具可在本机调试；真机调试时，把 `API_BASE_URL` 改成开发电脑的局域网 IP（例如 `http://192.168.1.10:8888`），手机与电脑需在同一网络。
+- 本地 HTTP 调试需在微信开发者工具中关闭“校验合法域名”相关校验；正式发布必须使用 HTTPS 且将域名加入微信公众平台白名单。
 - 生产发布时把它改成线上服务地址（建议 `https://`）即可，无需再维护多个环境变量文件。
 
 ## 构建

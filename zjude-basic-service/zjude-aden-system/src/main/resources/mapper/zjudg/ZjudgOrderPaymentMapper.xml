@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgOrderPaymentMapper">
+  <resultMap id="PaymentResult" type="com.zjude.system.domain.ZjudgOrderPayment">
+    <id property="paymentId" column="payment_id"/>
+    <result property="orderId" column="order_id"/>
+    <result property="orderNo" column="order_no"/>
+    <result property="provider" column="provider"/>
+    <result property="outTradeNo" column="out_trade_no"/>
+    <result property="transactionId" column="transaction_id"/>
+    <result property="amount" column="amount"/>
+    <result property="payStatus" column="pay_status"/>
+    <result property="prepayId" column="prepay_id"/>
+    <result property="notifyRaw" column="notify_raw"/>
+    <result property="paidTime" column="paid_time"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <sql id="columns">payment_id,order_id,order_no,provider,out_trade_no,transaction_id,amount,pay_status,prepay_id,notify_raw,paid_time,create_time,update_time</sql>
+
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgOrderPayment">
+    insert into zjudg_order_payment(payment_id,order_id,order_no,provider,out_trade_no,amount,pay_status,prepay_id,create_time)
+    values(#{paymentId},#{orderId},#{orderNo},#{provider},#{outTradeNo},#{amount},#{payStatus},#{prepayId},sysdate())
+  </insert>
+
+  <select id="selectByOutTradeNo" resultMap="PaymentResult">
+    select <include refid="columns"/> from zjudg_order_payment where out_trade_no=#{outTradeNo}
+  </select>
+
+  <select id="selectPendingByOrderId" resultMap="PaymentResult">
+    select <include refid="columns"/> from zjudg_order_payment
+    where order_id=#{orderId} and pay_status='0' order by create_time desc limit 1
+  </select>
+
+  <!-- 幂等：只有仍未支付的流水会被更新，重复回调不会产生副作用 -->
+  <update id="markPaid">
+    update zjudg_order_payment
+    set pay_status='1',transaction_id=#{transactionId},notify_raw=#{notifyRaw},paid_time=sysdate(),update_time=sysdate()
+    where out_trade_no=#{outTradeNo} and pay_status='0'
+  </update>
+
+  <update id="updatePrepayId">
+    update zjudg_order_payment set prepay_id=#{prepayId},update_time=sysdate() where out_trade_no=#{outTradeNo}
+  </update>
+</mapper>

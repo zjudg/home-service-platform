@@ -22,11 +22,8 @@
     { "path": "pages/address/edit/index", "style": { "navigationStyle": "custom" } },
     { "path": "pages/favorite/index", "style": { "navigationStyle": "custom" } },
     { "path": "pages/settings/index", "style": { "navigationStyle": "custom" } },
-    { "path": "pages/contract-sign/index", "style": { "navigationStyle": "custom" } },
     { "path": "pages/certificates/index", "style": { "navigationStyle": "custom" } },
-    { "path": "pages/service-fee/index", "style": { "navigationStyle": "custom" } },
-    { "path": "pages/my-business/index", "style": { "navigationStyle": "custom" } },
-    { "path": "pages/admin-tools/index", "style": { "navigationStyle": "custom" } },
+    { "path": "pages/legal/index", "style": { "navigationStyle": "custom" } },
     { "path": "pages/login/index", "style": { "navigationStyle": "custom" } }
   ],
   "subPackages": [

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjude.system.mapper.ZjudgOrderMapper">
-  <resultMap id="OrderResult" type="com.zjude.system.domain.ZjudgOrder"><id property="orderId" column="order_id"/><result property="orderNo" column="order_no"/><result property="serviceId" column="service_id"/><result property="serviceName" column="service_name"/><result property="serviceImage" column="service_image"/><result property="categoryName" column="category_name"/><result property="categoryImage" column="category_image"/><result property="cityId" column="city_id"/><result property="userId" column="user_id"/><result property="userInfo" column="user_info"/><result property="masterId" column="master_id"/><result property="dispatchStatus" column="dispatch_status"/><result property="dispatchTime" column="dispatch_time"/><result property="settleStatus" column="settle_status"/><result property="masterIncome" column="master_income"/><result property="platformFee" column="platform_fee"/><result property="settleTime" column="settle_time"/><result property="acceptTime" column="accept_time"/><result property="startTime" column="start_time"/><result property="finishTime" column="finish_time"/><result property="finishPhotos" column="finish_photos"/><result property="appointmentDate" column="appointment_date"/><result property="slotId" column="slot_id"/><result property="slotName" column="slot_name"/><result property="quantity" column="quantity"/><result property="quantityUnit" column="quantity_unit"/><result property="address" column="address"/><result property="phone" column="phone"/><result property="amount" column="amount"/><result property="orderStatus" column="order_status"/><result property="paymentStatus" column="payment_status"/><result property="reviewed" column="reviewed"/><result property="remark" column="remark"/><result property="createBy" column="create_by"/><result property="createTime" column="create_time"/><result property="updateBy" column="update_by"/></resultMap>
-  <sql id="columns">o.order_id,o.order_no,o.service_id,o.service_name,(select s.carousel_images from zjudg_service s where s.service_id=o.service_id) service_image,(select c.category_name from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id where s.service_id=o.service_id) category_name,(select c.image_url from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id where s.service_id=o.service_id) category_image,o.city_id,o.user_id,o.user_info,o.master_id,o.dispatch_status,o.dispatch_time,o.accept_time,o.start_time,o.finish_time,o.finish_photos,o.appointment_date,o.slot_id,o.slot_name,o.quantity,o.quantity_unit,o.address,o.phone,o.amount,o.order_status,o.payment_status,o.settle_status,o.master_income,o.platform_fee,o.settle_time,o.remark,o.create_by,o.create_time,o.update_time,(select count(1) from zjudg_service_review r where r.order_id=o.order_id) reviewed</sql>
+  <resultMap id="OrderResult" type="com.zjude.system.domain.ZjudgOrder"><id property="orderId" column="order_id"/><result property="orderNo" column="order_no"/><result property="serviceId" column="service_id"/><result property="serviceName" column="service_name"/><result property="serviceImage" column="service_image"/><result property="categoryName" column="category_name"/><result property="categoryImage" column="category_image"/><result property="cityId" column="city_id"/><result property="userId" column="user_id"/><result property="userInfo" column="user_info"/><result property="adminUserInfo" column="admin_user_info"/><result property="masterId" column="master_id"/><result property="dispatchStatus" column="dispatch_status"/><result property="dispatchTime" column="dispatch_time"/><result property="settleStatus" column="settle_status"/><result property="masterIncome" column="master_income"/><result property="platformFee" column="platform_fee"/><result property="settleTime" column="settle_time"/><result property="acceptTime" column="accept_time"/><result property="startTime" column="start_time"/><result property="finishTime" column="finish_time"/><result property="finishPhotos" column="finish_photos"/><result property="appointmentDate" column="appointment_date"/><result property="slotId" column="slot_id"/><result property="slotName" column="slot_name"/><result property="quantity" column="quantity"/><result property="quantityUnit" column="quantity_unit"/><result property="address" column="address"/><result property="phone" column="phone"/><result property="amount" column="amount"/><result property="masterPrice" column="master_price"/><result property="orderStatus" column="order_status"/><result property="paymentStatus" column="payment_status"/><result property="paymentSource" column="payment_source"/><result property="reviewed" column="reviewed"/><result property="remark" column="remark"/><result property="createBy" column="create_by"/><result property="createTime" column="create_time"/><result property="updateBy" column="update_by"/></resultMap>
+  <sql id="columns">o.order_id,o.order_no,o.service_id,o.service_name,(select s.carousel_images from zjudg_service s where s.service_id=o.service_id) service_image,(select c.category_name from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id where s.service_id=o.service_id) category_name,(select c.image_url from zjudg_service s left join zjudg_service_category c on c.category_id=s.category_id where s.service_id=o.service_id) category_image,o.city_id,o.user_id,o.user_info,o.master_id,o.dispatch_status,o.dispatch_time,o.accept_time,o.start_time,o.finish_time,o.finish_photos,o.appointment_date,o.slot_id,o.slot_name,o.quantity,o.quantity_unit,o.address,o.phone,o.amount,o.master_price,o.order_status,o.payment_status,o.payment_source,o.settle_status,o.master_income,o.platform_fee,o.settle_time,o.remark,o.create_by,o.create_time,o.update_time,(select count(1) from zjudg_service_review r where r.order_id=o.order_id) reviewed</sql>
   <sql id="selectListWhere">
     <where>
+      <if test="orderId != null and orderId != ''">and o.order_id=#{orderId}</if>
       <if test="orderNo != null and orderNo != ''">and o.order_no like concat('%',#{orderNo},'%')</if>
       <if test="userId != null and userId != ''">and o.user_id=#{userId}</if>
       <if test="serviceId != null and serviceId != ''">and o.service_id=#{serviceId}</if>
       <if test="serviceName != null and serviceName != ''">and o.service_name like concat('%',#{serviceName},'%')</if>
-      <if test="userInfo != null and userInfo != ''">and o.user_info like concat('%',#{userInfo},'%')</if>
+      <if test="userInfo != null and userInfo != ''">and (o.user_info like concat('%',#{userInfo},'%') or exists (select 1 from sys_user su where su.user_id=o.user_id and (su.nick_name like concat('%',#{userInfo},'%') or su.user_name like concat('%',#{userInfo},'%'))))</if>
       <if test="phone != null and phone != ''">and o.phone like concat('%',#{phone},'%')</if>
       <if test="masterId != null and masterId != ''">and o.master_id=#{masterId}</if>
       <if test="orderStatus != null and orderStatus != ''">and o.order_status=#{orderStatus}</if>
@@ -24,6 +25,17 @@
     select <include refid="columns"/> from zjudg_order o
     <include refid="selectListWhere"/>
     order by o.create_time desc
+  </select>
+  <select id="selectAdminList" resultMap="OrderResult">
+    select <include refid="columns"/>,coalesce(nullif(u.nick_name,''),nullif(o.user_info,''),'-') admin_user_info from zjudg_order o
+    left join sys_user u on u.user_id=o.user_id
+    <include refid="selectListWhere"/>
+    order by o.create_time desc
+  </select>
+  <select id="selectAdminById" resultMap="OrderResult">
+    select <include refid="columns"/>,coalesce(nullif(u.nick_name,''),nullif(o.user_info,''),'-') admin_user_info from zjudg_order o
+    left join sys_user u on u.user_id=o.user_id
+    where o.order_id=#{id}
   </select>
   <select id="selectListByUser" resultMap="OrderResult">
     select <include refid="columns"/> from zjudg_order o
@@ -41,13 +53,17 @@
     select count(1) from zjudg_order o
     <include refid="selectListWhere"/>
   </select>
+  <select id="selectAdminList_COUNT" resultType="long">
+    select count(1) from zjudg_order o
+    <include refid="selectListWhere"/>
+  </select>
   <select id="selectById" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o where o.order_id=#{id}</select>
   <select id="selectByIdAndUser" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o where o.order_id=#{id} and o.user_id=#{userId}</select>
   <select id="selectByIdAndMaster" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o where o.order_id=#{id} and o.master_id=#{masterId}</select>
 
-  <!-- 待接单池：仅返回未指派、仍待接单、预约日期不早于今天的订单 -->
+  <!-- 待接单池：仅返回已收款、未指派、仍待接单、预约日期不早于今天的订单 -->
   <select id="selectPendingPool" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o
-    where o.master_id is null and o.order_status='0' and o.appointment_date &gt;= #{appointmentDate}
+    where o.master_id is null and o.order_status='0' and o.payment_status='1' and o.appointment_date &gt;= #{appointmentDate}
     <if test="slotId != null and slotId != ''">and o.slot_id=#{slotId}</if>
     order by o.appointment_date asc, o.create_time asc</select>
 
@@ -59,7 +75,7 @@
   <select id="selectPendingPoolBySkills" resultMap="OrderResult">
     select <include refid="columns"/> from zjudg_order o
     left join zjudg_service s on s.service_id = o.service_id
-    where o.master_id is null and o.order_status='0' and o.appointment_date &gt;= #{appointmentDate}
+    where o.master_id is null and o.order_status='0' and o.payment_status='1' and o.appointment_date &gt;= #{appointmentDate}
     <if test="slotId != null and slotId != ''">and o.slot_id=#{slotId}</if>
     and (
       s.category_id in
@@ -73,9 +89,37 @@
 
   <select id="countActiveBySlot" resultType="int">select count(1) from zjudg_order where slot_id=#{slotId} and appointment_date=#{appointmentDate} and order_status &lt;&gt; '3'</select>
   <select id="selectFinishedByUser" resultMap="OrderResult">select <include refid="columns"/> from zjudg_order o where o.order_id=#{id} and o.user_id=#{userId} and o.order_status='2'</select>
-  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgOrder">insert into zjudg_order(order_id,order_no,service_id,service_name,city_id,user_id,user_info,appointment_date,slot_id,slot_name,quantity,quantity_unit,address,phone,amount,order_status,payment_status,create_by,create_time,remark) values(#{orderId},#{orderNo},#{serviceId},#{serviceName},#{cityId},#{userId},#{userInfo},#{appointmentDate},#{slotId},#{slotName},#{quantity},#{quantityUnit},#{address},#{phone},#{amount},#{orderStatus},#{paymentStatus},#{createBy},sysdate(),#{remark})</insert>
+  <insert id="insert" parameterType="com.zjude.system.domain.ZjudgOrder">insert into zjudg_order(order_id,order_no,service_id,service_name,city_id,user_id,user_info,appointment_date,slot_id,slot_name,quantity,quantity_unit,address,phone,amount,master_price,order_status,payment_status,payment_source,create_by,create_time,remark) values(#{orderId},#{orderNo},#{serviceId},#{serviceName},#{cityId},#{userId},#{userInfo},#{appointmentDate},#{slotId},#{slotName},#{quantity},#{quantityUnit},#{address},#{phone},#{amount},#{masterPrice},#{orderStatus},#{paymentStatus},#{paymentSource},#{createBy},sysdate(),#{remark})</insert>
   <update id="updateStatusOwned">update zjudg_order set order_status=#{targetStatus},update_by=#{operator},update_time=sysdate() where order_id=#{id} and user_id=#{userId} and order_status=#{fromStatus}</update>
   <update id="updateStatus">update zjudg_order set order_status=#{targetStatus},update_by=#{operator},update_time=sysdate() where order_id=#{id}</update>
+
+  <!-- 仅清理已取消、未支付、未指派且没有关联记录的订单，避免破坏支付与履约审计链。 -->
+  <delete id="deleteAdminIfUnreferenced">
+    delete from zjudg_order
+    where order_id=#{id}
+      and order_status='3'
+      and payment_status='0'
+      and (master_id is null or master_id='')
+      and not exists (select 1 from zjudg_order_payment p where p.order_id=zjudg_order.order_id)
+      and not exists (select 1 from zjudg_refund r where r.order_id=zjudg_order.order_id)
+      and not exists (select 1 from zjudg_service_review r where r.order_id=zjudg_order.order_id)
+      and not exists (select 1 from zjudg_order_extra_time e where e.order_id=zjudg_order.order_id)
+      and not exists (select 1 from zjudg_dispatch_record d where d.order_id=zjudg_order.order_id)
+  </delete>
+
+  <delete id="deleteUserIfUnreferenced">
+    delete from zjudg_order
+    where order_id=#{id}
+      and user_id=#{userId}
+      and order_status='3'
+      and payment_status='0'
+      and (master_id is null or master_id='')
+      and not exists (select 1 from zjudg_order_payment p where p.order_id=zjudg_order.order_id)
+      and not exists (select 1 from zjudg_refund r where r.order_id=zjudg_order.order_id)
+      and not exists (select 1 from zjudg_service_review r where r.order_id=zjudg_order.order_id)
+      and not exists (select 1 from zjudg_order_extra_time e where e.order_id=zjudg_order.order_id)
+      and not exists (select 1 from zjudg_dispatch_record d where d.order_id=zjudg_order.order_id)
+  </delete>
 
   <!-- 抢单：master_id is null 条件保证两名师傅并发接单时只有一人成功 -->
   <update id="claimOrder">update zjudg_order set master_id=#{masterId},order_status=#{targetStatus},accept_time=sysdate(),update_by=#{operator},update_time=sysdate() where order_id=#{id} and order_status=#{fromStatus} and master_id is null</update>
@@ -148,6 +192,7 @@
   <select id="selectDispatchPending" resultMap="OrderResult">
     select <include refid="columns"/> from zjudg_order o
     where o.master_id is null and o.order_status='0' and o.payment_status='1' and o.dispatch_status='0'
+      and o.payment_source &lt;&gt; 'OFFLINE'
     order by o.create_time asc
     limit 50
   </select>

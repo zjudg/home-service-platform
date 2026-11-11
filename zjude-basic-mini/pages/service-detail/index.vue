@@ -155,7 +155,7 @@ const notices = [
 ]
 
 const serviceImage = computed(() => {
-  const images = service.value?.carouselImages || service.value?.imageUrl || ''
+  const images = service.value?.detailImage || service.value?.carouselImages || service.value?.imageUrl || ''
   return (Array.isArray(images) ? images : String(images).split(',')).map(value => String(value).trim()).find(Boolean) || ''
 })
 

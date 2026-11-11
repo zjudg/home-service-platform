@@ -105,13 +105,23 @@
         min-width="180"
       />
       <el-table-column
-        label="服务图片"
+        label="商品用途"
+        width="110"
+      >
+        <template #default="{ row }">
+          <el-tag :type="Number(row.extraTimeOnly) === 1 ? 'warning' : 'info'">
+            {{ Number(row.extraTimeOnly) === 1 ? '补时专用' : '普通服务' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="商品图"
         width="100"
       >
         <template #default="{ row }">
           <image-preview
-            v-if="getServiceImage(row.carouselImages)"
-            :src="getServiceImage(row.carouselImages)"
+            v-if="getServiceImage(row.productImage || row.carouselImages)"
+            :src="getServiceImage(row.productImage || row.carouselImages)"
             width="64"
             height="64"
           />
@@ -125,6 +135,18 @@
         label="价格"
         prop="price"
       />
+      <el-table-column
+        label="中介费"
+      >
+        <template #default="{ row }">
+          {{ formatMoney(getCommissionFee(row)) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="扣款方式">
+        <template #default="{ row }">
+          {{ row.commissionType === 'RATE' ? `按比例 ${formatPercent(row.commissionRate)}` : '固定金额' }}
+        </template>
+      </el-table-column>
       <el-table-column
         label="单位"
         prop="unitName"
@@ -198,8 +220,9 @@
         >
           <el-form
             ref="formRef"
+            class="service-form"
             :model="form"
-            label-width="100px"
+            label-width="130px"
           >
             <el-form-item
               label="服务名称"
@@ -242,14 +265,28 @@
                 留空时该服务对所有城市可见；选择城市后仅该城市可见
               </div>
             </el-form-item><el-form-item
-              label="轮播图"
+              class="form-item-wide"
+              label="详情主图"
+              required
             >
-              <image-upload
-                v-model="form.carouselImages"
-                :limit="10"
+              <MaterialImageField
+                v-model="form.detailImage"
+                :limit="1"
               />
               <div class="form-tip">
-                建议尺寸：800×800，最多上传10张
+                服务详情页顶部展示，建议上传清晰横图或方图
+              </div>
+            </el-form-item><el-form-item
+              class="form-item-wide"
+              label="商品图"
+              required
+            >
+              <MaterialImageField
+                v-model="form.productImage"
+                :limit="1"
+              />
+              <div class="form-tip">
+                商品列表、首页推荐、搜索和预约摘要中展示
               </div>
             </el-form-item><el-form-item
               label="价格"
@@ -259,12 +296,70 @@
                 v-model="form.price"
                 :min="0"
                 :precision="2"
+                @change="syncPayoutPrice"
               />
             </el-form-item><el-form-item label="划线价">
               <el-input-number
                 v-model="form.originalPrice"
                 :min="0"
                 :precision="2"
+              />
+            </el-form-item><el-form-item
+              class="form-item-wide"
+              label="平台扣款方式"
+              required
+            >
+              <el-radio-group
+                v-model="form.commissionType"
+                @change="syncPayoutPrice"
+              >
+                <el-radio-button value="FIXED">
+                  固定金额
+                </el-radio-button>
+                <el-radio-button value="RATE">
+                  按百分比
+                </el-radio-button>
+              </el-radio-group>
+            </el-form-item><el-form-item
+              v-if="form.commissionType === 'FIXED'"
+              label="中介费"
+              required
+            >
+              <el-input-number
+                v-model="form.commissionFee"
+                :min="0"
+                :max="Number(form.price || 0)"
+                :precision="2"
+                @change="syncPayoutPrice"
+              />
+              <div class="form-tip">
+                每个服务单位扣固定金额；师傅到手 = 卖价 − 中介费。例如 90 − 15 = 75
+              </div>
+            </el-form-item><el-form-item
+              v-else
+              label="中介费比例"
+              required
+            >
+              <el-input-number
+                v-model="form.commissionRatePercent"
+                :min="0"
+                :max="100"
+                :precision="2"
+                :step="1"
+                @change="syncPayoutPrice"
+              />%
+              <div class="form-tip">
+                按服务卖价计算平台中介费，师傅到手 = 卖价 × (1 − 扣款比例)
+              </div>
+            </el-form-item><el-form-item
+              label="师傅到手"
+              required
+            >
+              <el-input-number
+                :model-value="calculatePayout(form)"
+                :min="0"
+                :precision="2"
+                disabled
               />
             </el-form-item><el-form-item
               label="服务单位"
@@ -324,6 +419,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import MaterialImageField from '@/components/MaterialImageField'
 import { listService, getService, addService, updateService, deleteService } from '@/api/zjudg/service'
 import { listCategory } from '@/api/zjudg/category'
 import { listUnit } from '@/api/zjudg/unit'
@@ -333,17 +429,65 @@ const loading = ref(false); const rows = ref([]); const total = ref(0); const se
 const query = reactive({ pageNum: 1, pageSize: 10, serviceName: '', categoryId: '', cityId: '', status: '' }); const form = reactive({})
 function load () { loading.value = true; listService(query).then(res => { rows.value = res.rows || []; total.value = res.total || 0 }).finally(() => { loading.value = false }) }
 function reset () { Object.assign(query, { pageNum: 1, serviceName: '', categoryId: '', cityId: '', status: '' }); load() }
-function blank () { Object.keys(form).forEach(key => delete form[key]); Object.assign(form, { serviceName: '', serviceIntro: '', categoryId: '', cityId: '', carouselImages: '', price: 0, originalPrice: null, unitId: '', sortNum: 0, status: '1', detailContent: '' }) }
+function blank () { Object.keys(form).forEach(key => delete form[key]); Object.assign(form, { serviceName: '', serviceIntro: '', categoryId: '', cityId: '', carouselImages: '', detailImage: '', productImage: '', price: 0, commissionType: 'FIXED', commissionRate: 0, commissionRatePercent: 0, commissionFee: 0, masterPrice: 0, originalPrice: null, unitId: '', extraTimeOnly: 0, sortNum: 0, status: '1', detailContent: '' }) }
+function formatMoney (value) { return `¥${Number(value || 0).toFixed(2)}` }
+function formatPercent (value) { return `${(Number(value || 0) * 100).toFixed(2).replace(/\\.00$/, '')}%` }
+function getCommissionFee (row) { return row.commissionType === 'RATE' ? Number(row.price || 0) * Number(row.commissionRate || 0) : Number(row.price || 0) - Number(row.masterPrice || 0) }
+function calculatePayout (item) { const price = Number(item.price || 0); return item.commissionType === 'RATE' ? Number((price * (1 - Number(item.commissionRatePercent || 0) / 100)).toFixed(2)) : Number((price - Number(item.commissionFee || 0)).toFixed(2)) }
+function syncPayoutPrice () { form.masterPrice = calculatePayout(form); form.commissionRate = form.commissionType === 'RATE' ? Number((Number(form.commissionRatePercent || 0) / 100).toFixed(4)) : 0 }
 function getServiceImage (images) {
   if (Array.isArray(images)) return images[0] || ''
   if (typeof images !== 'string') return ''
   return images.split(',').map(image => image.trim()).find(Boolean) || ''
 }
-function openForm (id) { blank(); activeTab.value = 'base'; formVisible.value = true; if (id) getService(id).then(res => Object.assign(form, res.data)) }
-function save () { const action = form.serviceId ? updateService : addService; action(form).then(() => { ElMessage.success('保存成功'); formVisible.value = false; load() }) }
+function openForm (id) { blank(); activeTab.value = 'base'; formVisible.value = true; if (id) getService(id).then(res => { Object.assign(form, res.data); const legacyImage = getServiceImage(res.data.carouselImages); form.detailImage = res.data.detailImage || legacyImage; form.productImage = res.data.productImage || legacyImage; form.commissionType = res.data.commissionType || 'RATE'; form.commissionRatePercent = Number((Number(res.data.commissionRate || 0) * 100).toFixed(2)); form.commissionFee = Number((Number(res.data.price || 0) - Number(res.data.masterPrice || 0)).toFixed(2)); syncPayoutPrice() }) }
+function save () { const price = Number(form.price || 0); const rate = Number(form.commissionRatePercent || 0); const fee = Number(form.commissionFee || 0); const selectedUnit = units.value.find(item => item.unitId === form.unitId); const isExtraTimeProduct = String(form.serviceName || '').trim() === '补时专用'; if (isExtraTimeProduct && selectedUnit?.measureType !== 'HOUR') { ElMessage.error('补时专用服务必须使用按小时计量的服务单位'); return }; if (!form.detailImage) { ElMessage.error('请上传服务详情主图'); return }; if (!form.productImage) { ElMessage.error('请上传商品列表图'); return }; if (form.commissionType === 'RATE' && (rate < 0 || rate > 100)) { ElMessage.error('中介费比例需在0%到100%之间'); return }; if (form.commissionType === 'FIXED' && (fee < 0 || fee > price)) { ElMessage.error('中介费不能高于服务卖价'); return }; syncPayoutPrice(); const payload = { ...form, extraTimeOnly: isExtraTimeProduct ? 1 : 0 }; delete payload.commissionFee; delete payload.commissionRatePercent; const action = form.serviceId ? updateService : addService; action(payload).then(() => { ElMessage.success('保存成功'); formVisible.value = false; load() }) }
 function remove (ids) { ElMessageBox.confirm('确认删除选中的服务吗？', '提示', { type: 'warning' }).then(() => deleteService(ids.join(',')).then(() => { ElMessage.success('删除成功'); load() })) }
 function removeSelected () { remove(selected.value.map(item => item.serviceId)) }
 onMounted(() => { Promise.all([listCategory({ pageSize: 100 }), listUnit({ pageSize: 100 }), listCity({ pageSize: 500 })]).then(([c, u, ct]) => { categories.value = c.rows || []; units.value = u.rows || []; cityOptions.value = ct.rows || [] }); load() })
 </script>
 
-<style scoped>.detail-preview{border:1px solid #ebeef5;padding:16px;min-height:80px}.form-tip{color:#909399;font-size:12px}.mb8{margin-bottom:8px}</style>
+<style scoped>
+.service-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+  width: 100%;
+}
+
+.service-form :deep(.el-form-item) {
+  min-width: 0;
+  margin-right: 0;
+}
+
+.service-form :deep(.form-item-wide) {
+  grid-column: 1 / -1;
+}
+
+.service-form :deep(.el-form-item__label) {
+  white-space: nowrap;
+}
+
+.service-form :deep(.el-form-item__content) {
+  min-width: 0;
+}
+
+.service-form :deep(.el-select) {
+  max-width: 100%;
+}
+
+.detail-preview{border:1px solid #ebeef5;padding:16px;min-height:80px}
+.form-tip{color:#909399;font-size:12px}
+.mb8{margin-bottom:8px}
+
+@media (max-width: 760px) {
+  .service-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .service-form :deep(.form-item-wide) {
+    grid-column: auto;
+  }
+
+}
+</style>

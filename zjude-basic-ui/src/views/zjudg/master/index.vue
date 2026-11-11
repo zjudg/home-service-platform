@@ -130,8 +130,7 @@
           <el-link
             v-if="row.healthCertUrl"
             type="primary"
-            :href="assetUrl(row.healthCertUrl)"
-            target="_blank"
+            @click="openCertificatePreview(row.healthCertUrl, '健康证')"
           >
             查看证书
           </el-link>
@@ -146,8 +145,7 @@
           <el-link
             v-if="row.skillCertUrl"
             type="primary"
-            :href="assetUrl(row.skillCertUrl)"
-            target="_blank"
+            @click="openCertificatePreview(row.skillCertUrl, '技能证书')"
           >
             查看证书
           </el-link>
@@ -364,8 +362,7 @@
           <el-link
             v-if="auditTarget.healthCertUrl"
             type="primary"
-            :href="assetUrl(auditTarget.healthCertUrl)"
-            target="_blank"
+            @click="openCertificatePreview(auditTarget.healthCertUrl, '健康证')"
           >
             查看
           </el-link>
@@ -375,8 +372,7 @@
           <el-link
             v-if="auditTarget.skillCertUrl"
             type="primary"
-            :href="assetUrl(auditTarget.skillCertUrl)"
-            target="_blank"
+            @click="openCertificatePreview(auditTarget.skillCertUrl, '技能证书')"
           >
             查看
           </el-link>
@@ -428,6 +424,29 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="certificatePreviewVisible"
+      :title="certificatePreviewTitle"
+      width="min(860px, 92vw)"
+      append-to-body
+      destroy-on-close
+      class="certificate-preview-dialog"
+    >
+      <div class="certificate-preview">
+        <el-image
+          :src="certificatePreviewUrl"
+          fit="contain"
+          class="certificate-preview-image"
+        >
+          <template #error>
+            <div class="certificate-preview-error">
+              证书图片加载失败
+            </div>
+          </template>
+        </el-image>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -476,12 +495,22 @@ const selected = ref([])
 const visible = ref(false)
 const auditVisible = ref(false)
 const auditLocked = ref(false)
+const certificatePreviewVisible = ref(false)
+const certificatePreviewUrl = ref('')
+const certificatePreviewTitle = ref('证书预览')
 const formRef = ref(null)
 
 const query = reactive({ pageNum: 1, pageSize: 10, masterName: '', phone: '', auditStatus: '', status: '' })
 const form = reactive({})
 const auditForm = reactive({ masterId: '', auditStatus: '1', auditRemark: '' })
 const auditTarget = ref({})
+
+function openCertificatePreview (url, title) {
+  if (!url) return
+  certificatePreviewUrl.value = assetUrl(url)
+  certificatePreviewTitle.value = title || '证书预览'
+  certificatePreviewVisible.value = true
+}
 
 const rules = {
   masterName: [{ required: true, message: '请输入师傅姓名', trigger: 'blur' }],
@@ -606,4 +635,7 @@ onMounted(load)
 .audit-form { margin-top: 8px; }
 .masked-hint { margin-left: 6px; color: #909399; font-size: 12px; }
 .form-hint { margin-left: 10px; color: #e6a23c; font-size: 12px; }
+.certificate-preview { display: flex; justify-content: center; align-items: center; min-height: 200px; max-height: 72vh; overflow: auto; background: #f5f7fa; }
+.certificate-preview-image { width: 100%; height: min(72vh, 760px); }
+.certificate-preview-error { display: flex; justify-content: center; align-items: center; width: 100%; height: 240px; color: #909399; }
 </style>

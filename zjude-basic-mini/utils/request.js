@@ -54,7 +54,7 @@ export function upload (filePath, options = {}) {
       filePath,
       name: options.name || 'file',
       formData: options.formData || {},
-      header: token ? { Authorization: `Bearer ${token}` } : {},
+      header: token && options.auth !== false ? { Authorization: `Bearer ${token}` } : {},
       success: ({ statusCode, data }) => {
         let response = data
         try { response = typeof data === 'string' ? JSON.parse(data) : data } catch (error) { /* keep raw response */ }

@@ -17,6 +17,12 @@ public interface ZjudgOrderMapper
      */
     List<ZjudgOrder> selectList(ZjudgOrder query);
 
+    /** 管理端条件查询，回填未脱敏用户昵称。 */
+    List<ZjudgOrder> selectAdminList(ZjudgOrder query);
+
+    /** 管理后台订单详情，用户信息使用未脱敏昵称。 */
+    ZjudgOrder selectAdminById(String id);
+
     /**
      * 查询指定用户的订单列表。
      *
@@ -119,6 +125,12 @@ public interface ZjudgOrderMapper
      */
     int updateStatus(@Param("id") String id, @Param("targetStatus") String targetStatus,
             @Param("operator") String operator);
+
+    /** 删除无关联记录且仍符合可删除条件的订单。 */
+    int deleteAdminIfUnreferenced(@Param("id") String id);
+
+    /** 删除仍归属指定用户且没有关联记录的已取消订单。 */
+    int deleteUserIfUnreferenced(@Param("id") String id, @Param("userId") String userId);
 
     /**
      * 查询用户已完成订单用于评价校验。

@@ -97,7 +97,7 @@ function serviceCount (categoryId) {
 }
 
 function responseList (response) { return response?.rows || response?.data?.rows || (Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : []) }
-function serviceImage (item) { const images = item?.carouselImages || item?.imageUrl || ''; return (Array.isArray(images) ? images : String(images).split(',')).map(value => String(value).trim()).find(Boolean) || '' }
+function serviceImage (item) { const images = item?.productImage || item?.carouselImages || item?.imageUrl || ''; return (Array.isArray(images) ? images : String(images).split(',')).map(value => String(value).trim()).find(Boolean) || '' }
 
 onMounted(async () => {
   await configStore.load().catch(() => {})

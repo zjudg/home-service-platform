@@ -127,6 +127,31 @@
         <UiPrice :value="order.amount || 0" size="lg" />
       </view>
 
+      <UiSection v-if="order.extraTimeProduct" title="补时支付">
+        <view class="extra-time-card card">
+          <text class="extra-time-title">{{ order.extraTimeProduct.serviceName }} · ¥{{ amountText(order.extraTimeProduct.price) }}/小时</text>
+          <view v-for="item in order.extraTimes || []" :key="item.extraTimeId" class="extra-time-row">
+            <view class="extra-time-copy">
+              <text>{{ item.hours }}小时补时 · ¥{{ amountText(item.amount) }}</text>
+              <text class="extra-time-status">{{ String(item.paymentStatus) === '1' ? '已支付' : '待支付' }}</text>
+            </view>
+            <button v-if="String(item.paymentStatus) !== '1'" class="ghost-button extra-time-pay" @click="payExtraTime(item)">继续支付</button>
+          </view>
+          <template v-if="!hasPendingExtraTime">
+            <view class="extra-time-stepper">
+              <text>补时时长</text>
+              <view class="stepper-control">
+                <button class="stepper-button" :disabled="extraTimeHours <= 1" @click="extraTimeHours = Math.max(1, extraTimeHours - 1)">−</button>
+                <text>{{ extraTimeHours }}小时</text>
+                <button class="stepper-button" :disabled="extraTimeHours >= 24" @click="extraTimeHours = Math.min(24, extraTimeHours + 1)">＋</button>
+              </view>
+            </view>
+            <text class="extra-time-total">需补付 ¥{{ amountText(Number(order.extraTimeProduct.price || 0) * extraTimeHours) }}</text>
+            <button class="primary-button action-btn" :loading="extraTimeSubmitting" @click="createAndPayExtraTime">确认补时并支付</button>
+          </template>
+        </view>
+      </UiSection>
+
       <!-- 操作 -->
       <view class="actions">
         <button v-if="canPayOrder(order)" class="primary-button action-btn" @click="pay">立即支付</button>
@@ -150,9 +175,9 @@ import AppFeedback from '@/components/AppFeedback.vue'
 import UiSection from '@/components/ui/UiSection.vue'
 import UiPrice from '@/components/ui/UiPrice.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
-import { cancelOrder, confirmOrder, getOrder } from '@/api/service'
+import { cancelOrder, confirmOrder, createExtraTimeOrder, getOrder } from '@/api/service'
 import { canPayOrder, USER_ORDER_STEPS, userOrderStatusDesc, userOrderStatusLabel, userStepIndex } from '@/constants/order'
-import { payOrder, requestSubscribe } from '@/composables/usePayment'
+import { payBusiness, payOrder, requestSubscribe } from '@/composables/usePayment'
 import { useConfigStore } from '@/stores/config'
 import { currentPageUrl, ensureLoggedIn } from '@/utils/guard'
 import { toastSuccess, showToast } from '@/utils/feedback'
@@ -161,6 +186,9 @@ import { assetUrl } from '@/utils/assets'
 const order = reactive({})
 const configStore = useConfigStore()
 const errorMessage = ref('')
+const extraTimeHours = ref(1)
+const extraTimeSubmitting = ref(false)
+const hasPendingExtraTime = computed(() => (order.extraTimes || []).some(item => String(item.paymentStatus) !== '1'))
 
 // 状态推进顺序：下单 → 师傅接单 → 服务中 → 完成
 const STEPS = USER_ORDER_STEPS
@@ -255,6 +283,32 @@ async function pay () {
     }
   } catch (e) {
     showToast(e.message || '支付失败')
+  }
+}
+
+async function createAndPayExtraTime () {
+  if (extraTimeSubmitting.value || !order.extraTimeProduct) return
+  extraTimeSubmitting.value = true
+  try {
+    const response = await createExtraTimeOrder(order.orderId, extraTimeHours.value)
+    const item = response?.data || response
+    order.extraTimes = [item, ...(order.extraTimes || [])]
+    await payExtraTime(item)
+  } catch (e) {
+    showToast(e.message || '补时支付失败')
+  } finally {
+    extraTimeSubmitting.value = false
+  }
+}
+
+async function payExtraTime (item) {
+  try {
+    await payBusiness('T', item.extraTimeId)
+    item.paymentStatus = '1'
+    item.paidTime = new Date().toLocaleString()
+    toastSuccess('补时支付成功')
+  } catch (e) {
+    showToast(e.message || '补时支付失败')
   }
 }
 
@@ -440,6 +494,18 @@ function review () { uni.navigateTo({ url: `/pages/review/index?id=${order.order
 }
 
 .amount-label { font-size: $font-caption; color: $ink-500; }
+
+.extra-time-card { padding: $space-4; }
+.extra-time-title { display: block; font-size: $font-caption; color: $ink-700; }
+.extra-time-row { display: flex; align-items: center; justify-content: space-between; gap: $space-2; padding: $space-3 0; border-bottom: 1rpx solid $line-soft; }
+.extra-time-copy { display: flex; flex-direction: column; gap: 6rpx; font-size: $font-caption; color: $ink-700; }
+.extra-time-status { font-size: $font-micro; color: $ink-400; }
+.extra-time-pay { margin: 0; padding: 0 $space-3; height: 60rpx; line-height: 58rpx; font-size: $font-micro; }
+.extra-time-stepper { display: flex; align-items: center; justify-content: space-between; padding-top: $space-3; font-size: $font-caption; color: $ink-700; }
+.stepper-control { display: flex; align-items: center; gap: $space-3; }
+.stepper-button { width: 58rpx; height: 58rpx; line-height: 54rpx; margin: 0; padding: 0; border-radius: 50%; background: $bg-sunken; color: $ink-700; font-size: 34rpx; }
+.stepper-button[disabled] { color: $ink-300; }
+.extra-time-total { display: block; margin-top: $space-3; text-align: right; font-size: $font-caption; color: $brand-600; font-weight: $weight-semibold; }
 
 /* ---------- 操作 ---------- */
 .actions { display: flex; flex-direction: column; gap: $space-2; margin-top: $space-4; }

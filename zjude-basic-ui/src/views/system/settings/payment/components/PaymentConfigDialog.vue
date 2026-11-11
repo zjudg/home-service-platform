@@ -52,7 +52,7 @@
             关闭
           </el-radio>
         </el-radio-group>
-        <ImageUpload
+        <MaterialImageField
           v-else-if="field.type === 'image'"
           v-model="form[field.key]"
           :limit="1"
@@ -97,6 +97,8 @@
 </template>
 
 <script setup>
+import MaterialImageField from '@/components/MaterialImageField'
+
 defineProps({
   modelValue: {
     type: Boolean,

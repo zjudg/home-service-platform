@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjude.system.mapper.ZjudgScheduleLockMapper">
+
+  <!--
+    抢占租约：只有「未被持有」或「已过期」才能抢到。
+    并发下相同 lock_name 的 UPDATE 由 InnoDB 行锁串行化，
+    后到者读到的 expires_at 已是新值，因此影响行数为 0，天然互斥。
+  -->
+  <update id="tryAcquire">
+    update zjudg_schedule_lock
+    set owner = #{owner}, locked_at = #{now}, expires_at = #{expiresAt}
+    where lock_name = #{lockName}
+      and (expires_at is null or expires_at &lt; #{now})
+  </update>
+
+  <!-- 只释放自己持有的锁，避免误删其他实例的租约 -->
+  <update id="release">
+    update zjudg_schedule_lock
+    set owner = null, expires_at = null
+    where lock_name = #{lockName} and owner = #{owner}
+  </update>
+</mapper>

@@ -34,7 +34,7 @@
                 :key="index"
                 class="banner-row"
               >
-                <image-upload
+                <MaterialImageField
                   v-model="banner.image"
                   :limit="1"
                 />
@@ -176,7 +176,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import ImageUpload from '@/components/ImageUpload'
+import MaterialImageField from '@/components/MaterialImageField'
 import {
   customerDecorationApi,
   homeDecorationApi,
@@ -345,7 +345,7 @@ watch(scope, load, { immediate: true })
 .decoration-editor { flex: 1; padding: 0 30px; position: relative; }
 .decoration-editor h3 { font-weight: 500; border-left: 3px solid #405dff; padding-left: 10px; }
 .banner-row { display: flex; align-items: center; gap: 12px; padding: 14px; background: #fafafa; margin-bottom: 12px; max-width: 900px; width: 100%; }
-.banner-row .image-upload { width: 100px; }
+.banner-row .material-image-field { width: 150px; flex: 0 0 150px; }
 .decoration-tip { max-width: 760px; margin: 8px 0 0; color: var(--el-text-color-secondary); font-size: 13px; line-height: 1.6; }
 .banner-alert { max-width: 900px; margin-bottom: 16px; }
 .save-button { margin-top: 20px; }

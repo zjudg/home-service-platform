@@ -11,8 +11,6 @@ import com.zjude.common.core.domain.entity.SysUser;
  */
 public interface SysUserMapper
 {
-    List<Map<String, Object>> selectMiniRecipients(@Param("keyword") String keyword);
-
     /**
      * 查询可接收订单通知的管理员账号（后台管理员及小程序业务管理员）。
      * 只返回启用且已绑定小程序 openid 的账号。

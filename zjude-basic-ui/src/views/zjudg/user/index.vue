@@ -78,6 +78,15 @@
         </template>
       </el-table-column>
       <el-table-column
+        label="默认地址"
+        min-width="220"
+        show-overflow-tooltip
+      >
+        <template #default="{ row }">
+          {{ row.address || '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column
         label="用户来源"
         prop="sourceLabel"
         width="120"
@@ -125,6 +134,15 @@
         </el-descriptions-item>
         <el-descriptions-item label="手机号">
           {{ current.phoneNumber || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item label="默认地址">
+          {{ current.address || '未设置' }}
+        </el-descriptions-item>
+        <el-descriptions-item label="地址联系人">
+          {{ current.addressContactName || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item label="地址联系电话">
+          {{ current.addressContactPhone || '-' }}
         </el-descriptions-item>
         <el-descriptions-item label="注册来源">
           {{ current.sourceLabel || '-' }}

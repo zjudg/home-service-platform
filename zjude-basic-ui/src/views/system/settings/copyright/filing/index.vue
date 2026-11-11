@@ -68,7 +68,7 @@
             class="qualification-item"
           >
             <el-form-item :label="item.label">
-              <ImageUpload
+              <MaterialImageField
                 v-model="form[item.key]"
                 :limit="item.limit"
                 :file-size="item.fileSize"
@@ -88,7 +88,7 @@
 
 <script setup name="CopyrightFiling">
 import { listConfig, saveConfig } from '@/api/settings/copyright'
-import ImageUpload from '@/components/ImageUpload'
+import MaterialImageField from '@/components/MaterialImageField'
 
 const { proxy } = getCurrentInstance()
 

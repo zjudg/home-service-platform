@@ -55,6 +55,7 @@ public class MiniConfigServiceImpl implements IMiniConfigService
     {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("shopName", value("website.shopName"));
+        result.put("mobileLoginLogo", value("website.mobileLoginLogo"));
         result.put("mobileLogo", value("website.mobileLogo"));
         result.put("memberDefaultAvatar", value("website.memberDefaultAvatar"));
         result.put("goodsDefaultImage", value("website.goodsDefaultImage"));

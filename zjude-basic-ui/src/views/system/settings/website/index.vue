@@ -41,7 +41,7 @@
                   :placeholder="item.placeholder"
                   clearable
                 />
-                <ImageUpload
+                <MaterialImageField
                   v-else
                   v-model="form[item.key]"
                   :limit="1"
@@ -63,7 +63,7 @@
 
 <script setup name="WebsiteSettings">
 import { getWebsiteSettings, saveConfig } from '@/api/settings/website'
-import ImageUpload from '@/components/ImageUpload'
+import MaterialImageField from '@/components/MaterialImageField'
 
 const { proxy } = getCurrentInstance()
 
