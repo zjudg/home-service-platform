@@ -102,6 +102,8 @@ public class SecurityConfig
                     permitAllUrl.getUrls().forEach(url -> requests.requestMatchers(url).permitAll());
                     // 对于登录login 注册register 验证码captcha/image 允许匿名访问
                     requests.requestMatchers("/login", "/register", "/captcha/image", "/api/mini/config/**").permitAll()
+                            // 登录前的小程序头像上传仅接受受限的图片文件，允许匿名上传到配置的存储服务
+                            .requestMatchers(HttpMethod.POST, "/common/upload/avatar").permitAll()
                             // 小程序公开只读数据（服务、分类、时段、城市）
                             .requestMatchers(HttpMethod.GET, "/api/mini/services", "/api/mini/services/*")
                             .permitAll()
